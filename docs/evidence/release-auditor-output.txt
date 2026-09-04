@@ -1,0 +1,50 @@
+**Operator Acceptance Card: GitFlash 0.1.0-alpha.1**
+
+**Scope:** Technical alpha only. This card is based on supplied task evidence only. I did not personally run commands, inspect artifacts, browse, contact anyone, or verify `company-context.json`; no independent tests are claimed.
+
+### 1. Tester Steps
+
+| # | Step | Pass / Fail | Evidence to record |
+|---|---|---|---|
+| 1 | Install the published `0.1.0-alpha.1` npm tarball on macOS arm64 using Node `24.19` with `npm --offline`. Confirm install succeeds and reports zero runtime dependencies. | Pass / Fail: ___ | Command, tarball name, install log excerpt |
+| 2 | Start GitFlash locally. Confirm packaged assets are served over loopback only and no external service setup is required for the manual/template workflow. | Pass / Fail: ___ | Local URL, network/console notes |
+| 3 | Create or load a company and agent, stop the app, restart it, and confirm SQLite persistence preserves the company and agent. | Pass / Fail: ___ | Before/after IDs or screenshots |
+| 4 | Apply the differentiated 20-role and 100-role templates. Confirm the 100-role template creates 100 configured agents and 10 departments. | Pass / Fail: ___ | Template output counts |
+| 5 | Review real Product Analyst output from run `23aac6dc-81d2-4903-9f41-08fb4112ed0a`. Confirm the saved textual brief exists and matches SHA256 `20522a42a7dd48c72800a9eda6fa34f2c983e61db7312871465b680fdfa9592e`. | Pass / Fail: ___ | File/hash verification |
+| 6 | Exercise atomic preview/apply, stale refusal, undo, backup/restore. Confirm restored agent IDs, assignment IDs, and history are preserved. | Pass / Fail: ___ | API/browser notes, IDs before/after |
+
+### 2. Claim / Evidence / Gap Table
+
+| Claim | Supplied evidence | Gap / limitation |
+|---|---|---|
+| Local technical alpha install works offline | npm tarball installed with `npm --offline`; zero runtime dependencies | Not personally verified; final public-download validation pending |
+| Runs on macOS arm64 | Evidence used Node `24.19` on Apple M1 Pro | OS CI matrix pending |
+| Assets are packaged and served locally | Supplied as integrator evidence | Loopback-only behavior still needs operator acceptance check |
+| SQLite restart persistence works | Company and agent persisted across restart | Needs acceptance reproduction |
+| 100-role template works | Added 100 configured agents and 10 departments | Browser responsiveness not established |
+| Atomic preview/apply works | One API smoke run took 24 ms | Not a browser benchmark; needs stale refusal and undo confirmation |
+| Backup/restore works | Preserved agent IDs, assignment IDs, and history | Needs acceptance reproduction |
+| Automated tests pass | Current application has 45 automated tests passing | Test suite not independently run |
+| Product Analyst execution works | Authenticated Codex CLI `0.138.0`, run ID, hash, duration `36.978s` supplied | Only one run; review real output before claim |
+| Buzz integration works | Buzz `0.5.8` imported a two-role test team; runtimes stopped | Effective runtime and task round trip unverified |
+| Slack integration works | None | Slack app/tokens/channel not configured |
+
+### 3. Corrections To Analyst Overreach
+
+The analyst correctly limited the recommendation to a local technical alpha and correctly required checks for loopback, offline setup, SQLite restart persistence, atomic preview/apply, stale refusal, undo, and differentiated 20/100-role templates.
+
+Corrections:
+
+| Analyst overreach | Corrected position |
+|---|---|
+| New human decision required before publishing | Incorrect. Operator has already authorized tested technical prereleases. The remaining issue is evidence completion, not a new authorization decision. |
+| Production-readiness may be implied | Do not claim production-ready. |
+| 100-concurrent-worker capability may be implied | Do not claim this; only a 100-role template creation result is supplied. |
+| Buzz/Slack round trip may be implied | Do not claim. Buzz runtime/task round trip is unverified; Slack is not configured. |
+| Human pilot may be implied | Do not claim. No human pilot occurred. |
+
+### 4. Publication Gate Decision
+
+**Decision:** Conditional acceptance for `GitFlash 0.1.0-alpha.1` as a tested local technical prerelease only.
+
+**Release Lead handoff:** Proceed only after the six operator acceptance steps are recorded as passing against the actual downloadable/public artifact. Do not approve production, concurrency, Buzz/Slack, or human-pilot claims. No new human publishing decision is required beyond satisfying this evidence gate.

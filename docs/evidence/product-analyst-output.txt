@@ -1,0 +1,104 @@
+**Release-Acceptance Brief: Local Open-Source AI Company Manager**
+
+**Scope Fact:** This brief is based only on the task facts and `company-context.json`. I did not test the product, browse, use connectors, contact anyone, or read other files.
+
+**Assumptions:** The tester has a local checkout, can start the Node server, can inspect SQLite data, and can use documented local UI/API/CLI entry points. Exact commands, ports, table names, and file paths are not supplied.
+
+**Human Decisions Needed:** Whether to ship as technical alpha, which adapters are in scope for the release, and whether absence of a real human pilot blocks public release.
+
+---
+
+## 1. Independent Tester Script
+
+1. Start the local Node server using the documented local startup command.  
+   **Expected outcome:** Server starts successfully and binds only to loopback, not a public interface.
+
+2. Verify network binding with an OS-level port inspection tool.  
+   **Expected outcome:** Listening address is `127.0.0.1`, `::1`, or equivalent loopback only. No `0.0.0.0` or externally reachable binding.
+
+3. Initialize the product manually without network access or external accounts.  
+   **Expected outcome:** A usable local company-management setup can be created without login, cloud services, or network dependency.
+
+4. Initialize the product from a template without network access or external accounts.  
+   **Expected outcome:** Template setup completes locally and creates company/department/agent/assignment/ownership records.
+
+5. Inspect the SQLite database after setup.  
+   **Expected outcome:** Company, department, agent, assignment, and ownership data are persisted in SQLite and remain available after restart.
+
+6. Create or edit a previewable change before confirmation.  
+   **Expected outcome:** The preview is persisted and can be reviewed before final confirmation.
+
+7. Confirm the previewed change atomically.  
+   **Expected outcome:** Either the full confirmed change is applied or no partial change is applied. No mixed or half-applied state appears in SQLite or UI/API output.
+
+8. Attempt to confirm a stale preview/version after the underlying data has changed.  
+   **Expected outcome:** The product refuses the stale confirmation and preserves the current newer state.
+
+9. Use undo after a confirmed change.  
+   **Expected outcome:** The prior valid state is restored consistently across persisted data and visible product output.
+
+10. Load both the 20-role and 100-role templates, then inspect runtime behavior.  
+   **Expected outcome:** Templates contain differentiated roles. The 100-role configuration is represented as configuration/data, not as proof that 100 concurrent agent runtimes are active.
+
+---
+
+## 2. Highest-Impact Failure Cases
+
+1. **Server binds publicly instead of loopback-only**  
+   **Detection:** Port inspection shows `0.0.0.0`, external interface binding, or remote accessibility.  
+   **Impact:** Local-only safety claim fails.
+
+2. **Atomic confirmation applies partial state**  
+   **Detection:** Interrupt, error, or conflicting update during confirmation leaves some but not all related records changed.  
+   **Impact:** Trust in company/agent/ownership data is compromised.
+
+3. **Stale-version confirmation is accepted**  
+   **Detection:** Create preview A, modify same entity through another path, then confirm preview A. If old data overwrites newer data, refusal failed.  
+   **Impact:** User work can be silently lost.
+
+4. **Undo restores incomplete or inconsistent data**  
+   **Detection:** After undo, compare company, department, agent, assignment, and ownership relationships against the pre-change state. Missing relationships or orphaned records indicate failure.  
+   **Impact:** Recovery feature becomes unsafe.
+
+5. **Templates imply operational capacity not actually proven**  
+   **Detection:** 100-role template exists, but no evidence shows 100 concurrent runtimes executing reliably.  
+   **Impact:** Public claims may overstate scale and mislead users.
+
+---
+
+## 3. Safe Public Claims vs. Unproven Claims
+
+**Safe Public Claims**
+
+- Runs as a local Node server bound to loopback.
+- Uses SQLite for company, department, agent, assignment, and ownership data.
+- Supports persisted preview before confirmation.
+- Supports atomic confirmation.
+- Refuses stale-version confirmation.
+- Supports undo.
+- Supports manual setup without network accounts.
+- Supports template setup without network accounts.
+- Includes templates with 20 or 100 differentiated roles.
+- Can optionally execute Codex CLI.
+- Includes Buzz native team snapshot export and Slack Socket Mode adapters in the current product surface.
+
+**Unproven Or Unsafe Claims**
+
+- Do not claim production readiness.
+- Do not claim 100 concurrent AI runtimes.
+- Do not claim the 100-role configuration proves runtime scalability.
+- Do not claim Buzz native team snapshot export has live round-trip proof.
+- Do not claim Slack Socket Mode adapter has live round-trip proof.
+- Do not claim real customer or human pilot validation.
+- Do not claim live collaboration reliability.
+- Do not claim cloud, account, or network integrations work unless separately proven.
+- Do not claim security beyond loopback-local operation and local persistence.
+- Do not claim the product has been independently tested based on this brief alone.
+
+---
+
+## 4. Technical Alpha Recommendation
+
+Release only as a **technical alpha** for local evaluators. The release can credibly demonstrate local setup, SQLite-backed company modeling, preview/confirmation safety mechanics, undo, templates, and optional Codex CLI execution.
+
+Block any broader public or production-positioned release until live round-trip proof exists for Buzz and Slack adapters, the 100-role template is clearly separated from concurrency claims, and at least one real human pilot has completed an observed workflow.
