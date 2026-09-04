@@ -2,7 +2,8 @@
 export const brand = {
   name: 'GitFlash',
   productName: 'Virtual Corporation Manager',
-  tagline: 'Build a company. Put it to work.',
-  accent: '#f4dc42',
+  tagline: 'Your company. In your hands.',
+  descriptor: 'The open-source control center for your AI company.',
+  accent: '#F4A340',
   repository: 'https://github.com/strobl/gitflash',
 };

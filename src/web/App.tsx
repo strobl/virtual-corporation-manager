@@ -24,7 +24,6 @@ import {
   ShieldCheck,
   Undo2,
   X,
-  Zap,
 } from 'lucide-react';
 import { brand } from '../brand';
 import type {
@@ -50,6 +49,8 @@ import {
 import { Dialog, EntityEditor, PreviewDialog, type EditorTarget } from './Dialogs';
 import { CompanyMap } from './CompanyMap';
 import { TextDisclosure } from './TextDisclosure';
+import { BrandMark } from './BrandMark';
+import { createWorkViewModel, getRunTargetCompany } from './work-view-model';
 import { AdvancedDialog, type AdvancedTarget } from './AdvancedDialogs';
 import {
   IntegrationsView,
@@ -85,6 +86,7 @@ export function App() {
   const [status, setStatus] = useState<IntegrationStatus | null>(null);
   const [runs, setRuns] = useState<RunInfo[]>([]);
   const [area, setArea] = useState<Area>('organization');
+  const [workScope, setWorkScope] = useState<'company' | 'all'>('company');
   const [view, setView] = useState<View>('map');
   const [selection, setSelection] = useState<Selection | null>(() =>
     parseSelection(new URLSearchParams(location.search).get('selected') ?? ''),
@@ -98,6 +100,7 @@ export function App() {
   const [undoPreview, setUndoPreview] = useState<UndoPreview | null>(null);
   const [pending, setPending] = useState<PendingChange | null>(null);
   const [runAgent, setRunAgent] = useState<Agent | null>(null);
+  const [initialRunId, setInitialRunId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -177,9 +180,13 @@ export function App() {
   }, [state]);
   const companyId = state ? companyForSelection(state, selection) : null;
   const company = state?.companies.find((row) => row.id === companyId);
+  const companyWork = state ? createWorkViewModel(state, runs, companyId) : null;
+  const runCompany = state && runAgent ? getRunTargetCompany(state, runAgent.id) : null;
   const tree = useMemo(() => (state ? organizationTree(state, query) : []), [state, query]);
   const snapshot = useMemo(() => (state ? toSnapshot(state) : null), [state]);
   const select = (value: Selection) => {
+    setInitialRunId(null);
+    setWorkScope('company');
     setSelection(
       value.kind === 'agent' && !value.companyId && companyId ? { ...value, companyId } : value,
     );
@@ -293,6 +300,8 @@ export function App() {
         )),
   );
   const navigate = (value: Area) => {
+    setInitialRunId(null);
+    if (value === 'work') setWorkScope('company');
     setArea(value);
     setNavOpen(false);
   };
@@ -345,9 +354,7 @@ export function App() {
           <X size={18} />
         </button>
         <a className="brand" href="/" aria-label={`${brand.name} home`}>
-          <span className="brand-mark">
-            <Zap size={20} fill="currentColor" />
-          </span>
+          <BrandMark size={36} decorative />
           <strong>{brand.name}</strong>
           <span className="local-badge">local</span>
         </a>
@@ -361,9 +368,12 @@ export function App() {
             >
               <Icon size={17} />
               {AREA_NAMES[id]}
-              {id === 'work' && running && (
-                <span className="activity-count">
-                  {runs.filter((run) => run.status === 'running' || run.status === 'queued').length}
+              {id === 'work' && !!companyWork?.stats.reviewable && (
+                <span
+                  className="activity-count"
+                  aria-label={`${companyWork.stats.reviewable} results need your review in ${companyWork.scopeName}`}
+                >
+                  {companyWork.stats.reviewable}
                 </span>
               )}
             </button>
@@ -524,15 +534,15 @@ export function App() {
                   {!activeCompanies.length ? (
                     <div className="welcome">
                       <div className="welcome-copy">
-                        <span className="eyebrow">YOUR COMPANY, REIMAGINED</span>
+                        <span className="eyebrow">GIVE YOUR IDEA A PLACE TO WORK</span>
                         <h1>
-                          Great work starts
+                          Your company.
                           <br />
-                          with a clear organization.
+                          <span>In your hands.</span>
                         </h1>
                         <p>
-                          Build your company of AI agents. Give every team a purpose, every agent a
-                          responsibility, and every task a place to land.
+                          Your own company of AI agents. Organize your team, assign work, and decide
+                          what happens next.
                         </p>
                         <div className="welcome-actions">
                           <button
@@ -551,30 +561,28 @@ export function App() {
                           Local first. Open source. No account required.
                         </div>
                       </div>
-                      <div className="welcome-illustration" aria-hidden="true">
-                        <div className="welcome-card main">
-                          <span className="brand-mark">
-                            <Building2 size={20} />
-                          </span>
-                          <strong>Your company</strong>
-                          <span>A shared mission</span>
-                        </div>
-                        <div className="illustration-line" />
-                        <div className="illustration-teams">
-                          {['Build', 'Create', 'Grow'].map((name, index) => (
-                            <div className="welcome-card" key={name}>
-                              <span className={`demo-dot demo-${index}`} />
-                              <strong>{name}</strong>
-                              <div className="demo-avatars">
-                                <span />
-                                <span />
-                                <span />
-                              </div>
-                            </div>
-                          ))}
+                      <div className="welcome-illustration">
+                        <div className="flash-stage">
+                          <span className="flash-orbit" aria-hidden="true" />
+                          <img
+                            className="welcome-flash"
+                            src="/flash-character.svg"
+                            width={300}
+                            height={350}
+                            alt="Flash, the GitFlash character"
+                          />
+                          <div className="flash-role role-product">
+                            <span aria-hidden="true">P</span>Product
+                          </div>
+                          <div className="flash-role role-marketing">
+                            <span aria-hidden="true">M</span>Marketing
+                          </div>
+                          <div className="flash-role role-care">
+                            <span aria-hidden="true">C</span>Customer care
+                          </div>
                         </div>
                         <span className="illustration-caption">
-                          An example structure · Your company starts empty
+                          Example roles · Your company starts empty
                         </span>
                       </div>
                       <div className="welcome-steps">
@@ -599,7 +607,7 @@ export function App() {
                     <>
                       <section className="organization-header">
                         <div>
-                          <span className="eyebrow">COMPANY WORKSPACE</span>
+                          <span className="eyebrow">YOUR COMPANY · YOUR NEXT MOVE</span>
                           <h1>{company?.name ?? 'Your organization'}</h1>
                           <TextDisclosure
                             text={
@@ -608,65 +616,94 @@ export function App() {
                             }
                           />
                         </div>
-                        <div className="organization-actions">
-                          <button
-                            className="button"
-                            onClick={() =>
-                              openEditor({
-                                kind: 'department',
-                                companyId: companyId ?? undefined,
-                              })
-                            }
-                            disabled={!companyId}
-                          >
-                            <Plus size={15} />
-                            Department
-                          </button>
-                          <button
-                            className="button primary"
-                            onClick={() =>
-                              openEditor({
-                                kind: 'agent',
-                                companyId: companyId ?? undefined,
-                                departmentId: selectedDepartment?.id,
-                              })
-                            }
-                            disabled={!companyId}
-                          >
-                            <Plus size={15} />
-                            Agent
-                          </button>
+                        <div className="company-control-actions">
+                          <img
+                            className="company-flash"
+                            src="/flash-character.svg"
+                            width={84}
+                            height={98}
+                            alt=""
+                          />
+                          <div className="organization-actions">
+                            <button
+                              className="button"
+                              onClick={() =>
+                                openEditor({
+                                  kind: 'department',
+                                  companyId: companyId ?? undefined,
+                                })
+                              }
+                              disabled={!companyId}
+                            >
+                              <Plus size={15} />
+                              Department
+                            </button>
+                            <button
+                              className="button primary"
+                              onClick={() =>
+                                openEditor({
+                                  kind: 'agent',
+                                  companyId: companyId ?? undefined,
+                                  departmentId: selectedDepartment?.id,
+                                })
+                              }
+                              disabled={!companyId}
+                            >
+                              <Plus size={15} />
+                              Agent
+                            </button>
+                          </div>
                         </div>
                       </section>
-                      <div className="organization-summary">
-                        <span>
-                          <Bot size={15} />
-                          <strong>
-                            {agents.filter((row) => row.kind === 'agent').length}
-                          </strong>{' '}
-                          configured agents
-                        </span>
-                        <span>
-                          <Layers3 size={15} />
-                          <strong>
-                            {state.departments.filter((row) => row.companyId === companyId).length}
-                          </strong>{' '}
-                          departments
-                        </span>
-                        <span>
-                          <CheckCircle2 size={15} />
-                          <strong>
-                            {
-                              state.work.filter(
-                                (row) => row.companyId === companyId && row.status === 'accepted',
-                              ).length
-                            }
-                          </strong>{' '}
-                          accepted outputs
-                        </span>
-                        <span className="configuration-note">
-                          Configuration does not start agents
-                        </span>
+                      <div
+                        className="company-instruments"
+                        aria-label={`Activity for ${company?.name ?? 'this company'}`}
+                      >
+                        <div className="company-instrument">
+                          <span>
+                            <Bot size={16} />
+                            Configured roles
+                          </span>
+                          <strong>{agents.filter((row) => row.kind === 'agent').length}</strong>
+                          <small>
+                            {state.departments.filter((row) => row.companyId === companyId).length}{' '}
+                            departments
+                          </small>
+                        </div>
+                        <div className="company-instrument">
+                          <span>
+                            <Activity size={16} />
+                            Running
+                          </span>
+                          <strong>{companyWork?.stats.running ?? 0}</strong>
+                          <small>{companyWork?.stats.queued ?? 0} queued</small>
+                        </div>
+                        <button
+                          className="company-instrument instrument-review"
+                          onClick={() => navigate('work')}
+                        >
+                          <span>
+                            <ArrowUpRight size={16} />
+                            Needs your review
+                          </span>
+                          <strong>{companyWork?.stats.reviewable ?? 0}</strong>
+                          <small>
+                            {companyWork?.stats.reviewable ? 'Review work' : 'View company work'}{' '}
+                            <ArrowRight size={13} />
+                          </small>
+                        </button>
+                        <div className="company-instrument">
+                          <span>
+                            <CheckCircle2 size={16} />
+                            Accepted
+                          </span>
+                          <strong>{companyWork?.stats.accepted ?? 0}</strong>
+                          <small>Results you approved</small>
+                        </div>
+                      </div>
+                      <div className="company-scope-note">
+                        <ShieldCheck size={13} />
+                        Saved configuration stays idle until you run a task.
                       </div>
                       <div className="view-toolbar">
                         <div className="view-tabs" role="tablist" aria-label="Organization view">
@@ -1033,6 +1070,13 @@ export function App() {
               )}
               {area === 'work' && (
                 <WorkView
+                  companyId={workScope === 'all' ? null : companyId}
+                  selectedCompanyName={company?.name ?? null}
+                  onScopeChange={(scope) => {
+                    setInitialRunId(null);
+                    setWorkScope(scope);
+                  }}
+                  initialRunId={initialRunId}
                   state={state}
                   runs={runs}
                   onAccept={(id, title) =>
@@ -1213,11 +1257,9 @@ export function App() {
                       </p>
                     </section>
                     <section className="settings-card">
-                      <Zap size={24} />
+                      <BrandMark size={40} decorative />
                       <h3>{brand.name}</h3>
-                      <p>
-                        {brand.productName}. Free, open-source software for a company of agents.
-                      </p>
+                      <p>{brand.descriptor} Free local core, in your hands.</p>
                       <a
                         className="text-button"
                         href={brand.repository}
@@ -1235,9 +1277,7 @@ export function App() {
           )}
         </main>
         <footer className="workspace-footer">
-          <span>
-            {brand.name} · {brand.productName}
-          </span>
+          <span>{brand.name} · Your AI company, on your computer</span>
           <span>
             {state ? `Revision ${state.revision}` : 'Local workspace'}
             <span className="footer-divider">/</span>Open source
@@ -1413,11 +1453,20 @@ export function App() {
         <RunDialog
           agent={runAgent}
           status={status}
+          actualCompanyName={runCompany?.name ?? null}
+          selectedCompanyName={company?.name ?? null}
+          targetDiffersFromSelection={!!runCompany && !!companyId && runCompany.id !== companyId}
           onClose={() => setRunAgent(null)}
-          onStarted={async () => {
+          onStarted={async (startedRun) => {
             await refresh();
+            setRuns((current) =>
+              current.some((run) => run.id === startedRun.id) ? current : [startedRun, ...current],
+            );
+            setSelection({ kind: 'company', id: startedRun.companyId });
+            setInitialRunId(startedRun.id);
+            setWorkScope('company');
             setArea('work');
-            announce('Task queued. Its result will appear here.');
+            announce('Task recorded. Opened its company and run.');
           }}
         />
       )}

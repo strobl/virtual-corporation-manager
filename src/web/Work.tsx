@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   ArrowUpRight,
   Download,
@@ -13,6 +13,7 @@ import type { Agent, WorkspaceState } from '../domain/contracts';
 import { Dialog } from './Dialogs';
 import { request } from './client';
 import { textExcerpt } from './TextDisclosure';
+import { createWorkViewModel, initialRunForScope, runDisplayState } from './work-view-model';
 
 export interface IntegrationStatus {
   codex: {
@@ -55,16 +56,32 @@ const date = (value: string) =>
     minute: '2-digit',
   });
 
+/** Forward the authoritative run receipt before navigating away from task submission. */
+export async function submitRunTask(
+  payload: { agentId: string; task: string; requestId: string; transport: 'codex' | 'buzz' },
+  onStarted: (run: RunInfo) => Promise<void>,
+): Promise<RunInfo> {
+  const run = await request<RunInfo>('/api/runs', payload);
+  await onStarted(run);
+  return run;
+}
+
 export function RunDialog({
   agent,
   status,
+  actualCompanyName,
+  selectedCompanyName = null,
+  targetDiffersFromSelection = false,
   onClose,
   onStarted,
 }: {
   agent: Agent;
   status: IntegrationStatus | null;
+  actualCompanyName: string | null;
+  selectedCompanyName?: string | null;
+  targetDiffersFromSelection?: boolean;
   onClose: () => void;
-  onStarted: () => Promise<void>;
+  onStarted: (run: RunInfo) => Promise<void>;
 }) {
   const [task, setTask] = useState('');
   const [transport, setTransport] = useState<'codex' | 'buzz'>('codex');
@@ -87,13 +104,15 @@ export function RunDialog({
       attempt.current = { task, transport, requestId: crypto.randomUUID() };
     }
     try {
-      await request<RunInfo>('/api/runs', {
-        agentId: agent.id,
-        task,
-        requestId: attempt.current.requestId,
-        transport,
-      });
-      await onStarted();
+      await submitRunTask(
+        {
+          agentId: agent.id,
+          task,
+          requestId: attempt.current.requestId,
+          transport,
+        },
+        onStarted,
+      );
       onClose();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not start the task.');
@@ -108,6 +127,20 @@ export function RunDialog({
           The runtime receives this task together with the agent’s role, instructions, and
           responsibilities.
         </p>
+        <div className={`connection-note ${actualCompanyName ? '' : 'warning-note'}`}>
+          {actualCompanyName ? (
+            <>
+              <strong>Task company: {actualCompanyName}</strong>
+              <p>
+                {targetDiffersFromSelection
+                  ? `You are viewing ${selectedCompanyName || 'another company'}. This task belongs to ${actualCompanyName}, where its result will open.`
+                  : 'The task and its result will be recorded in this company.'}
+              </p>
+            </>
+          ) : (
+            'Assign this agent to an active company before starting a task.'
+          )}
+        </div>
         <label>
           Task
           <textarea
@@ -148,7 +181,7 @@ export function RunDialog({
           <button type="button" className="button" onClick={onClose}>
             Cancel
           </button>
-          <button className="button primary" disabled={busy || !ready}>
+          <button className="button primary" disabled={busy || !ready || !actualCompanyName}>
             <Play size={15} />
             {busy ? 'Starting…' : 'Run task'}
           </button>
@@ -161,21 +194,42 @@ export function RunDialog({
 export function WorkView({
   state,
   runs,
+  companyId = null,
+  initialRunId = null,
+  selectedCompanyName = null,
+  onScopeChange,
   onSelectAgent,
   onRefresh,
   onAccept,
 }: {
   state: WorkspaceState;
   runs: RunInfo[];
+  companyId?: string | null;
+  initialRunId?: string | null;
+  selectedCompanyName?: string | null;
+  onScopeChange?: (scope: 'company' | 'all') => void;
   onSelectAgent: (id: string) => void;
   onRefresh: () => void;
   onAccept: (recordId: string, title: string) => void;
 }) {
-  const [selectedRun, setSelectedRun] = useState<string | null>(null);
-  const run = runs.find((item) => item.id === selectedRun);
-  const workRecord = run ? state.work.find((record) => record.runId === run.id) : null;
-  const completed = runs.filter((item) => item.status === 'completed').length;
-  const accepted = state.work.filter((item) => item.status === 'accepted');
+  const requestedRun = initialRunForScope(runs, companyId, initialRunId);
+  const [selectedRun, setSelectedRun] = useState<string | null>(() => requestedRun?.id ?? null);
+  const openedRequest = useRef<string | null>(null);
+  useEffect(() => {
+    if (!initialRunId) {
+      openedRequest.current = null;
+      return;
+    }
+    const requestKey = JSON.stringify([companyId, initialRunId]);
+    if (requestedRun && openedRequest.current !== requestKey) {
+      openedRequest.current = requestKey;
+      setSelectedRun(requestedRun.id);
+    }
+  }, [companyId, initialRunId, requestedRun]);
+  const view = createWorkViewModel(state, runs, companyId);
+  const run = view.runs.find((item) => item.id === selectedRun);
+  const runState = run ? runDisplayState(run, view.work) : null;
+  const workRecord = runState?.workRecord;
   const download = (value: RunInfo) => {
     const url = URL.createObjectURL(new Blob([value.output], { type: 'text/plain;charset=utf-8' }));
     const anchor = document.createElement('a');
@@ -185,33 +239,71 @@ export function WorkView({
     URL.revokeObjectURL(url);
   };
   return (
-    <div className="page-content">
+    <div className="page-content work-page">
       <div className="section-intro">
         <div>
           <span className="eyebrow">Work, with evidence</span>
-          <h2>What your company has delivered</h2>
-          <p>Every result stays connected to the agent and task that produced it.</p>
+          <h2>{view.scopeName}</h2>
+          <p>See what is running, review the output, and decide what to accept.</p>
+          {onScopeChange && (
+            <label className="work-scope-control">
+              Work scope
+              <select
+                value={companyId === null ? 'all' : 'company'}
+                onChange={(event) => onScopeChange(event.target.value as 'company' | 'all')}
+              >
+                <option value="company" disabled={!selectedCompanyName}>
+                  {selectedCompanyName || 'Selected company'}
+                </option>
+                <option value="all">All companies</option>
+              </select>
+            </label>
+          )}
         </div>
         <button className="button" onClick={onRefresh}>
           <RefreshCw size={14} />
           Refresh
         </button>
       </div>
+      {view.reviewableRuns.length > 0 && (
+        <section className="work-review-banner" aria-label="Work ready for review">
+          <span className="work-review-count">{view.stats.reviewable}</span>
+          <div className="work-review-copy">
+            <h3>Needs your review</h3>
+            <p>
+              {view.stats.reviewable === 1
+                ? 'One result is ready for your decision.'
+                : `${view.stats.reviewable} results are ready for your decision.`}{' '}
+              Read the output before accepting it.
+            </p>
+          </div>
+          <button
+            className="button primary work-review-action"
+            onClick={() => setSelectedRun(view.reviewableRuns[0]!.id)}
+          >
+            Review work <ArrowUpRight size={16} />
+          </button>
+        </section>
+      )}
       <div className="work-metrics">
         <div>
-          <strong>{runs.length}</strong>
-          <span>Tasks started</span>
+          <strong>{view.stats.running}</strong>
+          <span>Running</span>
         </div>
         <div>
-          <strong>{completed}</strong>
-          <span>Runtime results</span>
+          <strong>{view.stats.queued}</strong>
+          <span>Queued</span>
         </div>
         <div>
-          <strong>{accepted.length}</strong>
-          <span>Accepted work records</span>
+          <strong>{view.stats.reviewable}</strong>
+          <span>Needs your review</span>
+        </div>
+        <div>
+          <strong>{view.stats.accepted}</strong>
+          <span>Accepted records</span>
         </div>
       </div>
-      {!runs.length && (
+      {!view.runs.length && !view.acceptedRecords.length && (
         <div className="empty-state">
           <span className="empty-icon">
             <Terminal size={25} />
@@ -224,40 +316,71 @@ export function WorkView({
           <p className="muted small">Creating agents does not automatically run them.</p>
         </div>
       )}
-      <div className="run-list">
-        {runs.map((item) => (
-          <button key={item.id} className="run-row" onClick={() => setSelectedRun(item.id)}>
-            <span className={`run-icon ${item.status}`}>
-              {item.status === 'completed' ? (
-                <CheckCircle2 size={19} />
-              ) : item.status === 'failed' ? (
-                <AlertCircle size={19} />
-              ) : (
-                <CircleDashed size={19} className={item.status === 'running' ? 'spin' : ''} />
-              )}
-            </span>
-            <span className="run-details">
-              <strong>{textExcerpt(item.task)}</strong>
-              <span>
-                {item.agentName} · {item.transport} · {date(item.createdAt)}
+      {view.runs.length > 0 && (
+        <div className="work-list-heading">
+          <h3>Tasks & results</h3>
+          <p>
+            {view.stats.tasks} {view.stats.tasks === 1 ? 'task' : 'tasks'} · {view.stats.completed}{' '}
+            {view.stats.completed === 1 ? 'run completed' : 'runs completed'}
+          </p>
+        </div>
+      )}
+      <div className="run-list work-results">
+        {view.runs.map((item) => {
+          const display = runDisplayState(item, view.work);
+          return (
+            <button
+              key={item.id}
+              className={`run-row work-result-row work-status-${display.tone}`}
+              onClick={() => setSelectedRun(item.id)}
+            >
+              <span className={`run-icon ${item.status}`}>
+                {item.status === 'completed' ? (
+                  <CheckCircle2 size={19} />
+                ) : item.status === 'failed' ? (
+                  <AlertCircle size={19} />
+                ) : (
+                  <CircleDashed size={19} className={item.status === 'running' ? 'spin' : ''} />
+                )}
               </span>
-            </span>
-            <span className={`status-pill ${item.status}`}>{item.status}</span>
-            <ArrowUpRight size={16} />
-          </button>
-        ))}
+              <span className="run-details work-result-copy">
+                <strong>{textExcerpt(item.task)}</strong>
+                <span>
+                  {item.agentName} · {item.transport} · {date(item.createdAt)}
+                </span>
+                {item.output.trim() && (
+                  <span className="work-result-preview">{textExcerpt(item.output, 140)}</span>
+                )}
+              </span>
+              <span className={`status-pill ${item.status} work-status-${display.tone}`}>
+                {display.label}
+              </span>
+              <ArrowUpRight size={16} />
+            </button>
+          );
+        })}
       </div>
-      {accepted.length > 0 && (
+      {view.acceptedRecords.length > 0 && (
         <section className="record-section">
           <h3>Accepted work</h3>
-          {accepted.map((record) => (
+          {view.acceptedRecords.map((record) => (
             <article className="work-record" key={record.id}>
               <h4>{record.title}</h4>
               <p className="muted small">
                 {state.agents.find((agent) => agent.id === record.agentId)?.name ?? 'Agent'} ·{' '}
                 {record.provenance} · {date(record.createdAt)}
               </p>
-              <pre>{record.output}</pre>
+              <details className="text-disclosure">
+                <summary>Read accepted output</summary>
+                <pre
+                  className="full-text work-record-output"
+                  tabIndex={0}
+                  role="region"
+                  aria-label="Accepted output"
+                >
+                  {record.output}
+                </pre>
+              </details>
             </article>
           ))}
         </section>
@@ -265,7 +388,9 @@ export function WorkView({
       {run && (
         <Dialog title="Task result" wide onClose={() => setSelectedRun(null)}>
           <div className="dialog-body">
-            <span className={`status-pill ${run.status}`}>{run.status}</span>
+            <span className={`status-pill ${run.status} work-status-${runState!.tone}`}>
+              {runState!.label}
+            </span>
             <h3 className="preview-title task-result-title">{textExcerpt(run.task)}</h3>
             <button
               className="text-button"
@@ -310,7 +435,7 @@ export function WorkView({
               </pre>
             ) : (
               <p className="connection-note">
-                {run.status === 'failed'
+                {run.status === 'failed' || run.status === 'completed'
                   ? 'No output was returned.'
                   : 'Waiting for the runtime to return its result…'}
               </p>
@@ -325,7 +450,7 @@ export function WorkView({
               <button className="button" onClick={() => setSelectedRun(null)}>
                 Close
               </button>
-              {workRecord?.status === 'submitted' && run.status === 'completed' && (
+              {runState?.reviewable && workRecord && (
                 <button
                   className="button primary"
                   onClick={() => {

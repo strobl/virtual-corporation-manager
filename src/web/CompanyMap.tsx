@@ -3,6 +3,7 @@ import type { WorkspaceState } from '../domain/contracts';
 import type { Selection } from './model';
 import { companyAgents } from './model';
 import { textExcerpt } from './TextDisclosure';
+import { brand } from '../brand';
 
 /** Department composition builds on the original company's progressive disclosure. */
 export function CompanyMap({
@@ -49,13 +50,13 @@ export function CompanyMap({
   return (
     <div className="company-map" data-testid="company-map">
       <div className="map-label">
-        <span className="live-dot" /> Organization · Saved configuration
+        <Layers3 size={14} /> Your organization · Saved configuration
       </div>
       <button
         className={`company-root ${selection?.kind === 'company' && selection.id === company.id ? 'is-selected' : ''}`}
         onClick={() => onSelect({ kind: 'company', id: company.id })}
       >
-        <span className="company-symbol" style={{ backgroundColor: company.color || '#f4dc42' }}>
+        <span className="company-symbol" style={{ backgroundColor: company.color || brand.accent }}>
           <Building2 size={20} />
         </span>
         <span>
@@ -117,11 +118,23 @@ export function CompanyMap({
                   title={`${agent.name} · ${agent.role}`}
                   className={`agent-avatar ${selection?.kind === 'agent' && selection.id === agent.id ? 'is-selected' : ''}`}
                 >
-                  {agent.name
-                    .split(/\s+/)
-                    .map((word) => word[0])
-                    .slice(0, 2)
-                    .join('')}
+                  <span
+                    className="agent-monogram"
+                    data-tone={
+                      [...agent.id].reduce((total, letter) => total + letter.charCodeAt(0), 0) % 4
+                    }
+                    aria-hidden="true"
+                  >
+                    {agent.name
+                      .split(/\s+/)
+                      .map((word) => word[0])
+                      .slice(0, 2)
+                      .join('')}
+                  </span>
+                  <span className="agent-avatar-caption">
+                    <strong>{agent.name}</strong>
+                    <small>{agent.role}</small>
+                  </span>
                 </button>
               ))}
               {group.agents.length > 8 && (
