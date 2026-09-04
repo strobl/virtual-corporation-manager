@@ -11,7 +11,7 @@ This is a **technical alpha**. The local core and optional Codex execution are t
 Use **Node.js 24.14 or newer in the 24.x line**. Release checks cover the documented operating systems in [acceptance evidence](docs/acceptance.md). Node 26+ is also allowed; the installed package has been checked on Node 26.0.0 on macOS arm64. The cross-platform CI matrix uses Node 24.
 
 ```sh
-npm install --global https://github.com/strobl/gitflash/releases/download/v0.1.0-alpha.1/gitflash-0.1.0-alpha.1.tgz
+npm install --global https://github.com/strobl/gitflash/releases/download/v0.1.0-alpha.2/gitflash-0.1.0-alpha.2.tgz
 gitflash
 ```
 

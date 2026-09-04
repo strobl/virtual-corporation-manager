@@ -1,6 +1,6 @@
 # Technical handoff and known limits
 
-GitFlash 0.1.0-alpha.1 is a local technical alpha. The maintainer is [strobl](https://github.com/strobl). Source, issues, pull requests, CI and release artifacts live in [this repository](https://github.com/strobl/gitflash).
+GitFlash 0.1.0-alpha.2 is a local technical alpha. The maintainer is [strobl](https://github.com/strobl). Source, issues, pull requests, CI and release artifacts live in [this repository](https://github.com/strobl/gitflash).
 
 ## Ownership and change process
 

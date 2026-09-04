@@ -49,6 +49,7 @@ import {
 } from './model';
 import { Dialog, EntityEditor, PreviewDialog, type EditorTarget } from './Dialogs';
 import { CompanyMap } from './CompanyMap';
+import { TextDisclosure } from './TextDisclosure';
 import { AdvancedDialog, type AdvancedTarget } from './AdvancedDialogs';
 import {
   IntegrationsView,
@@ -600,10 +601,12 @@ export function App() {
                         <div>
                           <span className="eyebrow">COMPANY WORKSPACE</span>
                           <h1>{company?.name ?? 'Your organization'}</h1>
-                          <p>
-                            {company?.description ||
-                              'A clear view of the people, agents, and teams behind your work.'}
-                          </p>
+                          <TextDisclosure
+                            text={
+                              company?.description ||
+                              'A clear view of the people, agents, and teams behind your work.'
+                            }
+                          />
                         </div>
                         <div className="organization-actions">
                           <button
@@ -890,10 +893,12 @@ export function App() {
                               <>
                                 <section className="inspector-section">
                                   <h3>Purpose</h3>
-                                  <p>
-                                    {(selectedDepartment?.description ?? company.description) ||
-                                      'Add a purpose so every agent knows what matters.'}
-                                  </p>
+                                  <TextDisclosure
+                                    text={
+                                      (selectedDepartment?.description ?? company.description) ||
+                                      'Add a purpose so every agent knows what matters.'
+                                    }
+                                  />
                                   {selectedDepartment?.managerId && (
                                     <p className="muted small">
                                       Led by{' '}
