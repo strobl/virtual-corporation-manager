@@ -11,9 +11,9 @@
  * ignored (the member becomes a local root), and reporting cycles are broken
  * deterministically so a bad row can never hang a render.
  */
-import type { WorkspaceSnapshot } from "./tree";
+import type { WorkspaceSnapshot } from './tree';
 
-export type PersonKind = "human" | "agent";
+export type PersonKind = 'human' | 'agent';
 
 export interface OrgPerson {
   id: string;
@@ -44,7 +44,7 @@ export interface OrgPyramid {
 }
 
 const EMPTY: OrgPyramid = {
-  corporationId: "",
+  corporationId: '',
   people: [],
   byId: new Map(),
   levels: [],
@@ -53,19 +53,19 @@ const EMPTY: OrgPyramid = {
   counts: { people: 0, humans: 0, agents: 0, departments: 0, depth: 0 },
 };
 
-export function emptyPyramid(corporationId = ""): OrgPyramid {
+export function emptyPyramid(corporationId = ''): OrgPyramid {
   return { ...EMPTY, corporationId, byId: new Map(), levels: [], people: [], rootIds: [] };
 }
 
 function asKind(value: string | null | undefined): PersonKind {
-  return value === "agent" ? "agent" : "human";
+  return value === 'agent' ? 'agent' : 'human';
 }
 
 export function buildOrgPyramid(
   snapshot: WorkspaceSnapshot,
   corporationId: string | null,
 ): OrgPyramid {
-  if (!corporationId) return emptyPyramid("");
+  if (!corporationId) return emptyPyramid('');
 
   const memberIds = new Set(
     snapshot.assignments
@@ -79,7 +79,7 @@ export function buildOrgPyramid(
     .map((member) => ({
       id: member.id,
       name: member.name,
-      role: member.role ?? "",
+      role: member.role ?? '',
       kind: asKind(member.kind ?? null),
       department: (member.department ?? null) || null,
       managerId: null,
@@ -120,7 +120,7 @@ export function buildOrgPyramid(
   }
   for (const person of people) {
     person.directReportIds.sort((a, b) =>
-      (byId.get(a)?.name ?? "").localeCompare(byId.get(b)?.name ?? ""),
+      (byId.get(a)?.name ?? '').localeCompare(byId.get(b)?.name ?? ''),
     );
   }
 
@@ -148,7 +148,7 @@ export function buildOrgPyramid(
     row.sort(
       (a, b) =>
         b.totalReports - a.totalReports ||
-        (a.department ?? "").localeCompare(b.department ?? "") ||
+        (a.department ?? '').localeCompare(b.department ?? '') ||
         a.name.localeCompare(b.name),
     );
   }
@@ -166,8 +166,8 @@ export function buildOrgPyramid(
     departments,
     counts: {
       people: people.length,
-      humans: people.filter((p) => p.kind === "human").length,
-      agents: people.filter((p) => p.kind === "agent").length,
+      humans: people.filter((p) => p.kind === 'human').length,
+      agents: people.filter((p) => p.kind === 'agent').length,
       departments: departments.length,
       depth: people.length ? depth + 1 : 0,
     },
@@ -176,30 +176,30 @@ export function buildOrgPyramid(
 
 export interface PyramidFilters {
   query: string;
-  kind: "all" | PersonKind;
+  kind: 'all' | PersonKind;
   department: string;
   /** Highest level index still rendered; null shows every level. */
   maxLevel: number | null;
 }
 
 export const EMPTY_PYRAMID_FILTERS: PyramidFilters = {
-  query: "",
-  kind: "all",
-  department: "all",
+  query: '',
+  kind: 'all',
+  department: 'all',
   maxLevel: null,
 };
 
 export function matchesPerson(person: OrgPerson, filters: PyramidFilters): boolean {
-  if (filters.kind !== "all" && person.kind !== filters.kind) return false;
-  if (filters.department !== "all" && (person.department ?? "") !== filters.department)
+  if (filters.kind !== 'all' && person.kind !== filters.kind) return false;
+  if (filters.department !== 'all' && (person.department ?? '') !== filters.department)
     return false;
   if (filters.maxLevel !== null && person.level > filters.maxLevel) return false;
   const query = filters.query.trim().toLowerCase();
-  if (query === "") return true;
+  if (query === '') return true;
   return (
     person.name.toLowerCase().includes(query) ||
     person.role.toLowerCase().includes(query) ||
-    (person.department ?? "").toLowerCase().includes(query)
+    (person.department ?? '').toLowerCase().includes(query)
   );
 }
 

@@ -29,6 +29,8 @@
     "build": "node scripts/build.mjs",
     "start": "node dist/cli.js",
     "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
     "check": "npm run typecheck && npm test && npm run build",
     "test:package": "node scripts/packed-smoke.mjs"
@@ -44,6 +46,7 @@
     "clsx": "^2.1.1",
     "esbuild": "^0.28.2",
     "lucide-react": "^0.575.0",
+    "prettier": "^3.9.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwind-merge": "^3.5.0",

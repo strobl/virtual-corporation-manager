@@ -1,13 +1,13 @@
 // Adapted from strobl/org-manager-console (GitFlash source prototype, 7edae2ad).
-import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
+import { useEffect, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
 
 export interface Column<Row> {
   key: string;
   header: string;
   /** Fixed width keeps the layout stable across loading and selection. */
   width: string;
-  align?: "left" | "right";
+  align?: 'left' | 'right';
   cell: (row: Row) => React.ReactNode;
 }
 
@@ -41,7 +41,7 @@ export function CompactTable<Row>({
   rowDisabled,
   loading = false,
   error = null,
-  emptyMessage = "No rows.",
+  emptyMessage = 'No rows.',
   disabled = false,
   className,
 }: CompactTableProps<Row>) {
@@ -69,21 +69,25 @@ export function CompactTable<Row>({
         focusRow(next);
       }
     };
-    if (event.key === "ArrowDown") move(index + 1);
-    else if (event.key === "ArrowUp") move(index - 1);
-    else if (event.key === "Home") move(0);
-    else if (event.key === "End") move(keys.length - 1);
-    else if (event.key === "Enter" || event.key === " ") {
+    if (event.key === 'ArrowDown') move(index + 1);
+    else if (event.key === 'ArrowUp') move(index - 1);
+    else if (event.key === 'Home') move(0);
+    else if (event.key === 'End') move(keys.length - 1);
+    else if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       onSelect?.(id);
     }
   };
 
-  const status = error ? "error" : loading ? "loading" : rows.length === 0 ? "empty" : "ready";
+  const status = error ? 'error' : loading ? 'loading' : rows.length === 0 ? 'empty' : 'ready';
 
   return (
     <div
-      className={cn("overflow-hidden rounded-lg border border-border bg-card", disabled && "opacity-60", className)}
+      className={cn(
+        'overflow-hidden rounded-lg border border-border bg-card',
+        disabled && 'opacity-60',
+        className,
+      )}
       data-status={status}
     >
       <table
@@ -104,8 +108,8 @@ export function CompactTable<Row>({
                 key={column.key}
                 scope="col"
                 className={cn(
-                  "border-b border-border px-dense-3 py-dense-1 text-micro font-medium text-muted-foreground",
-                  column.align === "right" ? "text-right" : "text-left",
+                  'border-b border-border px-dense-3 py-dense-1 text-micro font-medium text-muted-foreground',
+                  column.align === 'right' ? 'text-right' : 'text-left',
                 )}
               >
                 {column.header}
@@ -114,17 +118,17 @@ export function CompactTable<Row>({
           </tr>
         </thead>
         <tbody>
-          {status !== "ready" ? (
+          {status !== 'ready' ? (
             <tr>
               <td
                 colSpan={columns.length}
                 className={cn(
-                  "h-row px-dense-2 text-dense",
-                  status === "error" ? "text-danger" : "text-muted-foreground",
+                  'h-row px-dense-2 text-dense',
+                  status === 'error' ? 'text-danger' : 'text-muted-foreground',
                 )}
               >
-                <span role={status === "error" ? "alert" : "status"}>
-                  {status === "error" ? error : status === "loading" ? "Loading…" : emptyMessage}
+                <span role={status === 'error' ? 'alert' : 'status'}>
+                  {status === 'error' ? error : status === 'loading' ? 'Loading…' : emptyMessage}
                 </span>
               </td>
             </tr>
@@ -151,19 +155,19 @@ export function CompactTable<Row>({
                     onSelect?.(id);
                   }}
                   className={cn(
-                    "focus-console h-row border-b border-border-subtle text-[length:var(--type-dense)]",
+                    'focus-console h-row border-b border-border-subtle text-[length:var(--type-dense)]',
                     isSelected
-                      ? "bg-primary/10 text-foreground [&>td:first-child]:shadow-[inset_2px_0_0_var(--color-primary)]"
-                      : "text-foreground hover:bg-hover",
-                    isDisabled && "text-disabled-foreground",
+                      ? 'bg-primary/10 text-foreground [&>td:first-child]:shadow-[inset_2px_0_0_var(--color-primary)]'
+                      : 'text-foreground hover:bg-hover',
+                    isDisabled && 'text-disabled-foreground',
                   )}
                 >
                   {columns.map((column) => (
                     <td
                       key={column.key}
                       className={cn(
-                        "truncate px-dense-2",
-                        column.align === "right" ? "text-right" : "text-left",
+                        'truncate px-dense-2',
+                        column.align === 'right' ? 'text-right' : 'text-left',
                       )}
                     >
                       {column.cell(row)}

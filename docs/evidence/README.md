@@ -2,8 +2,8 @@
 
 These are real outputs produced by two configured roles through the installed Codex CLI, not seeded demo records. They concern a synthetic GitFlash acceptance company and contain no customer data. They are agent-authored working documents, not independent test certificates or human-pilot feedback.
 
-| Role | Run ID | Duration | Output SHA-256 |
-| --- | --- | --- | --- |
+| Role            | Run ID                                 | Duration | Output SHA-256                                                     |
+| --------------- | -------------------------------------- | -------- | ------------------------------------------------------------------ |
 | Release Auditor | `723f7fd4-c01d-4002-a526-664ea6ec9f15` | 36.845 s | `d4736671f8ecbedbe8aa31180ddf2c69407715091c1f60098f54fe85e2df1c31` |
 | Product Analyst | `23aac6dc-81d2-4903-9f41-08fb4112ed0a` | 36.978 s | `20522a42a7dd48c72800a9eda6fa34f2c983e61db7312871465b680fdfa9592e` |
 

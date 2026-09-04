@@ -1,7 +1,7 @@
 // Adapted from strobl/org-manager-console (GitFlash source prototype, 7edae2ad).
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
-import { TYPEAHEAD_RESET_MS } from "@/lib/organization/tree";
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
+import { TYPEAHEAD_RESET_MS } from '@/lib/organization/tree';
 
 export interface TreeNode {
   id: string;
@@ -73,7 +73,7 @@ export function DenseTree({
   onExpandedChange,
   loading = false,
   error = null,
-  emptyMessage = "No items.",
+  emptyMessage = 'No items.',
   disabled = false,
   className,
 }: DenseTreeProps) {
@@ -86,7 +86,7 @@ export function DenseTree({
   const rows = useMemo(() => flatten(nodes, expanded), [nodes, expanded]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const rowRefs = useRef(new Map<string, HTMLDivElement>());
-  const buffer = useRef({ text: "", at: 0 });
+  const buffer = useRef({ text: '', at: 0 });
   const selectedSet = useMemo(
     () => new Set<string>(selectedIds ?? (selectedId ? [selectedId] : [])),
     [selectedIds, selectedId],
@@ -126,19 +126,19 @@ export function DenseTree({
     if (disabled) return;
     const index = rows.findIndex((r) => r.node.id === row.node.id);
     switch (event.key) {
-      case "ArrowDown": {
+      case 'ArrowDown': {
         event.preventDefault();
         const next = rows[index + 1];
         if (next) focusRow(next.node.id);
         break;
       }
-      case "ArrowUp": {
+      case 'ArrowUp': {
         event.preventDefault();
         const prev = rows[index - 1];
         if (prev) focusRow(prev.node.id);
         break;
       }
-      case "ArrowRight": {
+      case 'ArrowRight': {
         event.preventDefault();
         if (row.hasChildren && !row.expanded) toggle(row.node.id, true);
         else if (row.expanded) {
@@ -147,26 +147,26 @@ export function DenseTree({
         }
         break;
       }
-      case "ArrowLeft": {
+      case 'ArrowLeft': {
         event.preventDefault();
         if (row.hasChildren && row.expanded) toggle(row.node.id, false);
         else if (row.parentId) focusRow(row.parentId);
         break;
       }
-      case "Home": {
+      case 'Home': {
         event.preventDefault();
         const first = rows[0];
         if (first) focusRow(first.node.id);
         break;
       }
-      case "End": {
+      case 'End': {
         event.preventDefault();
         const last = rows[rows.length - 1];
         if (last) focusRow(last.node.id);
         break;
       }
-      case "Enter":
-      case " ": {
+      case 'Enter':
+      case ' ': {
         event.preventDefault();
         if (!row.node.disabled) onSelect?.(row.node.id);
         break;
@@ -198,22 +198,26 @@ export function DenseTree({
     }
   };
 
-  const status = error ? "error" : loading ? "loading" : rows.length === 0 ? "empty" : "ready";
+  const status = error ? 'error' : loading ? 'loading' : rows.length === 0 ? 'empty' : 'ready';
 
   return (
     <div
-      className={cn("overflow-hidden rounded-lg border border-border bg-card", disabled && "opacity-60", className)}
+      className={cn(
+        'overflow-hidden rounded-lg border border-border bg-card',
+        disabled && 'opacity-60',
+        className,
+      )}
       data-status={status}
     >
-      {status !== "ready" ? (
+      {status !== 'ready' ? (
         <p
           className={cn(
-            "px-dense-3 py-dense-2 text-dense",
-            status === "error" ? "text-danger" : "text-muted-foreground",
+            'px-dense-3 py-dense-2 text-dense',
+            status === 'error' ? 'text-danger' : 'text-muted-foreground',
           )}
-          role={status === "error" ? "alert" : "status"}
+          role={status === 'error' ? 'alert' : 'status'}
         >
-          {status === "error" ? error : status === "loading" ? "Loading…" : emptyMessage}
+          {status === 'error' ? error : status === 'loading' ? 'Loading…' : emptyMessage}
         </p>
       ) : (
         <div role="tree" aria-label={label} aria-busy={loading || undefined} className="py-dense-0">
@@ -227,7 +231,7 @@ export function DenseTree({
                 aria-level={row.level}
                 aria-selected={isSelected}
                 aria-disabled={row.node.disabled || disabled || undefined}
-                {...(row.hasChildren ? { "aria-expanded": row.expanded } : {})}
+                {...(row.hasChildren ? { 'aria-expanded': row.expanded } : {})}
                 tabIndex={isActive ? 0 : -1}
                 ref={(el) => {
                   if (el) rowRefs.current.set(row.node.id, el);
@@ -241,11 +245,11 @@ export function DenseTree({
                   onSelect?.(row.node.id);
                 }}
                 className={cn(
-                  "focus-console flex h-row cursor-default items-center gap-dense-1 pr-dense-2 text-[length:var(--type-dense)]",
+                  'focus-console flex h-row cursor-default items-center gap-dense-1 pr-dense-2 text-[length:var(--type-dense)]',
                   isSelected
-                    ? "bg-primary/10 font-medium text-foreground shadow-[inset_2px_0_0_var(--color-primary)]"
-                    : "text-foreground hover:bg-hover",
-                  (row.node.disabled || disabled) && "cursor-not-allowed text-disabled-foreground",
+                    ? 'bg-primary/10 font-medium text-foreground shadow-[inset_2px_0_0_var(--color-primary)]'
+                    : 'text-foreground hover:bg-hover',
+                  (row.node.disabled || disabled) && 'cursor-not-allowed text-disabled-foreground',
                 )}
                 style={{ paddingLeft: `calc(var(--tree-indent) * ${row.level})` }}
               >
@@ -260,7 +264,7 @@ export function DenseTree({
                   }}
                   className="w-3 shrink-0 text-left text-micro disabled:opacity-0"
                 >
-                  {row.expanded ? "−" : "+"}
+                  {row.expanded ? '−' : '+'}
                 </button>
                 <span className="truncate">{row.node.label}</span>
                 {row.node.trailing ? (

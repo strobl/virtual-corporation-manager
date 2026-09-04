@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Activity,
   Archive,
@@ -25,18 +25,18 @@ import {
   Undo2,
   X,
   Zap,
-} from "lucide-react";
-import { brand } from "../brand";
+} from 'lucide-react';
+import { brand } from '../brand';
 import type {
   Agent,
   ChangePreview,
   DomainCommand,
   TemplateSummary,
   WorkspaceState,
-} from "../domain/contracts";
-import { DenseTree } from "../components/ds/DenseTree";
-import { CorporationOrgChart } from "../components/organization/CorporationOrgChart";
-import { client, request, type UndoPreview } from "./client";
+} from '../domain/contracts';
+import { DenseTree } from '../components/ds/DenseTree';
+import { CorporationOrgChart } from '../components/organization/CorporationOrgChart';
+import { client, request, type UndoPreview } from './client';
 import {
   companyAgents,
   companyForSelection,
@@ -46,56 +46,49 @@ import {
   selectedTreeRows,
   toSnapshot,
   type Selection,
-} from "./model";
-import {
-  Dialog,
-  EntityEditor,
-  PreviewDialog,
-  type EditorTarget,
-} from "./Dialogs";
-import { CompanyMap } from "./CompanyMap";
-import { AdvancedDialog, type AdvancedTarget } from "./AdvancedDialogs";
+} from './model';
+import { Dialog, EntityEditor, PreviewDialog, type EditorTarget } from './Dialogs';
+import { CompanyMap } from './CompanyMap';
+import { AdvancedDialog, type AdvancedTarget } from './AdvancedDialogs';
 import {
   IntegrationsView,
   RunDialog,
   WorkView,
   type IntegrationStatus,
   type RunInfo,
-} from "./Work";
+} from './Work';
 
-type Area = "organization" | "work" | "integrations" | "activity" | "settings";
-type View = "map" | "reporting" | "list";
+type Area = 'organization' | 'work' | 'integrations' | 'activity' | 'settings';
+type View = 'map' | 'reporting' | 'list';
 const AREA_NAMES: Record<Area, string> = {
-  organization: "Organization",
-  work: "Work",
-  integrations: "Integrations",
-  activity: "Activity",
-  settings: "Settings",
+  organization: 'Organization',
+  work: 'Work',
+  integrations: 'Integrations',
+  activity: 'Activity',
+  settings: 'Settings',
 };
 const AREAS = [
-  { id: "organization", icon: Building2 },
-  { id: "work", icon: Activity },
-  { id: "integrations", icon: PlugZap },
+  { id: 'organization', icon: Building2 },
+  { id: 'work', icon: Activity },
+  { id: 'integrations', icon: PlugZap },
 ] as const;
 type PendingChange =
-  | { kind: "commands"; commands: DomainCommand[]; summary: string }
-  | { kind: "template"; id: string };
+  | { kind: 'commands'; commands: DomainCommand[]; summary: string }
+  | { kind: 'template'; id: string };
 const message = (error: unknown) =>
-  error instanceof Error
-    ? error.message
-    : "Something went wrong. Please try again.";
+  error instanceof Error ? error.message : 'Something went wrong. Please try again.';
 
 export function App() {
   const [state, setState] = useState<WorkspaceState | null>(null);
   const [templates, setTemplates] = useState<TemplateSummary[]>([]);
   const [status, setStatus] = useState<IntegrationStatus | null>(null);
   const [runs, setRuns] = useState<RunInfo[]>([]);
-  const [area, setArea] = useState<Area>("organization");
-  const [view, setView] = useState<View>("map");
+  const [area, setArea] = useState<Area>('organization');
+  const [view, setView] = useState<View>('map');
   const [selection, setSelection] = useState<Selection | null>(() =>
-    parseSelection(new URLSearchParams(location.search).get("selected") ?? ""),
+    parseSelection(new URLSearchParams(location.search).get('selected') ?? ''),
   );
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<string[]>([]);
   const [editor, setEditor] = useState<EditorTarget | null>(null);
   const [templatesOpen, setTemplatesOpen] = useState(false);
@@ -114,8 +107,10 @@ export function App() {
   const drawerClose = useRef<HTMLButtonElement>(null);
   const drawerUsed = useRef(false);
   useEffect(() => {
-    if (navOpen) { drawerUsed.current = true; drawerClose.current?.focus(); }
-    else if (drawerUsed.current) menuButton.current?.focus();
+    if (navOpen) {
+      drawerUsed.current = true;
+      drawerClose.current?.focus();
+    } else if (drawerUsed.current) menuButton.current?.focus();
   }, [navOpen]);
   const [showInspector, setShowInspector] = useState(true);
   const [archived, setArchived] = useState(false);
@@ -124,24 +119,22 @@ export function App() {
     const results = await Promise.allSettled([
       client.state(),
       client.templates(),
-      request<IntegrationStatus>("/api/integrations"),
-      request<RunInfo[]>("/api/runs"),
+      request<IntegrationStatus>('/api/integrations'),
+      request<RunInfo[]>('/api/runs'),
     ]);
-    if (results[0].status === "fulfilled") {
+    if (results[0].status === 'fulfilled') {
       setState(results[0].value);
       setError(null);
     } else setError(message(results[0].reason));
-    if (results[1].status === "fulfilled") setTemplates(results[1].value);
-    if (results[2].status === "fulfilled") setStatus(results[2].value);
-    if (results[3].status === "fulfilled") setRuns(results[3].value);
+    if (results[1].status === 'fulfilled') setTemplates(results[1].value);
+    if (results[2].status === 'fulfilled') setStatus(results[2].value);
+    if (results[3].status === 'fulfilled') setRuns(results[3].value);
     setLoading(false);
   }, []);
   useEffect(() => {
     void refresh();
   }, [refresh]);
-  const running = runs.some(
-    (run) => run.status === "queued" || run.status === "running",
-  );
+  const running = runs.some((run) => run.status === 'queued' || run.status === 'running');
   useEffect(() => {
     if (!running) return;
     const timer = window.setInterval(() => void refresh(), 2500);
@@ -154,50 +147,41 @@ export function App() {
   }, [toast]);
   useEffect(() => {
     const url = new URL(location.href);
-    if (selection) url.searchParams.set("selected", selectionKey(selection));
-    else url.searchParams.delete("selected");
-    history.replaceState(null, "", url);
+    if (selection) url.searchParams.set('selected', selectionKey(selection));
+    else url.searchParams.delete('selected');
+    history.replaceState(null, '', url);
   }, [selection]);
   useEffect(() => {
     if (!state) return;
     const valid =
       selection &&
-      (selection.kind === "company"
-        ? state.companies.some(
-            (row) => row.id === selection.id && row.status === "active",
-          )
-        : selection.kind === "department"
+      (selection.kind === 'company'
+        ? state.companies.some((row) => row.id === selection.id && row.status === 'active')
+        : selection.kind === 'department'
           ? state.departments.some(
               (row) =>
                 row.id === selection.id &&
                 state.companies.some(
-                  (company) =>
-                    company.id === row.companyId && company.status === "active",
+                  (company) => company.id === row.companyId && company.status === 'active',
                 ),
             )
-          : state.agents.some(
-              (row) => row.id === selection.id && row.status === "active",
-            ));
+          : state.agents.some((row) => row.id === selection.id && row.status === 'active'));
     if (!valid) {
-      const first = state.companies.find((row) => row.status === "active");
-      setSelection(first ? { kind: "company", id: first.id } : null);
+      const first = state.companies.find((row) => row.status === 'active');
+      setSelection(first ? { kind: 'company', id: first.id } : null);
     }
     setExpanded((previous) => [
-      ...new Set([
-        ...previous,
-        ...state.companies.map((row) => `company:${row.id}`),
-      ]),
+      ...new Set([...previous, ...state.companies.map((row) => `company:${row.id}`)]),
     ]);
   }, [state]);
   const companyId = state ? companyForSelection(state, selection) : null;
   const company = state?.companies.find((row) => row.id === companyId);
-  const tree = useMemo(
-    () => (state ? organizationTree(state, query) : []),
-    [state, query],
-  );
+  const tree = useMemo(() => (state ? organizationTree(state, query) : []), [state, query]);
   const snapshot = useMemo(() => (state ? toSnapshot(state) : null), [state]);
   const select = (value: Selection) => {
-    setSelection(value.kind === "agent" && !value.companyId && companyId ? { ...value, companyId } : value);
+    setSelection(
+      value.kind === 'agent' && !value.companyId && companyId ? { ...value, companyId } : value,
+    );
     setShowInspector(true);
     setNavOpen(false);
   };
@@ -217,21 +201,16 @@ export function App() {
     setPending(change);
     try {
       const next =
-        change.kind === "template"
+        change.kind === 'template'
           ? await client.template(change.id, revision ?? state.revision)
-          : await client.preview(
-              change.commands,
-              revision ?? state.revision,
-              change.summary,
-            );
+          : await client.preview(change.commands, revision ?? state.revision, change.summary);
       setPreview(next);
       setEditor(null);
       setTemplatesOpen(false);
       setAdvanced(null);
     } catch (cause) {
       setModalError(message(cause));
-      if (!editor && !preview && !templatesOpen && !advanced)
-        setError(message(cause));
+      if (!editor && !preview && !templatesOpen && !advanced) setError(message(cause));
     } finally {
       setBusy(false);
     }
@@ -257,8 +236,8 @@ export function App() {
       setPending(null);
       announce(
         result.replayed
-          ? "This change was already applied."
-          : "Changes saved. Your company is up to date.",
+          ? 'This change was already applied.'
+          : 'Changes saved. Your company is up to date.',
       );
     } catch (cause) {
       setModalError(message(cause));
@@ -267,7 +246,7 @@ export function App() {
     }
   };
   const undo = async (id: string) => {
-    if (!state) return;
+    if (!state || busy) return;
     setBusy(true);
     setError(null);
     setModalError(null);
@@ -286,7 +265,7 @@ export function App() {
     try {
       setState(await client.undo(undoPreview.changeId, undoPreview.baseRevision));
       setUndoPreview(null);
-      announce("Configuration change undone. Work evidence was retained.");
+      announce('Configuration change undone. Work evidence was retained.');
     } catch (cause) {
       setModalError(message(cause));
     } finally {
@@ -294,20 +273,16 @@ export function App() {
     }
   };
   const command = (commands: DomainCommand[], summary: string) =>
-    prepare({ kind: "commands", commands, summary });
-  const activeCompanies =
-    state?.companies.filter((row) => row.status === "active") ?? [];
-  const activeAgents =
-    state?.agents.filter((row) => row.status === "active") ?? [];
+    prepare({ kind: 'commands', commands, summary });
+  const activeCompanies = state?.companies.filter((row) => row.status === 'active') ?? [];
+  const activeAgents = state?.agents.filter((row) => row.status === 'active') ?? [];
   const agents = state && companyId ? companyAgents(state, companyId) : [];
   const selectedDepartment =
-    selection?.kind === "department"
+    selection?.kind === 'department'
       ? state?.departments.find((row) => row.id === selection.id)
       : null;
   const selectedAgent =
-    selection?.kind === "agent"
-      ? state?.agents.find((row) => row.id === selection.id)
-      : null;
+    selection?.kind === 'agent' ? state?.agents.find((row) => row.id === selection.id) : null;
   const filteredAgents = agents.filter(
     (agent) =>
       (!selectedDepartment || agent.departmentId === selectedDepartment.id) &&
@@ -322,10 +297,7 @@ export function App() {
   };
 
   return (
-    <div
-      className="gitflash"
-      style={{ "--brand-accent": brand.accent } as React.CSSProperties}
-    >
+    <div className="gitflash" style={{ '--brand-accent': brand.accent } as React.CSSProperties}>
       <a className="skip-link" href="#main">
         Skip to workspace
       </a>
@@ -337,20 +309,40 @@ export function App() {
         />
       )}
       <aside
-        className={`sidebar ${navOpen ? "open" : ""}`}
+        className={`sidebar ${navOpen ? 'open' : ''}`}
         aria-label="Workspace navigation"
-        onKeyDown={event => {
+        onKeyDown={(event) => {
           if (!navOpen) return;
-          if (event.key === "Escape") { event.preventDefault(); setNavOpen(false); }
-          if (event.key === "Tab") {
-            const elements = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], input, [tabindex="0"]')).filter(element => element.getClientRects().length > 0);
-            const first = elements[0], last = elements.at(-1);
-            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
-            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+          if (event.key === 'Escape') {
+            event.preventDefault();
+            setNavOpen(false);
+          }
+          if (event.key === 'Tab') {
+            const elements = Array.from(
+              event.currentTarget.querySelectorAll<HTMLElement>(
+                'button:not([disabled]), a[href], input, [tabindex="0"]',
+              ),
+            ).filter((element) => element.getClientRects().length > 0);
+            const first = elements[0],
+              last = elements.at(-1);
+            if (event.shiftKey && document.activeElement === first) {
+              event.preventDefault();
+              last?.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+              event.preventDefault();
+              first?.focus();
+            }
           }
         }}
       >
-        <button ref={drawerClose} className="icon-button drawer-close" aria-label="Close navigation drawer" onClick={() => setNavOpen(false)}><X size={18} /></button>
+        <button
+          ref={drawerClose}
+          className="icon-button drawer-close"
+          aria-label="Close navigation drawer"
+          onClick={() => setNavOpen(false)}
+        >
+          <X size={18} />
+        </button>
         <a className="brand" href="/" aria-label={`${brand.name} home`}>
           <span className="brand-mark">
             <Zap size={20} fill="currentColor" />
@@ -361,21 +353,16 @@ export function App() {
         <nav className="primary-nav" aria-label="Primary">
           {AREAS.map(({ id, icon: Icon }) => (
             <button
-              className={area === id ? "active" : ""}
-              aria-current={area === id ? "page" : undefined}
+              className={area === id ? 'active' : ''}
+              aria-current={area === id ? 'page' : undefined}
               onClick={() => navigate(id)}
               key={id}
             >
               <Icon size={17} />
               {AREA_NAMES[id]}
-              {id === "work" && running && (
+              {id === 'work' && running && (
                 <span className="activity-count">
-                  {
-                    runs.filter(
-                      (run) =>
-                        run.status === "running" || run.status === "queued",
-                    ).length
-                  }
+                  {runs.filter((run) => run.status === 'running' || run.status === 'queued').length}
                 </span>
               )}
             </button>
@@ -386,7 +373,7 @@ export function App() {
           <button
             className="icon-button"
             aria-label="Create company"
-            onClick={() => openEditor({ kind: "company" })}
+            onClick={() => openEditor({ kind: 'company' })}
           >
             <Plus size={16} />
           </button>
@@ -400,11 +387,7 @@ export function App() {
             aria-label="Search organization"
           />
           {query && (
-            <button
-              className="icon-button"
-              aria-label="Clear search"
-              onClick={() => setQuery("")}
-            >
+            <button className="icon-button" aria-label="Clear search" onClick={() => setQuery('')}>
               <X size={12} />
             </button>
           )}
@@ -422,29 +405,29 @@ export function App() {
                 const next = parseSelection(key);
                 if (next) {
                   select(next);
-                  setArea("organization");
+                  setArea('organization');
                 }
               }}
             />
           ) : (
             <p className="sidebar-empty">
               {query
-                ? "No matches. Try a name or responsibility."
-                : "Your company will appear here."}
+                ? 'No matches. Try a name or responsibility.'
+                : 'Your company will appear here.'}
             </p>
           )}
         </div>
         <div className="sidebar-bottom">
           <button
-            onClick={() => navigate("activity")}
-            className={area === "activity" ? "active" : ""}
+            onClick={() => navigate('activity')}
+            className={area === 'activity' ? 'active' : ''}
           >
             <Activity size={16} />
             Activity & undo
           </button>
           <button
-            onClick={() => navigate("settings")}
-            className={area === "settings" ? "active" : ""}
+            onClick={() => navigate('settings')}
+            className={area === 'settings' ? 'active' : ''}
           >
             <Settings2 size={16} />
             Settings
@@ -468,12 +451,10 @@ export function App() {
           </button>
           <div className="breadcrumb">
             <span>{AREA_NAMES[area]}</span>
-            {company && area === "organization" && (
+            {company && area === 'organization' && (
               <>
                 <ChevronRight size={14} />
-                <button
-                  onClick={() => select({ kind: "company", id: company.id })}
-                >
+                <button onClick={() => select({ kind: 'company', id: company.id })}>
                   {company.name}
                 </button>
                 {selectedDepartment && (
@@ -494,9 +475,9 @@ export function App() {
           <div className="topbar-actions">
             <span className="saved-status">
               <CheckCircle2 size={13} />
-              {loading ? "Connecting…" : "Saved locally"}
+              {loading ? 'Connecting…' : 'Saved locally'}
             </span>
-            {area === "organization" && (
+            {area === 'organization' && (
               <button
                 className="button"
                 aria-label="Templates"
@@ -537,36 +518,30 @@ export function App() {
             </div>
           ) : (
             <>
-              {area === "organization" && (
+              {area === 'organization' && (
                 <>
                   {!activeCompanies.length ? (
                     <div className="welcome">
                       <div className="welcome-copy">
-                        <span className="eyebrow">
-                          YOUR COMPANY, REIMAGINED
-                        </span>
+                        <span className="eyebrow">YOUR COMPANY, REIMAGINED</span>
                         <h1>
                           Great work starts
                           <br />
                           with a clear organization.
                         </h1>
                         <p>
-                          Build your company of AI agents. Give every team a
-                          purpose, every agent a responsibility, and every task
-                          a place to land.
+                          Build your company of AI agents. Give every team a purpose, every agent a
+                          responsibility, and every task a place to land.
                         </p>
                         <div className="welcome-actions">
                           <button
                             className="button primary large"
-                            onClick={() => openEditor({ kind: "company" })}
+                            onClick={() => openEditor({ kind: 'company' })}
                           >
                             Create a company
                             <ArrowRight size={17} />
                           </button>
-                          <button
-                            className="button large"
-                            onClick={() => setTemplatesOpen(true)}
-                          >
+                          <button className="button large" onClick={() => setTemplatesOpen(true)}>
                             Explore templates
                           </button>
                         </div>
@@ -585,7 +560,7 @@ export function App() {
                         </div>
                         <div className="illustration-line" />
                         <div className="illustration-teams">
-                          {["Build", "Create", "Grow"].map((name, index) => (
+                          {['Build', 'Create', 'Grow'].map((name, index) => (
                             <div className="welcome-card" key={name}>
                               <span className={`demo-dot demo-${index}`} />
                               <strong>{name}</strong>
@@ -610,16 +585,12 @@ export function App() {
                         <div>
                           <b>02</b>
                           <strong>Make ownership clear</strong>
-                          <span>
-                            Connect departments, agents, and responsibilities.
-                          </span>
+                          <span>Connect departments, agents, and responsibilities.</span>
                         </div>
                         <div>
                           <b>03</b>
                           <strong>Get useful work done</strong>
-                          <span>
-                            Connect a runtime and inspect the real result.
-                          </span>
+                          <span>Connect a runtime and inspect the real result.</span>
                         </div>
                       </div>
                     </div>
@@ -628,10 +599,10 @@ export function App() {
                       <section className="organization-header">
                         <div>
                           <span className="eyebrow">COMPANY WORKSPACE</span>
-                          <h1>{company?.name ?? "Your organization"}</h1>
+                          <h1>{company?.name ?? 'Your organization'}</h1>
                           <p>
                             {company?.description ||
-                              "A clear view of the people, agents, and teams behind your work."}
+                              'A clear view of the people, agents, and teams behind your work.'}
                           </p>
                         </div>
                         <div className="organization-actions">
@@ -639,7 +610,7 @@ export function App() {
                             className="button"
                             onClick={() =>
                               openEditor({
-                                kind: "department",
+                                kind: 'department',
                                 companyId: companyId ?? undefined,
                               })
                             }
@@ -652,7 +623,7 @@ export function App() {
                             className="button primary"
                             onClick={() =>
                               openEditor({
-                                kind: "agent",
+                                kind: 'agent',
                                 companyId: companyId ?? undefined,
                                 departmentId: selectedDepartment?.id,
                               })
@@ -668,22 +639,15 @@ export function App() {
                         <span>
                           <Bot size={15} />
                           <strong>
-                            {
-                              agents.filter((row) => row.kind === "agent")
-                                .length
-                            }
-                          </strong>{" "}
+                            {agents.filter((row) => row.kind === 'agent').length}
+                          </strong>{' '}
                           configured agents
                         </span>
                         <span>
                           <Layers3 size={15} />
                           <strong>
-                            {
-                              state.departments.filter(
-                                (row) => row.companyId === companyId,
-                              ).length
-                            }
-                          </strong>{" "}
+                            {state.departments.filter((row) => row.companyId === companyId).length}
+                          </strong>{' '}
                           departments
                         </span>
                         <span>
@@ -691,12 +655,10 @@ export function App() {
                           <strong>
                             {
                               state.work.filter(
-                                (row) =>
-                                  row.companyId === companyId &&
-                                  row.status === "accepted",
+                                (row) => row.companyId === companyId && row.status === 'accepted',
                               ).length
                             }
-                          </strong>{" "}
+                          </strong>{' '}
                           accepted outputs
                         </span>
                         <span className="configuration-note">
@@ -704,31 +666,27 @@ export function App() {
                         </span>
                       </div>
                       <div className="view-toolbar">
-                        <div
-                          className="view-tabs"
-                          role="tablist"
-                          aria-label="Organization view"
-                        >
+                        <div className="view-tabs" role="tablist" aria-label="Organization view">
                           {(
                             [
                               {
-                                id: "map",
+                                id: 'map',
                                 icon: LayoutGrid,
-                                label: "Company map",
+                                label: 'Company map',
                               },
                               {
-                                id: "reporting",
+                                id: 'reporting',
                                 icon: GitBranch,
-                                label: "Reporting lines",
+                                label: 'Reporting lines',
                               },
-                              { id: "list", icon: List, label: "Agent list" },
+                              { id: 'list', icon: List, label: 'Agent list' },
                             ] as const
                           ).map(({ id, icon: Icon, label }) => (
                             <button
                               key={id}
                               role="tab"
                               aria-selected={view === id}
-                              className={view === id ? "active" : ""}
+                              className={view === id ? 'active' : ''}
                               onClick={() => setView(id)}
                             >
                               <Icon size={14} />
@@ -740,63 +698,54 @@ export function App() {
                           className="text-button"
                           onClick={() => setShowInspector((value) => !value)}
                         >
-                          {showInspector ? "Hide details" : "Show details"}
+                          {showInspector ? 'Hide details' : 'Show details'}
                         </button>
                       </div>
                       <div className="organization-body">
                         <div className="organization-canvas">
-                          {companyId && view === "map" && (
+                          {companyId && view === 'map' && (
                             <CompanyMap
                               state={state}
                               companyId={companyId}
                               selection={selection}
                               onSelect={select}
                               onCreateDepartment={() =>
-                                openEditor({ kind: "department", companyId })
+                                openEditor({ kind: 'department', companyId })
                               }
                             />
                           )}
-                          {companyId && snapshot && view === "reporting" && (
+                          {companyId && snapshot && view === 'reporting' && (
                             <div className="reporting-view">
                               <CorporationOrgChart
                                 snapshot={snapshot}
                                 corporationId={companyId}
-                                corporationName={company?.name ?? ""}
-                                selection={
-                                  selection?.kind === "agent"
-                                    ? selection.id
-                                    : null
-                                }
+                                corporationName={company?.name ?? ''}
+                                selection={selection?.kind === 'agent' ? selection.id : null}
                                 onSelectAgent={(id) =>
                                   id
-                                    ? select({ kind: "agent", id })
-                                    : select({ kind: "company", id: companyId })
+                                    ? select({ kind: 'agent', id })
+                                    : select({ kind: 'company', id: companyId })
                                 }
                               />
                             </div>
                           )}
-                          {view === "list" && (
+                          {view === 'list' && (
                             <div className="agent-list-view">
                               <div className="list-heading">
-                                <h2>
-                                  {selectedDepartment?.name ??
-                                    "All company agents"}
-                                </h2>
-                                <span className="muted small">
-                                  {filteredAgents.length} members
-                                </span>
+                                <h2>{selectedDepartment?.name ?? 'All company agents'}</h2>
+                                <span className="muted small">{filteredAgents.length} members</span>
                               </div>
                               <AgentList
                                 agents={filteredAgents}
                                 state={state}
                                 selection={selection}
-                                onSelect={(id) => select({ kind: "agent", id })}
+                                onSelect={(id) => select({ kind: 'agent', id })}
                               />
                               {!filteredAgents.length && (
                                 <p className="list-empty">
                                   {query
-                                    ? "No agents match your search."
-                                    : "Add your first agent to start defining responsibilities."}
+                                    ? 'No agents match your search.'
+                                    : 'Add your first agent to start defining responsibilities.'}
                                 </p>
                               )}
                             </div>
@@ -816,24 +765,20 @@ export function App() {
                             </div>
                             <div className="inspector-identity">
                               <span className="inspector-symbol">
-                                {selection.kind === "agent" ? (
+                                {selection.kind === 'agent' ? (
                                   <Bot size={24} />
-                                ) : selection.kind === "department" ? (
+                                ) : selection.kind === 'department' ? (
                                   <Layers3 size={24} />
                                 ) : (
                                   <Building2 size={24} />
                                 )}
                               </span>
                               <h2>
-                                {selectedAgent?.name ??
-                                  selectedDepartment?.name ??
-                                  company.name}
+                                {selectedAgent?.name ?? selectedDepartment?.name ?? company.name}
                               </h2>
                               <p>
                                 {selectedAgent?.role ??
-                                  (selectedDepartment
-                                    ? "Department"
-                                    : company.shortCode)}
+                                  (selectedDepartment ? 'Department' : company.shortCode)}
                               </p>
                               <button
                                 className="button small-button"
@@ -855,11 +800,9 @@ export function App() {
                                   <h3>Responsibilities</h3>
                                   {selectedAgent.responsibilities.length ? (
                                     <ul className="responsibilities">
-                                      {selectedAgent.responsibilities.map(
-                                        (item, index) => (
-                                          <li key={index}>{item}</li>
-                                        ),
-                                      )}
+                                      {selectedAgent.responsibilities.map((item, index) => (
+                                        <li key={index}>{item}</li>
+                                      ))}
                                     </ul>
                                   ) : (
                                     <p>No responsibilities defined yet.</p>
@@ -869,7 +812,7 @@ export function App() {
                                   <h3>Instructions</h3>
                                   <p className="preserve-lines">
                                     {selectedAgent.instructions ||
-                                      "Add working context and constraints to guide this agent."}
+                                      'Add working context and constraints to guide this agent.'}
                                   </p>
                                 </section>
                                 <section className="inspector-section">
@@ -879,7 +822,7 @@ export function App() {
                                       className="text-button"
                                       onClick={() =>
                                         openAdvanced({
-                                          kind: "assignments",
+                                          kind: 'assignments',
                                           agentId: selectedAgent.id,
                                         })
                                       }
@@ -891,30 +834,22 @@ export function App() {
                                     <dt>Department</dt>
                                     <dd>
                                       {state.departments.find(
-                                        (row) =>
-                                          row.id === selectedAgent.departmentId,
-                                      )?.name ?? "Company level"}
+                                        (row) => row.id === selectedAgent.departmentId,
+                                      )?.name ?? 'Company level'}
                                     </dd>
                                     <dt>Reports to</dt>
                                     <dd>
                                       {state.agents.find(
-                                        (row) =>
-                                          row.id === selectedAgent.managerId,
-                                      )?.name ?? "No manager"}
+                                        (row) => row.id === selectedAgent.managerId,
+                                      )?.name ?? 'No manager'}
                                     </dd>
                                     <dt>Type</dt>
-                                    <dd>
-                                      {selectedAgent.kind === "agent"
-                                        ? "AI agent"
-                                        : "Human"}
-                                    </dd>
+                                    <dd>{selectedAgent.kind === 'agent' ? 'AI agent' : 'Human'}</dd>
                                   </dl>
                                 </section>
                                 <section className="inspector-section run-cta">
                                   <h3>Put this agent to work</h3>
-                                  <p>
-                                    Run a specific task and review its result.
-                                  </p>
+                                  <p>Run a specific task and review its result.</p>
                                   <button
                                     className="button primary"
                                     onClick={() => setRunAgent(selectedAgent)}
@@ -924,7 +859,7 @@ export function App() {
                                   </button>
                                   <button
                                     className="text-button"
-                                    onClick={() => navigate("integrations")}
+                                    onClick={() => navigate('integrations')}
                                   >
                                     Runtime connections
                                     <ArrowUpRight size={12} />
@@ -938,7 +873,7 @@ export function App() {
                                       void command(
                                         [
                                           {
-                                            type: "agent.archive",
+                                            type: 'agent.archive',
                                             id: selectedAgent.id,
                                           },
                                         ],
@@ -956,18 +891,15 @@ export function App() {
                                 <section className="inspector-section">
                                   <h3>Purpose</h3>
                                   <p>
-                                    {(selectedDepartment?.description ??
-                                      company.description) ||
-                                      "Add a purpose so every agent knows what matters."}
+                                    {(selectedDepartment?.description ?? company.description) ||
+                                      'Add a purpose so every agent knows what matters.'}
                                   </p>
                                   {selectedDepartment?.managerId && (
                                     <p className="muted small">
-                                      Led by{" "}
+                                      Led by{' '}
                                       {
                                         state.agents.find(
-                                          (row) =>
-                                            row.id ===
-                                            selectedDepartment.managerId,
+                                          (row) => row.id === selectedDepartment.managerId,
                                         )?.name
                                       }
                                     </p>
@@ -975,23 +907,17 @@ export function App() {
                                 </section>
                                 <section className="inspector-section">
                                   <div className="section-title">
-                                    <h3>
-                                      {selectedDepartment
-                                        ? "Team members"
-                                        : "Departments"}
-                                    </h3>
+                                    <h3>{selectedDepartment ? 'Team members' : 'Departments'}</h3>
                                     <button
                                       className="icon-button"
                                       aria-label={
                                         selectedDepartment
-                                          ? "Add agent to department"
-                                          : "Add department"
+                                          ? 'Add agent to department'
+                                          : 'Add department'
                                       }
                                       onClick={() =>
                                         openEditor({
-                                          kind: selectedDepartment
-                                            ? "agent"
-                                            : "department",
+                                          kind: selectedDepartment ? 'agent' : 'department',
                                           companyId: company.id,
                                           departmentId: selectedDepartment?.id,
                                         })
@@ -1003,16 +929,12 @@ export function App() {
                                   {selectedDepartment ? (
                                     <div className="inspector-members">
                                       {agents
-                                        .filter(
-                                          (row) =>
-                                            row.departmentId ===
-                                            selectedDepartment.id,
-                                        )
+                                        .filter((row) => row.departmentId === selectedDepartment.id)
                                         .map((agent) => (
                                           <button
                                             onClick={() =>
                                               select({
-                                                kind: "agent",
+                                                kind: 'agent',
                                                 id: agent.id,
                                               })
                                             }
@@ -1031,15 +953,13 @@ export function App() {
                                     </div>
                                   ) : (
                                     state.departments
-                                      .filter(
-                                        (row) => row.companyId === company.id,
-                                      )
+                                      .filter((row) => row.companyId === company.id)
                                       .map((department) => (
                                         <button
                                           className="inspector-department"
                                           onClick={() =>
                                             select({
-                                              kind: "department",
+                                              kind: 'department',
                                               id: department.id,
                                             })
                                           }
@@ -1050,9 +970,7 @@ export function App() {
                                           <b>
                                             {
                                               agents.filter(
-                                                (row) =>
-                                                  row.departmentId ===
-                                                  department.id,
+                                                (row) => row.departmentId === department.id,
                                               ).length
                                             }
                                           </b>
@@ -1067,7 +985,7 @@ export function App() {
                                       className="text-button company-links"
                                       onClick={() =>
                                         openAdvanced({
-                                          kind: "relationships",
+                                          kind: 'relationships',
                                           companyId: company.id,
                                         })
                                       }
@@ -1075,10 +993,7 @@ export function App() {
                                       <GitBranch size={13} />
                                       Company relationships
                                     </button>
-                                    <button
-                                      className="text-button"
-                                      onClick={() => setView("list")}
-                                    >
+                                    <button className="text-button" onClick={() => setView('list')}>
                                       View all {agents.length} members
                                       <ArrowRight size={13} />
                                     </button>
@@ -1089,7 +1004,7 @@ export function App() {
                                         void command(
                                           [
                                             {
-                                              type: "company.archive",
+                                              type: 'company.archive',
                                               id: company.id,
                                             },
                                           ],
@@ -1111,53 +1026,47 @@ export function App() {
                   )}
                 </>
               )}
-              {area === "work" && (
+              {area === 'work' && (
                 <WorkView
                   state={state}
                   runs={runs}
                   onAccept={(id, title) =>
-                    void command(
-                      [{ type: "work.accept", id }],
-                      `Accept result: ${title}`,
-                    )
+                    void command([{ type: 'work.accept', id }], `Accept result: ${title}`)
                   }
                   onSelectAgent={(id) => {
-                    select({ kind: "agent", id });
-                    setArea("organization");
+                    select({ kind: 'agent', id });
+                    setArea('organization');
                   }}
                   onRefresh={() => void refresh()}
                 />
               )}
-              {area === "integrations" && (
+              {area === 'integrations' && (
                 <IntegrationsView
                   status={status}
                   companyId={companyId}
                   onRefresh={() => void refresh()}
                 />
               )}
-              {area === "activity" && (
+              {area === 'activity' && (
                 <div className="page-content">
                   <div className="section-intro">
                     <div>
                       <span className="eyebrow">A clear change history</span>
                       <h2>Activity & recovery</h2>
                       <p>
-                        Every saved change has a receipt. Undo is available
-                        while a configuration change is still safe to reverse.
+                        Every saved change has a receipt. Undo is available while a configuration
+                        change is still safe to reverse.
                       </p>
                     </div>
-                    <button
-                      className="button"
-                      onClick={() => setArchived((value) => !value)}
-                    >
+                    <button className="button" onClick={() => setArchived((value) => !value)}>
                       <Archive size={14} />
-                      {archived ? "Show changes" : "Archived entities"}
+                      {archived ? 'Show changes' : 'Archived entities'}
                     </button>
                   </div>
                   {archived ? (
                     <div className="history-list">
                       {state.companies
-                        .filter((row) => row.status === "archived")
+                        .filter((row) => row.status === 'archived')
                         .map((row) => (
                           <article key={row.id}>
                             <div>
@@ -1169,7 +1078,7 @@ export function App() {
                               disabled={busy}
                               onClick={() =>
                                 void command(
-                                  [{ type: "company.restore", id: row.id }],
+                                  [{ type: 'company.restore', id: row.id }],
                                   `Restore company: ${row.name}`,
                                 )
                               }
@@ -1179,7 +1088,7 @@ export function App() {
                           </article>
                         ))}
                       {state.agents
-                        .filter((row) => row.status === "archived")
+                        .filter((row) => row.status === 'archived')
                         .map((row) => (
                           <article key={row.id}>
                             <div>
@@ -1194,7 +1103,7 @@ export function App() {
                                 void command(
                                   [
                                     {
-                                      type: "agent.restore",
+                                      type: 'agent.restore',
                                       id: row.id,
                                       companyId,
                                     },
@@ -1203,7 +1112,7 @@ export function App() {
                                 )
                               }
                             >
-                              Restore to {company?.name ?? "a company"}
+                              Restore to {company?.name ?? 'a company'}
                             </button>
                           </article>
                         ))}
@@ -1211,45 +1120,44 @@ export function App() {
                   ) : (
                     <div className="history-list">
                       {state.history.length ? (
-                        [...state.history].sort((a, b) => b.revision - a.revision).map((row) => (
-                          <article key={row.id}>
-                            <span className="history-dot">
-                              <CheckCircle2 size={17} />
-                            </span>
-                            <div>
-                              <strong>{row.summary}</strong>
-                              <span>
-                                {new Date(row.createdAt).toLocaleString()} ·
-                                Revision {row.revision}
+                        [...state.history]
+                          .sort((a, b) => b.revision - a.revision)
+                          .map((row) => (
+                            <article key={row.id}>
+                              <span className="history-dot">
+                                <CheckCircle2 size={17} />
                               </span>
-                            </div>
-                            {row.undoable && (
-                              <button
-                                className="button"
-                                disabled={busy}
-                                onClick={() => void undo(row.id)}
-                              >
-                                <Undo2 size={14} />
-                                Undo
-                              </button>
-                            )}
-                          </article>
-                        ))
+                              <div>
+                                <strong>{row.summary}</strong>
+                                <span>
+                                  {new Date(row.createdAt).toLocaleString()} · Revision{' '}
+                                  {row.revision}
+                                </span>
+                              </div>
+                              {row.undoable && (
+                                <button
+                                  className="button"
+                                  aria-disabled={busy}
+                                  onClick={() => void undo(row.id)}
+                                >
+                                  <Undo2 size={14} />
+                                  Undo
+                                </button>
+                              )}
+                            </article>
+                          ))
                       ) : (
                         <div className="empty-state">
                           <Activity size={28} />
                           <h3>Your history starts with the first change</h3>
-                          <p>
-                            Create a company or review a template to get
-                            started.
-                          </p>
+                          <p>Create a company or review a template to get started.</p>
                         </div>
                       )}
                     </div>
                   )}
                 </div>
               )}
-              {area === "settings" && (
+              {area === 'settings' && (
                 <div className="page-content">
                   <div className="section-intro">
                     <div>
@@ -1263,9 +1171,8 @@ export function App() {
                       <ShieldCheck size={24} />
                       <h3>Local storage</h3>
                       <p>
-                        Your company configuration and work records are saved in
-                        SQLite on this computer. No GitFlash account is
-                        required.
+                        Your company configuration and work records are saved in SQLite on this
+                        computer. No GitFlash account is required.
                       </p>
                       <dl className="details-list">
                         <dt>Companies</dt>
@@ -1282,36 +1189,29 @@ export function App() {
                       <Download size={24} />
                       <h3>Export & backup</h3>
                       <p>
-                        Export a portable company definition. It contains
-                        structure and responsibilities. Use the CLI backup
-                        command to preserve the complete workspace, including
-                        work and history.
+                        Export a portable company definition. It contains structure and
+                        responsibilities. Use the CLI backup command to preserve the complete
+                        workspace, including work and history.
                       </p>
-                      <a
-                        className="button"
-                        href="/api/export"
-                        download="gitflash-company.json"
-                      >
+                      <a className="button" href="/api/export" download="gitflash-company.json">
                         <Download size={14} />
                         Export company definition
                       </a>
                       <button
                         className="button import-button"
-                        onClick={() => openAdvanced({ kind: "import" })}
+                        onClick={() => openAdvanced({ kind: 'import' })}
                       >
                         Import a company definition
                       </button>
                       <p className="small muted">
-                        See the README for backup, restore, and upgrade
-                        commands.
+                        See the README for backup, restore, and upgrade commands.
                       </p>
                     </section>
                     <section className="settings-card">
                       <Zap size={24} />
                       <h3>{brand.name}</h3>
                       <p>
-                        {brand.productName}. Free, open-source software for a
-                        company of agents.
+                        {brand.productName}. Free, open-source software for a company of agents.
                       </p>
                       <a
                         className="text-button"
@@ -1334,7 +1234,7 @@ export function App() {
             {brand.name} · {brand.productName}
           </span>
           <span>
-            {state ? `Revision ${state.revision}` : "Local workspace"}
+            {state ? `Revision ${state.revision}` : 'Local workspace'}
             <span className="footer-divider">/</span>Open source
           </span>
         </footer>
@@ -1366,7 +1266,7 @@ export function App() {
       )}
       {editor && state && (
         <EntityEditor
-          key={`${editor.kind}:${editor.id ?? "new"}:${editor.departmentId ?? ""}`}
+          key={`${editor.kind}:${editor.id ?? 'new'}:${editor.departmentId ?? ''}`}
           target={editor}
           state={state}
           busy={busy}
@@ -1394,17 +1294,62 @@ export function App() {
         />
       )}
       {undoPreview && (
-        <Dialog title="Review undo" wide onClose={() => { if (!busy) { setUndoPreview(null); setModalError(null); } }}>
+        <Dialog
+          title="Review undo"
+          wide
+          onClose={() => {
+            if (!busy) {
+              setUndoPreview(null);
+              setModalError(null);
+            }
+          }}
+        >
           <div className="dialog-body">
-            <div className="draft-label"><span /> Review · Nothing has been undone</div>
+            <div className="draft-label">
+              <span /> Review · Nothing has been undone
+            </div>
             <h3 className="preview-title">{undoPreview.summary}</h3>
-            <p className="muted">Confirm these exact configuration reversals at revision {undoPreview.baseRevision}. A later change will require a new review.</p>
-            <ol className="preview-list">{undoPreview.changes.map((change, index) => <li key={index}><span className="change-number">{index + 1}</span>{change}</li>)}</ol>
-            <p className="preview-note"><ShieldCheck size={16} /> Real work and accepted evidence are retained. Undo does not reverse external actions.</p>
-            {modalError && <div className="error-box" role="alert"><p>{modalError}</p><p>Cancel and reopen Undo to review the current workspace.</p></div>}
+            <p className="muted">
+              Confirm these exact configuration reversals at revision {undoPreview.baseRevision}. A
+              later change will require a new review.
+            </p>
+            <ol className="preview-list">
+              {undoPreview.changes.map((change, index) => (
+                <li key={index}>
+                  <span className="change-number">{index + 1}</span>
+                  {change}
+                </li>
+              ))}
+            </ol>
+            <p className="preview-note">
+              <ShieldCheck size={16} /> Real work and accepted evidence are retained. Undo does not
+              reverse external actions.
+            </p>
+            {modalError && (
+              <div className="error-box" role="alert">
+                <p>{modalError}</p>
+                <p>Cancel and reopen Undo to review the current workspace.</p>
+              </div>
+            )}
             <footer className="dialog-actions">
-              <button className="button" disabled={busy} onClick={() => { setUndoPreview(null); setModalError(null); }}>Cancel</button>
-              <button className="button primary" disabled={busy || Boolean(modalError)} onClick={() => void confirmUndo()}><Undo2 size={16} />{busy ? "Undoing…" : "Confirm undo"}</button>
+              <button
+                className="button"
+                disabled={busy}
+                onClick={() => {
+                  setUndoPreview(null);
+                  setModalError(null);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="button primary"
+                disabled={busy || Boolean(modalError)}
+                onClick={() => void confirmUndo()}
+              >
+                <Undo2 size={16} />
+                {busy ? 'Undoing…' : 'Confirm undo'}
+              </button>
             </footer>
           </div>
         </Dialog>
@@ -1419,9 +1364,8 @@ export function App() {
         >
           <div className="dialog-body">
             <p className="muted">
-              A template gives your agents roles and responsibilities. Preview
-              the entire structure before adding it. It contains no fabricated
-              work.
+              A template gives your agents roles and responsibilities. Preview the entire structure
+              before adding it. It contains no fabricated work.
             </p>
             <div className="template-grid">
               {templates.map((template) => (
@@ -1429,9 +1373,7 @@ export function App() {
                   className="template-card"
                   key={template.id}
                   disabled={busy}
-                  onClick={() =>
-                    void prepare({ kind: "template", id: template.id })
-                  }
+                  onClick={() => void prepare({ kind: 'template', id: template.id })}
                 >
                   <span className="template-icon">
                     <Layers3 size={22} />
@@ -1439,11 +1381,10 @@ export function App() {
                   <h3>{template.name}</h3>
                   <p>{template.description}</p>
                   <span className="template-counts">
-                    {template.agentCount} agents · {template.departmentCount}{" "}
-                    departments
+                    {template.agentCount} agents · {template.departmentCount} departments
                   </span>
                   <span className="text-button">
-                    {busy ? "Preparing…" : "Preview structure"}
+                    {busy ? 'Preparing…' : 'Preview structure'}
                     <ArrowRight size={14} />
                   </span>
                 </button>
@@ -1451,8 +1392,8 @@ export function App() {
             </div>
             {!templates.length && (
               <p className="connection-note">
-                No templates are available yet. You can create a company and
-                define its structure manually.
+                No templates are available yet. You can create a company and define its structure
+                manually.
               </p>
             )}
             {modalError && (
@@ -1470,8 +1411,8 @@ export function App() {
           onClose={() => setRunAgent(null)}
           onStarted={async () => {
             await refresh();
-            setArea("work");
-            announce("Task queued. Its result will appear here.");
+            setArea('work');
+            announce('Task queued. Its result will appear here.');
           }}
         />
       )}
@@ -1511,17 +1452,10 @@ function AgentList({
           {agents.map((agent) => (
             <tr
               key={agent.id}
-              className={
-                selection?.kind === "agent" && selection.id === agent.id
-                  ? "selected"
-                  : ""
-              }
+              className={selection?.kind === 'agent' && selection.id === agent.id ? 'selected' : ''}
             >
               <td>
-                <button
-                  className="agent-name"
-                  onClick={() => onSelect(agent.id)}
-                >
+                <button className="agent-name" onClick={() => onSelect(agent.id)}>
                   <span className="tiny-avatar">
                     <Bot size={13} />
                   </span>
@@ -1530,8 +1464,8 @@ function AgentList({
               </td>
               <td>{agent.role}</td>
               <td>
-                {state.departments.find((row) => row.id === agent.departmentId)
-                  ?.name ?? "Company level"}
+                {state.departments.find((row) => row.id === agent.departmentId)?.name ??
+                  'Company level'}
               </td>
               <td>{agent.responsibilities.length}</td>
               <td>

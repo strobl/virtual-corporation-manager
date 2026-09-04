@@ -1,16 +1,16 @@
 // Adapted from strobl/org-manager-console (GitFlash source prototype, 7edae2ad).
-import { forwardRef, useId, type ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { forwardRef, useId, type ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
 /* ------------------------------------------------------------------ */
 /* Validation message                                                   */
 /* ------------------------------------------------------------------ */
 
-export type MessageTone = "error" | "hint" | "success";
+export type MessageTone = 'error' | 'hint' | 'success';
 
 export function ValidationMessage({
   id,
-  tone = "error",
+  tone = 'error',
   children,
 }: {
   id?: string | undefined;
@@ -22,15 +22,15 @@ export function ValidationMessage({
     <p
       id={id}
       data-tone={tone}
-      role={tone === "error" ? "alert" : undefined}
+      role={tone === 'error' ? 'alert' : undefined}
       className={cn(
-        "mt-dense-0 text-micro",
-        tone === "error" && "text-danger",
-        tone === "success" && "text-success",
-        tone === "hint" && "text-muted-foreground",
+        'mt-dense-0 text-micro',
+        tone === 'error' && 'text-danger',
+        tone === 'success' && 'text-success',
+        tone === 'hint' && 'text-muted-foreground',
       )}
     >
-      {tone === "error" ? <span aria-hidden="true">! </span> : null}
+      {tone === 'error' ? <span aria-hidden="true">! </span> : null}
       {children}
     </p>
   );
@@ -47,11 +47,7 @@ interface FieldShellProps {
   hint?: string | undefined;
   error?: string | undefined;
   required?: boolean | undefined;
-  children: (ids: {
-    id: string;
-    describedBy: string | undefined;
-    invalid: boolean;
-  }) => ReactNode;
+  children: (ids: { id: string; describedBy: string | undefined; invalid: boolean }) => ReactNode;
   controlId?: string | undefined;
   className?: string | undefined;
 }
@@ -70,21 +66,21 @@ export function Field({
   const id = controlId ?? generated;
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
-  const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
+  const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined;
 
   return (
-    <div className={cn("mb-dense-3", className)}>
+    <div className={cn('mb-dense-3', className)}>
       <label
         htmlFor={id}
         className={cn(
-          "mb-dense-1 block text-micro font-medium text-muted-foreground",
-          hideLabel && "sr-only",
+          'mb-dense-1 block text-micro font-medium text-muted-foreground',
+          hideLabel && 'sr-only',
         )}
       >
         {label}
         {required ? (
           <span className="text-danger" aria-hidden="true">
-            {" *"}
+            {' *'}
           </span>
         ) : null}
       </label>
@@ -102,7 +98,7 @@ export function Field({
 }
 
 const controlBase =
-  "focus-console w-full rounded-control border border-border bg-card px-dense-3 py-dense-2 text-[length:var(--type-dense)] shadow-xs transition-colors hover:border-input text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:bg-disabled disabled:text-disabled-foreground aria-[invalid=true]:border-danger";
+  'focus-console w-full rounded-control border border-border bg-card px-dense-3 py-dense-2 text-[length:var(--type-dense)] shadow-xs transition-colors hover:border-input text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:bg-disabled disabled:text-disabled-foreground aria-[invalid=true]:border-danger';
 
 /* ------------------------------------------------------------------ */
 /* Text input                                                           */
@@ -199,7 +195,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
 /* Checkbox                                                             */
 /* ------------------------------------------------------------------ */
 
-export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> {
+export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label: string;
   hint?: string;
   error?: string;
@@ -213,7 +209,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
   const id = controlId ?? generated;
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
-  const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
+  const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined;
 
   return (
     <div className="mb-dense-3">
@@ -226,7 +222,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
           className={cn(
-            "focus-console size-3.5 shrink-0 rounded-control border border-border accent-selected disabled:cursor-not-allowed",
+            'focus-console size-3.5 shrink-0 rounded-control border border-border accent-selected disabled:cursor-not-allowed',
             className,
           )}
         />
@@ -250,7 +246,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
 /* Button                                                               */
 /* ------------------------------------------------------------------ */
 
-export type ButtonVariant = "default" | "primary" | "danger" | "ghost";
+export type ButtonVariant = 'default' | 'primary' | 'danger' | 'ghost';
 
 export interface ConsoleButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -260,22 +256,22 @@ export interface ConsoleButtonProps extends React.ButtonHTMLAttributes<HTMLButto
 }
 
 const variantClass: Record<ButtonVariant, string> = {
-  default: "bg-card text-foreground shadow-xs hover:bg-hover",
-  primary: "border-transparent bg-primary text-primary-foreground shadow-xs hover:opacity-90",
-  danger: "border-transparent bg-danger text-danger-foreground shadow-xs hover:opacity-90",
-  ghost: "border-transparent bg-transparent text-foreground hover:bg-hover",
+  default: 'bg-card text-foreground shadow-xs hover:bg-hover',
+  primary: 'border-transparent bg-primary text-primary-foreground shadow-xs hover:opacity-90',
+  danger: 'border-transparent bg-danger text-danger-foreground shadow-xs hover:opacity-90',
+  ghost: 'border-transparent bg-transparent text-foreground hover:bg-hover',
 };
 
 export const ConsoleButton = forwardRef<HTMLButtonElement, ConsoleButtonProps>(
   function ConsoleButton(
     {
-      variant = "default",
+      variant = 'default',
       loading = false,
-      loadingLabel = "Working…",
+      loadingLabel = 'Working…',
       disabled,
       children,
       className,
-      type = "button",
+      type = 'button',
       ...props
     },
     ref,
@@ -289,8 +285,8 @@ export const ConsoleButton = forwardRef<HTMLButtonElement, ConsoleButtonProps>(
         aria-busy={loading || undefined}
         data-loading={loading || undefined}
         className={cn(
-          "focus-console inline-flex min-h-8 items-center justify-center gap-dense-1 rounded-control border border-border px-dense-3 py-dense-1 text-[length:var(--type-dense)] font-medium transition-colors",
-          "disabled:cursor-not-allowed disabled:border-border-subtle disabled:bg-disabled disabled:text-disabled-foreground",
+          'focus-console inline-flex min-h-8 items-center justify-center gap-dense-1 rounded-control border border-border px-dense-3 py-dense-1 text-[length:var(--type-dense)] font-medium transition-colors',
+          'disabled:cursor-not-allowed disabled:border-border-subtle disabled:bg-disabled disabled:text-disabled-foreground',
           variantClass[variant],
           className,
         )}

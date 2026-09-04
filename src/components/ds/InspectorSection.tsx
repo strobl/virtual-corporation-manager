@@ -1,6 +1,6 @@
 // Adapted from strobl/org-manager-console (GitFlash source prototype, 7edae2ad).
-import { useId, useState, type ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { useId, useState, type ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
 export interface InspectorSectionProps {
   title: string;
@@ -41,7 +41,7 @@ export function InspectorSection({
 
   return (
     <section
-      className={cn("overflow-hidden rounded-lg border border-border bg-card", className)}
+      className={cn('overflow-hidden rounded-lg border border-border bg-card', className)}
       aria-label={title}
     >
       <div className="flex h-row items-center gap-dense-2 border-b border-border bg-muted/50 px-dense-3">
@@ -53,7 +53,7 @@ export function InspectorSection({
             aria-controls={bodyId}
             className="focus-console -mx-dense-1 flex items-center gap-dense-1 px-dense-1 text-micro font-medium text-foreground hover:bg-hover"
           >
-            <span aria-hidden="true">{isOpen ? "−" : "+"}</span>
+            <span aria-hidden="true">{isOpen ? '−' : '+'}</span>
             {title}
           </button>
         ) : (

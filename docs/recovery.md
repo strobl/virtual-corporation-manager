@@ -50,13 +50,13 @@ To return to an earlier release, restore the backup created before that upgrade 
 
 ## Recovery messages
 
-| Message | Next step |
-| --- | --- |
-| Workspace already open | Stop the server using that directory before running backup, restore, export or doctor. Different workspaces can run separately. |
-| Workspace lock cannot be read | Confirm no GitFlash process is using this directory. Preserve the directory, then remove only its stale `workspace.lock`. Normal stale locks with a dead recorded PID are recovered automatically. |
-| Newer schema or migration journal mismatch | Keep the database unchanged. Use its compatible release, upgrade GitFlash, or restore a known compatible backup. |
-| Invalid backup or entity records | The current workspace has not been replaced. Choose another backup; retain the rejected file for diagnosis. |
-| Stale preview | Refresh the preview, inspect the new changes, and confirm again. |
-| Interrupted or failed task | Inspect the saved output and any external runtime activity before submitting a new request. GitFlash does not automatically repeat uncertain external work. |
+| Message                                    | Next step                                                                                                                                                                                          |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Workspace already open                     | Stop the server using that directory before running backup, restore, export or doctor. Different workspaces can run separately.                                                                    |
+| Workspace lock cannot be read              | Confirm no GitFlash process is using this directory. Preserve the directory, then remove only its stale `workspace.lock`. Normal stale locks with a dead recorded PID are recovered automatically. |
+| Newer schema or migration journal mismatch | Keep the database unchanged. Use its compatible release, upgrade GitFlash, or restore a known compatible backup.                                                                                   |
+| Invalid backup or entity records           | The current workspace has not been replaced. Choose another backup; retain the rejected file for diagnosis.                                                                                        |
+| Stale preview                              | Refresh the preview, inspect the new changes, and confirm again.                                                                                                                                   |
+| Interrupted or failed task                 | Inspect the saved output and any external runtime activity before submitting a new request. GitFlash does not automatically repeat uncertain external work.                                        |
 
 Do not delete `workspace.sqlite-wal` or `workspace.sqlite-shm` from a running or crashed workspace to clear an error. They may belong to committed data. Use the stopped-workspace recovery commands so SQLite can preserve and verify the state.

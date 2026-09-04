@@ -6,6 +6,6 @@ Optional runtimes have their own trust boundary. The initial Codex executor uses
 
 Never put tokens or passwords in company definitions. Integration credentials are supplied through the documented local environment; they are not browser settings or portable template fields. Do not commit them or include them in screenshots.
 
-For a suspected vulnerability, contact the maintainer through the contact route on [the strobl GitHub profile](https://github.com/strobl). If private vulnerability reporting is enabled, prefer GitHub's private report form. Until a private route is established, open a minimal issue requesting contact without exploit details, credentials or private data. Security fixes receive priority; no response-time guarantee is promised.
+Report suspected vulnerabilities through [GitHub private vulnerability reporting](https://github.com/strobl/gitflash/security/advisories/new), which is enabled for this repository. Include a minimal reproduction without unrelated private data. Security fixes receive priority; no response-time guarantee is promised.
 
 On Windows, files inherit the selected directory’s OS ACLs; GitFlash does not guarantee Unix-style permission bits or create a separate Windows ACL policy. Choose a private user-owned data directory.

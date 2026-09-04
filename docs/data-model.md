@@ -4,15 +4,15 @@ GitFlash stores the local company and its execution ledger in one SQLite databas
 
 ## Company structure
 
-| Record | Meaning and enforced rules |
-| --- | --- |
-| Company | Name, unique short code, purpose, color, active/archive state and version. Archived companies keep their short codes. |
-| Department | An explicit company-owned department with a purpose and optional lead. Its lead must have an active assignment to that company. |
-| Agent | Name, role, agent/human kind, instructions, responsibilities, department and reporting manager. Reporting cycles are rejected. A configured agent is not a running process. |
-| Assignment | A dated link from an agent to a company. Every active agent has exactly one active primary assignment and may have additional assignments. Duplicate active pairs are rejected. |
-| Relationship | Dated ownership or collaboration between two different companies. Ownership is acyclic; specified incoming percentages cannot total more than 100%. Unspecified ownership is allowed and is not treated as a confirmed percentage. Collaboration carries no ownership percentage. |
-| Work record | Supplied output linked to a company and agent, with manual/Codex/Buzz/Slack provenance and submitted/accepted/failed status. A runtime run ID may appear only once. Acceptance is a separate operator decision. |
-| Execution ledger | Durable request IDs, task status, captured execution context, result, result hash, runtime/session evidence and delivery status. A repeated request ID cannot start a different task. |
+| Record           | Meaning and enforced rules                                                                                                                                                                                                                                                        |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Company          | Name, unique short code, purpose, color, active/archive state and version. Archived companies keep their short codes.                                                                                                                                                             |
+| Department       | An explicit company-owned department with a purpose and optional lead. Its lead must have an active assignment to that company.                                                                                                                                                   |
+| Agent            | Name, role, agent/human kind, instructions, responsibilities, department and reporting manager. Reporting cycles are rejected. A configured agent is not a running process.                                                                                                       |
+| Assignment       | A dated link from an agent to a company. Every active agent has exactly one active primary assignment and may have additional assignments. Duplicate active pairs are rejected.                                                                                                   |
+| Relationship     | Dated ownership or collaboration between two different companies. Ownership is acyclic; specified incoming percentages cannot total more than 100%. Unspecified ownership is allowed and is not treated as a confirmed percentage. Collaboration carries no ownership percentage. |
+| Work record      | Supplied output linked to a company and agent, with manual/Codex/Buzz/Slack provenance and submitted/accepted/failed status. A runtime run ID may appear only once. Acceptance is a separate operator decision.                                                                   |
+| Execution ledger | Durable request IDs, task status, captured execution context, result, result hash, runtime/session evidence and delivery status. A repeated request ID cannot start a different task.                                                                                             |
 
 Archiving an agent closes its assignments and clears other agents' reporting links to it. Archiving a company closes its assignments and relationships. Agents with another company assignment remain active and receive a primary assignment there; agents without another assignment are archived. Restoring a company does not silently reopen historical assignments. Restoring an agent requires an active company and starts a new primary assignment.
 

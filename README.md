@@ -8,7 +8,7 @@ This is a **technical alpha**. The local core and optional Codex execution are t
 
 ## Install and start
 
-Use **Node.js 24.14 or newer in the 24.x line**. Release checks cover the documented operating systems in [acceptance evidence](docs/acceptance.md). Node 26+ is allowed by the CLI, but is not a tested platform until its release checks are recorded.
+Use **Node.js 24.14 or newer in the 24.x line**. Release checks cover the documented operating systems in [acceptance evidence](docs/acceptance.md). Node 26+ is also allowed; the installed package has been checked on Node 26.0.0 on macOS arm64. The cross-platform CI matrix uses Node 24.
 
 ```sh
 npm install --global https://github.com/strobl/gitflash/releases/download/v0.1.0-alpha.1/gitflash-0.1.0-alpha.1.tgz
@@ -48,6 +48,8 @@ gitflash doctor --data-dir ./restored-company
 ```
 
 Backups contain sensitive company instructions and results in plaintext SQLite. Keep them private. See [backup, restore and upgrade](docs/recovery.md), [the data model](docs/data-model.md) and [security boundaries](SECURITY.md). Do not expose the loopback server through a tunnel or proxy.
+
+To remove the application, stop it and run `npm uninstall --global gitflash`. This leaves `~/.gitflash` and any custom data directory intact. Keep a verified backup before deliberately deleting a workspace.
 
 ## Contribute
 

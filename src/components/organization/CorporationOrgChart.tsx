@@ -8,7 +8,7 @@
  * nodes, and the default Pyramid layout makes the reporting depth obvious at
  * a glance: one row per level, top leader centred at the top.
  */
-import { useMemo, useState } from "react";
+import { useMemo, useState } from 'react';
 import {
   EMPTY_PYRAMID_FILTERS,
   buildOrgPyramid,
@@ -17,36 +17,35 @@ import {
   pyramidTreeRows,
   type OrgPerson,
   type PyramidFilters,
-} from "@/lib/organization/org-pyramid";
-import type { WorkspaceSnapshot } from "@/lib/organization/tree";
+} from '@/lib/organization/org-pyramid';
+import type { WorkspaceSnapshot } from '@/lib/organization/tree';
 
-
-export const ORG_CHART_LAYOUTS = ["pyramid", "tree", "manager"] as const;
+export const ORG_CHART_LAYOUTS = ['pyramid', 'tree', 'manager'] as const;
 export type OrgChartLayout = (typeof ORG_CHART_LAYOUTS)[number];
 
 const LAYOUT_LABELS: Record<OrgChartLayout, string> = {
-  pyramid: "Pyramid",
-  tree: "Tree",
-  manager: "Manager",
+  pyramid: 'Pyramid',
+  tree: 'Tree',
+  manager: 'Manager',
 };
 
 const LEVEL_CAPTIONS = [
-  "Company lead",
-  "Department heads",
-  "Team leads",
-  "Seniors & specialists",
-  "Individual contributors",
+  'Company lead',
+  'Department heads',
+  'Team leads',
+  'Seniors & specialists',
+  'Individual contributors',
 ];
 
 function levelCaption(level: number): string {
   return LEVEL_CAPTIONS[level] ?? `Level ${level}`;
 }
 
-function KindBadge({ kind }: { kind: OrgPerson["kind"] }) {
+function KindBadge({ kind }: { kind: OrgPerson['kind'] }) {
   return (
     <span className="inline-flex items-center gap-1 rounded border border-border px-1 py-px text-micro font-medium text-muted-foreground">
-      <span aria-hidden="true">{kind === "agent" ? "✦" : "☺"}</span>
-      {kind === "agent" ? "Agent" : "Human"}
+      <span aria-hidden="true">{kind === 'agent' ? '✦' : '☺'}</span>
+      {kind === 'agent' ? 'Agent' : 'Human'}
     </span>
   );
 }
@@ -70,21 +69,21 @@ function PersonCard({
       data-testid={`org-person-${person.id}`}
       className={`focus-console flex w-44 flex-col gap-0.5 rounded-lg bg-card px-2.5 py-1.5 text-left transition-opacity ${
         selected
-          ? "border-2 border-primary"
-          : person.kind === "agent"
-            ? "border border-dashed border-foreground/40 hover:border-foreground/70"
-            : "border border-border hover:border-foreground/50"
-      } ${dimmed ? "opacity-35" : ""}`}
+          ? 'border-2 border-primary'
+          : person.kind === 'agent'
+            ? 'border border-dashed border-foreground/40 hover:border-foreground/70'
+            : 'border border-border hover:border-foreground/50'
+      } ${dimmed ? 'opacity-35' : ''}`}
     >
       <span className="truncate text-xs font-medium text-foreground">{person.name}</span>
-      <span className="truncate text-micro text-muted-foreground">{person.role || "—"}</span>
+      <span className="truncate text-micro text-muted-foreground">{person.role || '—'}</span>
       <span className="flex flex-wrap items-center gap-1 text-micro text-muted-foreground">
         <KindBadge kind={person.kind} />
         <span>Level {person.level}</span>
       </span>
       <span className="truncate text-micro tabular-nums text-muted-foreground">
         {person.directReportIds.length} direct
-        {person.department ? ` · ${person.department}` : ""}
+        {person.department ? ` · ${person.department}` : ''}
       </span>
     </button>
   );
@@ -108,15 +107,18 @@ export function CorporationOrgChart({
   onSelectAgent,
   onBack,
 }: CorporationOrgChartProps) {
-  const pyramid = useMemo(() => buildOrgPyramid(snapshot, corporationId), [snapshot, corporationId]);
-  const [layout, setLayout] = useState<OrgChartLayout>("pyramid");
+  const pyramid = useMemo(
+    () => buildOrgPyramid(snapshot, corporationId),
+    [snapshot, corporationId],
+  );
+  const [layout, setLayout] = useState<OrgChartLayout>('pyramid');
   const [filters, setFilters] = useState<PyramidFilters>(EMPTY_PYRAMID_FILTERS);
   const [groupByDepartment, setGroupByDepartment] = useState(false);
   const [highlightChain, setHighlightChain] = useState(true);
   const focusedId = selection;
-  const setFocusedId = (value: string | null | ((id: string | null) => string | null)) => onSelectAgent?.(typeof value === "function" ? value(focusedId) : value);
+  const setFocusedId = (value: string | null | ((id: string | null) => string | null)) =>
+    onSelectAgent?.(typeof value === 'function' ? value(focusedId) : value);
   const [collapsedIds, setCollapsedIds] = useState<readonly string[]>([]);
-
 
   const rows = useMemo(() => filterPyramid(pyramid, filters), [pyramid, filters]);
   const chain = useMemo(
@@ -170,7 +172,7 @@ export function CorporationOrgChart({
             aria-label="Filter by kind"
             value={filters.kind}
             onChange={(event) =>
-              setFilters((f) => ({ ...f, kind: event.target.value as PyramidFilters["kind"] }))
+              setFilters((f) => ({ ...f, kind: event.target.value as PyramidFilters['kind'] }))
             }
             className="focus-console rounded-md border border-border bg-card px-2 py-1 text-xs text-foreground"
           >
@@ -202,11 +204,11 @@ export function CorporationOrgChart({
           <select
             aria-label="Filter by level"
             data-testid="org-chart-depth"
-            value={filters.maxLevel === null ? "all" : String(filters.maxLevel)}
+            value={filters.maxLevel === null ? 'all' : String(filters.maxLevel)}
             onChange={(event) =>
               setFilters((f) => ({
                 ...f,
-                maxLevel: event.target.value === "all" ? null : Number(event.target.value),
+                maxLevel: event.target.value === 'all' ? null : Number(event.target.value),
               }))
             }
             className="focus-console rounded-md border border-border bg-card px-2 py-1 text-xs text-foreground"
@@ -237,7 +239,7 @@ export function CorporationOrgChart({
           />
           Highlight chain of command
         </label>
-        {layout === "tree" ? (
+        {layout === 'tree' ? (
           <>
             <button
               type="button"
@@ -269,7 +271,7 @@ export function CorporationOrgChart({
 
       <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row">
         <div className="min-w-0 flex-1">
-          {layout === "pyramid" ? (
+          {layout === 'pyramid' ? (
             <div className="flex flex-col gap-3" data-testid="org-chart-pyramid">
               {rows.map((row, level) =>
                 row.length === 0 ? null : (
@@ -281,8 +283,8 @@ export function CorporationOrgChart({
                     <header className="mb-1.5 flex items-baseline gap-2">
                       <h4 className="text-xs font-semibold text-foreground">Level {level}</h4>
                       <span className="text-micro text-muted-foreground">
-                        {levelCaption(level)} · {row.length}{" "}
-                        {row.length === 1 ? "person" : "people"}
+                        {levelCaption(level)} · {row.length}{' '}
+                        {row.length === 1 ? 'person' : 'people'}
                       </span>
                     </header>
                     {groupByDepartment ? (
@@ -329,7 +331,7 @@ export function CorporationOrgChart({
             </div>
           ) : null}
 
-          {layout === "tree" ? (
+          {layout === 'tree' ? (
             <ul className="flex flex-col gap-1" data-testid="org-chart-tree">
               {pyramidTreeRows(pyramid, new Set(collapsedIds))
                 .filter(({ person }) => rows[person.level]?.includes(person))
@@ -340,7 +342,7 @@ export function CorporationOrgChart({
                         <button
                           type="button"
                           aria-label={
-                            collapsedIds.includes(person.id) ? "Expand branch" : "Collapse branch"
+                            collapsedIds.includes(person.id) ? 'Expand branch' : 'Collapse branch'
                           }
                           onClick={() =>
                             setCollapsedIds((ids) =>
@@ -351,7 +353,7 @@ export function CorporationOrgChart({
                           }
                           className="focus-console w-4 text-micro text-muted-foreground"
                         >
-                          {collapsedIds.includes(person.id) ? "▸" : "▾"}
+                          {collapsedIds.includes(person.id) ? '▸' : '▾'}
                         </button>
                       ) : (
                         <span className="w-4" />
@@ -368,7 +370,7 @@ export function CorporationOrgChart({
             </ul>
           ) : null}
 
-          {layout === "manager" ? (
+          {layout === 'manager' ? (
             <div className="flex flex-col gap-3" data-testid="org-chart-manager">
               {pyramid.people
                 .filter((person) => person.directReportIds.length > 0)
@@ -381,7 +383,7 @@ export function CorporationOrgChart({
                     <header className="mb-1.5 flex flex-wrap items-baseline gap-2">
                       <h4 className="text-xs font-semibold text-foreground">{manager.name}</h4>
                       <span className="text-micro text-muted-foreground">
-                        {manager.role} · Level {manager.level} · {manager.directReportIds.length}{" "}
+                        {manager.role} · Level {manager.level} · {manager.directReportIds.length}{' '}
                         direct · {manager.totalReports} total
                       </span>
                     </header>
@@ -406,7 +408,6 @@ export function CorporationOrgChart({
             </div>
           ) : null}
         </div>
-
       </div>
     </div>
   );
@@ -415,7 +416,7 @@ export function CorporationOrgChart({
 function groupRows(row: readonly OrgPerson[]): [string, OrgPerson[]][] {
   const map = new Map<string, OrgPerson[]>();
   for (const person of row) {
-    const key = person.department ?? "Unassigned";
+    const key = person.department ?? 'Unassigned';
     const bucket = map.get(key);
     if (bucket) bucket.push(person);
     else map.set(key, [person]);
@@ -450,7 +451,7 @@ function Header({
       ) : null}
       <h3 className="text-xs font-semibold text-foreground">{corporationName} — Reporting lines</h3>
       <span className="text-micro tabular-nums text-muted-foreground">
-        {pyramid.counts.humans} people · {pyramid.counts.agents} agents ·{" "}
+        {pyramid.counts.humans} people · {pyramid.counts.agents} agents ·{' '}
         {pyramid.counts.departments} teams · {pyramid.counts.depth} levels
       </span>
       <div
@@ -468,8 +469,8 @@ function Header({
             onClick={() => setLayout(candidate)}
             className={
               layout === candidate
-                ? "focus-console rounded-md bg-card px-3 py-1 text-xs font-medium text-foreground shadow-xs"
-                : "focus-console rounded-md px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+                ? 'focus-console rounded-md bg-card px-3 py-1 text-xs font-medium text-foreground shadow-xs'
+                : 'focus-console rounded-md px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground'
             }
           >
             {LAYOUT_LABELS[candidate]}

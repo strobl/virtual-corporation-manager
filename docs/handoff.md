@@ -10,12 +10,12 @@ Use one issue or linked work order for each change. Describe the observed trigge
 
 ## Open dependencies
 
-| Dependency | Needed from | Required for | Independent work |
-| --- | --- | --- | --- |
-| Installed Slack test app with Socket Mode, allowed owner/channel and local app/bot credentials | Workspace/app administrator | Live event → GitFlash runtime → correlated reply proof before Slack is called supported | Adapter tests, clear setup, secure failure handling and local/Codex delivery |
-| Working Buzz editor, verified effective runtime and mapped public identities | Existing Buzz installation/account operator | Buzz dispatch and output proof before its task route is called supported | Native team import proof and documented snapshot export |
-| One real person outside the implementation agents to follow the published install journey and return observations | Founder/pilot owner | Human-pilot acceptance | Deliver package, reproducible tester guide and fix technically observed defects |
-| Positioning/distribution feedback | Venture owner | Campaign and market-facing positioning | Publish accurate technical documentation and factual landing page |
+| Dependency                                                                                                        | Needed from                                 | Required for                                                                            | Independent work                                                                |
+| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Installed Slack test app with Socket Mode, allowed owner/channel and local app/bot credentials                    | Workspace/app administrator                 | Live event → GitFlash runtime → correlated reply proof before Slack is called supported | Adapter tests, clear setup, secure failure handling and local/Codex delivery    |
+| Working Buzz editor, verified effective runtime and mapped public identities                                      | Existing Buzz installation/account operator | Buzz dispatch and output proof before its task route is called supported                | Native team import proof and documented snapshot export                         |
+| One real person outside the implementation agents to follow the published install journey and return observations | Founder/pilot owner                         | Human-pilot acceptance                                                                  | Deliver package, reproducible tester guide and fix technically observed defects |
+| Positioning/distribution feedback                                                                                 | Venture owner                               | Campaign and market-facing positioning                                                  | Publish accurate technical documentation and factual landing page               |
 
 Credentials stay in the operator's local environment; do not paste them into an issue, company definition or chat. No additional service purchase is necessary for the local core.
 

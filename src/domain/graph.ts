@@ -1,9 +1,16 @@
 /** Adapted from the private GitFlash prototype's pure ownership graph rules.
  * Only graph traversal and percentage semantics are retained; no hosted state.
  */
-export interface DirectedEdge { fromCompanyId: string; toCompanyId: string }
+export interface DirectedEdge {
+  fromCompanyId: string;
+  toCompanyId: string;
+}
 
-export function findActivePath(edges: readonly DirectedEdge[], from: string, to: string): string[] | null {
+export function findActivePath(
+  edges: readonly DirectedEdge[],
+  from: string,
+  to: string,
+): string[] | null {
   const queue: string[][] = [[from]];
   const seen = new Set<string>([from]);
   for (let index = 0; index < queue.length; index += 1) {
@@ -22,5 +29,11 @@ export function findActivePath(edges: readonly DirectedEdge[], from: string, to:
 }
 
 export function isValidPercentage(percentage: unknown): percentage is number | null {
-  return percentage === null || (typeof percentage === 'number' && Number.isFinite(percentage) && percentage > 0 && percentage <= 100);
+  return (
+    percentage === null ||
+    (typeof percentage === 'number' &&
+      Number.isFinite(percentage) &&
+      percentage > 0 &&
+      percentage <= 100)
+  );
 }

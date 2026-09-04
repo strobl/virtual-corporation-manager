@@ -1,8 +1,8 @@
 // Adapted from strobl/org-manager-console (GitFlash source prototype, 7edae2ad).
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
-export type NumericAlign = "right" | "left";
-export type NumericTone = "default" | "muted" | "danger" | "success";
+export type NumericAlign = 'right' | 'left';
+export type NumericTone = 'default' | 'muted' | 'danger' | 'success';
 
 export interface NumericTextProps {
   /** Pre-formatted value. NumericText never computes or rounds anything. */
@@ -17,15 +17,15 @@ export interface NumericTextProps {
    * `value` (default) renders tabular sans digits; `code` switches to
    * monospace and is reserved for identifiers and short codes.
    */
-  variant?: "value" | "code";
+  variant?: 'value' | 'code';
   className?: string;
 }
 
 const toneClass: Record<NumericTone, string> = {
-  default: "text-foreground",
-  muted: "text-muted-foreground",
-  danger: "text-danger",
-  success: "text-success",
+  default: 'text-foreground',
+  muted: 'text-muted-foreground',
+  danger: 'text-danger',
+  success: 'text-success',
 };
 
 /**
@@ -36,10 +36,10 @@ const toneClass: Record<NumericTone, string> = {
 export function NumericText({
   value,
   unit,
-  align = "right",
-  tone = "default",
+  align = 'right',
+  tone = 'default',
   label,
-  variant = "value",
+  variant = 'value',
   className,
 }: NumericTextProps) {
   return (
@@ -48,9 +48,9 @@ export function NumericText({
       data-align={align}
       aria-label={label}
       className={cn(
-        "tabular text-dense whitespace-nowrap",
-        variant === "code" && "font-mono",
-        align === "right" ? "text-right" : "text-left",
+        'tabular text-dense whitespace-nowrap',
+        variant === 'code' && 'font-mono',
+        align === 'right' ? 'text-right' : 'text-left',
         toneClass[tone],
         className,
       )}

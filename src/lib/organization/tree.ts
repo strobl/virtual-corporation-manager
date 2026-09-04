@@ -15,54 +15,47 @@
  * Every row carries a stable path id so the same entity appearing under two
  * owners can be expanded independently while still sharing one Selection.
  */
-import type { Lens, Selection, SelectionEntityType } from "@/types/organization-view";
+import type { Lens, Selection, SelectionEntityType } from '@/types/organization-view';
 
 /** Declared legal nature of an entity; independent of what it operates. */
-export const ENTITY_TYPES = [
-  "holding",
-  "opco",
-  "propco",
-  "serviceco",
-  "spv",
-  "other",
-] as const;
+export const ENTITY_TYPES = ['holding', 'opco', 'propco', 'serviceco', 'spv', 'other'] as const;
 export type EntityType = (typeof ENTITY_TYPES)[number];
 
 export const ENTITY_TYPE_LABELS: Record<EntityType, string> = {
-  holding: "Holding",
-  opco: "OpCo",
-  propco: "PropCo",
-  serviceco: "ServiceCo",
-  spv: "SPV",
-  other: "Entity",
+  holding: 'Holding',
+  opco: 'OpCo',
+  propco: 'PropCo',
+  serviceco: 'ServiceCo',
+  spv: 'SPV',
+  other: 'Entity',
 };
 
 export function asEntityType(value: string | null | undefined): EntityType {
-  return (ENTITY_TYPES as readonly string[]).includes(value ?? "")
+  return (ENTITY_TYPES as readonly string[]).includes(value ?? '')
     ? (value as EntityType)
-    : "other";
+    : 'other';
 }
 
 /** Non-ownership, non-assignment links between entities. */
 export const RELATION_KINDS = [
-  "operates",
-  "manages",
-  "provides_services_to",
-  "finances",
-  "leases_to",
-  "licenses",
-  "participates_in",
+  'operates',
+  'manages',
+  'provides_services_to',
+  'finances',
+  'leases_to',
+  'licenses',
+  'participates_in',
 ] as const;
 export type RelationKind = (typeof RELATION_KINDS)[number];
 
 export const RELATION_LABELS: Record<RelationKind, string> = {
-  operates: "operates",
-  manages: "manages",
-  provides_services_to: "provides services to",
-  finances: "finances",
-  leases_to: "leases to",
-  licenses: "licenses",
-  participates_in: "participates in",
+  operates: 'operates',
+  manages: 'manages',
+  provides_services_to: 'provides services to',
+  finances: 'finances',
+  leases_to: 'leases to',
+  licenses: 'licenses',
+  participates_in: 'participates in',
 };
 
 export interface CorporationRow {
@@ -132,7 +125,7 @@ export interface WorkspaceSnapshot {
 }
 
 export const EMPTY_SNAPSHOT: WorkspaceSnapshot = {
-  workspaceName: "Workspace",
+  workspaceName: 'Workspace',
   corporations: [],
   ownership: [],
   members: [],
@@ -141,7 +134,7 @@ export const EMPTY_SNAPSHOT: WorkspaceSnapshot = {
   relationships: [],
 };
 
-export type TreeNodeKind = "workspace" | SelectionEntityType;
+export type TreeNodeKind = 'workspace' | SelectionEntityType;
 
 export interface OrgTreeNode {
   /** Stable path-scoped row id (unique per row). */
@@ -158,7 +151,7 @@ export interface OrgTreeNode {
   children: OrgTreeNode[];
 }
 
-export const WORKSPACE_NODE_ID = "workspace";
+export const WORKSPACE_NODE_ID = 'workspace';
 
 function byName<T extends { name: string }>(a: T, b: T): number {
   return a.name.localeCompare(b.name);
@@ -166,13 +159,13 @@ function byName<T extends { name: string }>(a: T, b: T): number {
 
 /** Selection targets for a node; the Workspace node is not selectable. */
 export function nodeSelection(node: OrgTreeNode): Selection | null {
-  if (node.kind === "workspace") return null;
+  if (node.kind === 'workspace') return null;
   return { type: node.kind, id: node.entityId };
 }
 
-export function buildWorkspaceTree(snapshot: WorkspaceSnapshot, lens: Lens = "all"): OrgTreeNode[] {
-  const showFactories = lens === "all" || lens === "assets";
-  const showMembers = lens === "all" || lens === "operating";
+export function buildWorkspaceTree(snapshot: WorkspaceSnapshot, lens: Lens = 'all'): OrgTreeNode[] {
+  const showFactories = lens === 'all' || lens === 'assets';
+  const showMembers = lens === 'all' || lens === 'operating';
 
   const corporations = [...snapshot.corporations].sort(byName);
   const active = new Set(corporations.map((c) => c.id));
@@ -219,7 +212,7 @@ export function buildWorkspaceTree(snapshot: WorkspaceSnapshot, lens: Lens = "al
     const owners = ownersOf.get(corporation.id) ?? [];
     const node: OrgTreeNode = {
       id,
-      kind: "corporation",
+      kind: 'corporation',
       entityId: corporation.id,
       label: corporation.name,
       shortCode: corporation.shortCode,
@@ -235,7 +228,7 @@ export function buildWorkspaceTree(snapshot: WorkspaceSnapshot, lens: Lens = "al
       for (const member of [...(membersOf.get(corporation.id) ?? [])].sort(byName)) {
         node.children.push({
           id: `${id}/member:${member.id}`,
-          kind: "member",
+          kind: 'member',
           entityId: member.id,
           label: member.name,
           shortCode: member.shortCode ?? null,
@@ -255,7 +248,7 @@ export function buildWorkspaceTree(snapshot: WorkspaceSnapshot, lens: Lens = "al
       for (const factory of [...(factoriesOf.get(corporation.id) ?? [])].sort(byName)) {
         node.children.push({
           id: `${id}/factory:${factory.id}`,
-          kind: "factory",
+          kind: 'factory',
           entityId: factory.id,
           label: factory.name,
           shortCode: factory.shortCode,
@@ -271,7 +264,7 @@ export function buildWorkspaceTree(snapshot: WorkspaceSnapshot, lens: Lens = "al
   const roots = corporations.filter((c) => (ownersOf.get(c.id) ?? []).length === 0);
   const workspaceNode: OrgTreeNode = {
     id: WORKSPACE_NODE_ID,
-    kind: "workspace",
+    kind: 'workspace',
     entityId: WORKSPACE_NODE_ID,
     label: snapshot.workspaceName,
     shortCode: null,
@@ -338,9 +331,9 @@ export function ancestorsToReveal(
 ): string[] {
   const ancestors = new Set<string>();
   for (const rowId of rowsForEntity(nodes, selection)) {
-    const parts = rowId.split("/");
+    const parts = rowId.split('/');
     for (let index = 1; index < parts.length; index += 1) {
-      ancestors.add(parts.slice(0, index).join("/"));
+      ancestors.add(parts.slice(0, index).join('/'));
     }
   }
   return [...ancestors];
@@ -359,7 +352,7 @@ export function matchTypeahead(
   currentIndex: number,
 ): string | null {
   const needle = buffer.trim().toLowerCase();
-  if (needle === "" || rows.length === 0) return null;
+  if (needle === '' || rows.length === 0) return null;
   // A repeated single character cycles through matches; a longer buffer may
   // still match the current row (the user is refining it).
   const start = buffer.length === 1 ? currentIndex + 1 : currentIndex;
@@ -367,8 +360,8 @@ export function matchTypeahead(
     const row = rows[(start + step + rows.length) % rows.length];
     if (!row) continue;
     const name = row.node.label.toLowerCase();
-    const code = (row.node.shortCode ?? "").toLowerCase();
-    if (name.startsWith(needle) || (code !== "" && code.startsWith(needle))) return row.node.id;
+    const code = (row.node.shortCode ?? '').toLowerCase();
+    if (name.startsWith(needle) || (code !== '' && code.startsWith(needle))) return row.node.id;
   }
   return null;
 }

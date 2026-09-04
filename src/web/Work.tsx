@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from 'react';
 import {
   ArrowUpRight,
   Download,
@@ -8,10 +8,10 @@ import {
   CheckCircle2,
   CircleDashed,
   AlertCircle,
-} from "lucide-react";
-import type { Agent, WorkspaceState } from "../domain/contracts";
-import { Dialog } from "./Dialogs";
-import { request } from "./client";
+} from 'lucide-react';
+import type { Agent, WorkspaceState } from '../domain/contracts';
+import { Dialog } from './Dialogs';
+import { request } from './client';
 
 export interface IntegrationStatus {
   codex: {
@@ -33,8 +33,8 @@ export interface RunInfo {
   agentName: string;
   companyId: string;
   task: string;
-  transport: "codex" | "buzz";
-  status: "queued" | "running" | "completed" | "failed";
+  transport: 'codex' | 'buzz';
+  status: 'queued' | 'running' | 'completed' | 'failed';
   output: string;
   error: string | null;
   createdAt: string;
@@ -48,10 +48,10 @@ export interface RunInfo {
 }
 const date = (value: string) =>
   new Date(value).toLocaleString(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   });
 
 export function RunDialog({
@@ -65,24 +65,28 @@ export function RunDialog({
   onClose: () => void;
   onStarted: () => Promise<void>;
 }) {
-  const [task, setTask] = useState("");
-  const [transport, setTransport] = useState<"codex" | "buzz">("codex");
+  const [task, setTask] = useState('');
+  const [transport, setTransport] = useState<'codex' | 'buzz'>('codex');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const attempt = useRef<{ task: string; transport: string; requestId: string } | null>(null);
   const ready =
-    transport === "codex"
-      ? status?.codex.state === "ready"
-      : status?.buzz.available && status?.buzz.state === "configured";
+    transport === 'codex'
+      ? status?.codex.state === 'ready'
+      : status?.buzz.available && status?.buzz.state === 'configured';
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     setBusy(true);
     setError(null);
-    if (!attempt.current || attempt.current.task !== task || attempt.current.transport !== transport) {
+    if (
+      !attempt.current ||
+      attempt.current.task !== task ||
+      attempt.current.transport !== transport
+    ) {
       attempt.current = { task, transport, requestId: crypto.randomUUID() };
     }
     try {
-      await request<RunInfo>("/api/runs", {
+      await request<RunInfo>('/api/runs', {
         agentId: agent.id,
         task,
         requestId: attempt.current.requestId,
@@ -91,9 +95,7 @@ export function RunDialog({
       await onStarted();
       onClose();
     } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "Could not start the task.",
-      );
+      setError(cause instanceof Error ? cause.message : 'Could not start the task.');
     } finally {
       setBusy(false);
     }
@@ -102,8 +104,8 @@ export function RunDialog({
     <Dialog title={`Give ${agent.name} a task`} onClose={onClose}>
       <form className="dialog-body editor-form" onSubmit={submit}>
         <p className="muted">
-          The runtime receives this task together with the agent’s role,
-          instructions, and responsibilities.
+          The runtime receives this task together with the agent’s role, instructions, and
+          responsibilities.
         </p>
         <label>
           Task
@@ -121,20 +123,20 @@ export function RunDialog({
           Runtime
           <select
             value={transport}
-            onChange={(e) => setTransport(e.target.value as "codex" | "buzz")}
+            onChange={(e) => setTransport(e.target.value as 'codex' | 'buzz')}
           >
             <option value="codex">Codex CLI</option>
             <option value="buzz">Buzz</option>
           </select>
         </label>
-        <p className={`connection-note ${ready ? "" : "warning-note"}`}>
-          {transport === "codex"
-            ? (status?.codex.message ?? "Checking Codex…")
-            : (status?.buzz.message ?? "Checking Buzz…")}
+        <p className={`connection-note ${ready ? '' : 'warning-note'}`}>
+          {transport === 'codex'
+            ? (status?.codex.message ?? 'Checking Codex…')
+            : (status?.buzz.message ?? 'Checking Buzz…')}
         </p>
         <p className="muted small">
           {status?.costNotice ||
-            "GitFlash is free. External runtimes may require an account and incur provider charges."}
+            'GitFlash is free. External runtimes may require an account and incur provider charges.'}
         </p>
         {error && (
           <p className="error-box" role="alert">
@@ -147,7 +149,7 @@ export function RunDialog({
           </button>
           <button className="button primary" disabled={busy || !ready}>
             <Play size={15} />
-            {busy ? "Starting…" : "Run task"}
+            {busy ? 'Starting…' : 'Run task'}
           </button>
         </footer>
       </form>
@@ -170,16 +172,12 @@ export function WorkView({
 }) {
   const [selectedRun, setSelectedRun] = useState<string | null>(null);
   const run = runs.find((item) => item.id === selectedRun);
-  const workRecord = run
-    ? state.work.find((record) => record.runId === run.id)
-    : null;
-  const completed = runs.filter((item) => item.status === "completed").length;
-  const accepted = state.work.filter((item) => item.status === "accepted");
+  const workRecord = run ? state.work.find((record) => record.runId === run.id) : null;
+  const completed = runs.filter((item) => item.status === 'completed').length;
+  const accepted = state.work.filter((item) => item.status === 'accepted');
   const download = (value: RunInfo) => {
-    const url = URL.createObjectURL(
-      new Blob([value.output], { type: "text/plain;charset=utf-8" }),
-    );
-    const anchor = document.createElement("a");
+    const url = URL.createObjectURL(new Blob([value.output], { type: 'text/plain;charset=utf-8' }));
+    const anchor = document.createElement('a');
     anchor.href = url;
     anchor.download = `gitflash-${value.id}.txt`;
     anchor.click();
@@ -191,9 +189,7 @@ export function WorkView({
         <div>
           <span className="eyebrow">Work, with evidence</span>
           <h2>What your company has delivered</h2>
-          <p>
-            Every result stays connected to the agent and task that produced it.
-          </p>
+          <p>Every result stays connected to the agent and task that produced it.</p>
         </div>
         <button className="button" onClick={onRefresh}>
           <RefreshCw size={14} />
@@ -221,32 +217,22 @@ export function WorkView({
           </span>
           <h3>Your first useful result starts here</h3>
           <p>
-            Choose an agent in your organization, connect a supported runtime,
-            and give it a specific task. Its result and execution evidence will
-            appear here.
+            Choose an agent in your organization, connect a supported runtime, and give it a
+            specific task. Its result and execution evidence will appear here.
           </p>
-          <p className="muted small">
-            Creating agents does not automatically run them.
-          </p>
+          <p className="muted small">Creating agents does not automatically run them.</p>
         </div>
       )}
       <div className="run-list">
         {runs.map((item) => (
-          <button
-            key={item.id}
-            className="run-row"
-            onClick={() => setSelectedRun(item.id)}
-          >
+          <button key={item.id} className="run-row" onClick={() => setSelectedRun(item.id)}>
             <span className={`run-icon ${item.status}`}>
-              {item.status === "completed" ? (
+              {item.status === 'completed' ? (
                 <CheckCircle2 size={19} />
-              ) : item.status === "failed" ? (
+              ) : item.status === 'failed' ? (
                 <AlertCircle size={19} />
               ) : (
-                <CircleDashed
-                  size={19}
-                  className={item.status === "running" ? "spin" : ""}
-                />
+                <CircleDashed size={19} className={item.status === 'running' ? 'spin' : ''} />
               )}
             </span>
             <span className="run-details">
@@ -267,9 +253,8 @@ export function WorkView({
             <article className="work-record" key={record.id}>
               <h4>{record.title}</h4>
               <p className="muted small">
-                {state.agents.find((agent) => agent.id === record.agentId)
-                  ?.name ?? "Agent"}{" "}
-                · {record.provenance} · {date(record.createdAt)}
+                {state.agents.find((agent) => agent.id === record.agentId)?.name ?? 'Agent'} ·{' '}
+                {record.provenance} · {date(record.createdAt)}
               </p>
               <pre>{record.output}</pre>
             </article>
@@ -294,15 +279,15 @@ export function WorkView({
             <dl className="result-meta">
               <dt>Runtime</dt>
               <dd>
-                {run.transport} {run.runtimeVersion ?? ""}
+                {run.transport} {run.runtimeVersion ?? ''}
               </dd>
               <dt>Started</dt>
-              <dd>{run.startedAt ? date(run.startedAt) : "Queued"}</dd>
+              <dd>{run.startedAt ? date(run.startedAt) : 'Queued'}</dd>
               <dt>Duration</dt>
               <dd>
                 {run.durationMs !== null
                   ? `${(run.durationMs / 1000).toFixed(1)} seconds`
-                  : "In progress"}
+                  : 'In progress'}
               </dd>
               <dt>Run ID</dt>
               <dd className="mono">{run.id}</dd>
@@ -322,36 +307,32 @@ export function WorkView({
               <pre className="result-output">{run.output}</pre>
             ) : (
               <p className="connection-note">
-                {run.status === "failed"
-                  ? "No output was returned."
-                  : "Waiting for the runtime to return its result…"}
+                {run.status === 'failed'
+                  ? 'No output was returned.'
+                  : 'Waiting for the runtime to return its result…'}
               </p>
             )}
             <footer className="dialog-actions">
               <button className="button" onClick={() => setSelectedRun(null)}>
                 Close
               </button>
-              {workRecord?.status === "submitted" &&
-                run.status === "completed" && (
-                  <button
-                    className="button primary"
-                    onClick={() => {
-                      onAccept(workRecord.id, workRecord.title);
-                      setSelectedRun(null);
-                    }}
-                  >
-                    <CheckCircle2 size={15} />
-                    Accept result
-                  </button>
-                )}
-              {workRecord?.status === "accepted" && (
+              {workRecord?.status === 'submitted' && run.status === 'completed' && (
+                <button
+                  className="button primary"
+                  onClick={() => {
+                    onAccept(workRecord.id, workRecord.title);
+                    setSelectedRun(null);
+                  }}
+                >
+                  <CheckCircle2 size={15} />
+                  Accept result
+                </button>
+              )}
+              {workRecord?.status === 'accepted' && (
                 <span className="status-pill completed">Accepted</span>
               )}
               {run.output && (
-                <button
-                  className="button primary"
-                  onClick={() => download(run)}
-                >
+                <button className="button primary" onClick={() => download(run)}>
                   <Download size={15} />
                   Download result
                 </button>
@@ -380,14 +361,12 @@ export function IntegrationsView({
     setError(null);
     try {
       await request(
-        `/api/slack/${status?.slack.state === "connected" ? "disconnect" : "connect"}`,
+        `/api/slack/${status?.slack.state === 'connected' ? 'disconnect' : 'connect'}`,
         {},
       );
       onRefresh();
     } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "Slack could not connect.",
-      );
+      setError(cause instanceof Error ? cause.message : 'Slack could not connect.');
     } finally {
       setBusy(false);
     }
@@ -398,9 +377,7 @@ export function IntegrationsView({
         <div>
           <span className="eyebrow">Bring your own runtime</span>
           <h2>Connect your company to work</h2>
-          <p>
-            Your organization is local. Activate execution when you are ready.
-          </p>
+          <p>Your organization is local. Activate execution when you are ready.</p>
         </div>
         <button className="button" onClick={onRefresh}>
           <RefreshCw size={14} />
@@ -414,27 +391,24 @@ export function IntegrationsView({
           </div>
           <div className="integration-title">
             <h3>Codex CLI</h3>
-            <span
-              className={`status-pill ${status?.codex.state === "ready" ? "completed" : ""}`}
-            >
-              {status?.codex.state === "ready"
-                ? "Ready"
-                : status?.codex.state === "authentication-required"
-                  ? "Sign-in needed"
-                  : "Not connected"}
+            <span className={`status-pill ${status?.codex.state === 'ready' ? 'completed' : ''}`}>
+              {status?.codex.state === 'ready'
+                ? 'Ready'
+                : status?.codex.state === 'authentication-required'
+                  ? 'Sign-in needed'
+                  : 'Not connected'}
             </span>
           </div>
           <p>
-            Run a focused task with an agent’s own instructions. Save the result
-            and execution receipt locally.
+            Run a focused task with an agent’s own instructions. Save the result and execution
+            receipt locally.
           </p>
           <p className="connection-note">
-            {status?.codex.message ?? "Checking the local runtime…"}
+            {status?.codex.message ?? 'Checking the local runtime…'}
           </p>
           <p className="muted small">
-            Install and authenticate Codex CLI in your terminal, then check
-            connections. Your existing provider access is separate from
-            GitFlash.
+            Install and authenticate Codex CLI in your terminal, then check connections. Your
+            existing provider access is separate from GitFlash.
           </p>
         </article>
         <article className="integration-card">
@@ -442,17 +416,15 @@ export function IntegrationsView({
           <div className="integration-title">
             <h3>Buzz</h3>
             <span className="status-pill">
-              {status?.buzz.state === "configured"
-                ? "Configured"
-                : "Not configured"}
+              {status?.buzz.state === 'configured' ? 'Configured' : 'Not configured'}
             </span>
           </div>
           <p>
-            Export your company as a native team definition or execute a task
-            through a configured Buzz runtime.
+            Export your company as a native team definition or execute a task through a configured
+            Buzz runtime.
           </p>
           <p className="connection-note">
-            {status?.buzz.message ?? "Checking Buzz configuration…"}
+            {status?.buzz.message ?? 'Checking Buzz configuration…'}
           </p>
           {companyId && (
             <a
@@ -464,39 +436,30 @@ export function IntegrationsView({
               Export Buzz team
             </a>
           )}
-          <p className="muted small">
-            Exporting a team does not activate agents or run work.
-          </p>
+          <p className="muted small">Exporting a team does not activate agents or run work.</p>
         </article>
         <article className="integration-card">
           <div className="integration-icon slack-mark">#</div>
           <div className="integration-title">
             <h3>Slack</h3>
             <span className="status-pill">
-              {status?.slack.state === "connected"
-                ? "Connected"
-                : status?.slack.state === "configured"
-                  ? "Configured"
-                  : "Not configured"}
+              {status?.slack.state === 'connected'
+                ? 'Connected'
+                : status?.slack.state === 'configured'
+                  ? 'Configured'
+                  : 'Not configured'}
             </span>
           </div>
-          <p>
-            Deliver work to a configured Slack destination through the optional
-            integration.
-          </p>
+          <p>Deliver work to a configured Slack destination through the optional integration.</p>
           <p className="connection-note">
-            {status?.slack.message ?? "Checking Slack configuration…"}
+            {status?.slack.message ?? 'Checking Slack configuration…'}
           </p>
-          <button
-            className="button"
-            disabled={busy}
-            onClick={() => void toggleSlack()}
-          >
+          <button className="button" disabled={busy} onClick={() => void toggleSlack()}>
             {busy
-              ? "Connecting…"
-              : status?.slack.state === "connected"
-                ? "Disconnect Slack"
-                : "Connect Slack"}
+              ? 'Connecting…'
+              : status?.slack.state === 'connected'
+                ? 'Disconnect Slack'
+                : 'Connect Slack'}
           </button>
           {error && (
             <p className="error-box" role="alert">
@@ -504,8 +467,7 @@ export function IntegrationsView({
             </p>
           )}
           <p className="muted small">
-            Slack is an external delivery destination. Local results remain
-            available without it.
+            Slack is an external delivery destination. Local results remain available without it.
           </p>
         </article>
       </div>
@@ -515,7 +477,7 @@ export function IntegrationsView({
           <strong>Your local company is always free.</strong>
           <p>
             {status?.costNotice ||
-              "External runtimes and services may require their own accounts, credentials, or paid usage. No connection is required to create and organize your agents."}
+              'External runtimes and services may require their own accounts, credentials, or paid usage. No connection is required to create and organize your agents.'}
           </p>
         </div>
       </aside>
