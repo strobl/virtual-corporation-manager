@@ -2,6 +2,7 @@ import { Bot, ChevronRight, Layers3, Plus, Building2, UsersRound } from 'lucide-
 import type { WorkspaceState } from '../domain/contracts';
 import type { Selection } from './model';
 import { companyAgents } from './model';
+import { textExcerpt } from './TextDisclosure';
 
 /** Department composition builds on the original company's progressive disclosure. */
 export function CompanyMap({
@@ -63,7 +64,7 @@ export function CompanyMap({
         </span>
         <ChevronRight size={17} className="muted" />
         <span className="root-purpose">
-          {company.description || 'Select to define your company’s purpose.'}
+          {textExcerpt(company.description, 180) || 'Select to define your company’s purpose.'}
         </span>
         <span className="root-counts">
           <span>

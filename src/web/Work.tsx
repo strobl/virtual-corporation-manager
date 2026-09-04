@@ -12,6 +12,7 @@ import {
 import type { Agent, WorkspaceState } from '../domain/contracts';
 import { Dialog } from './Dialogs';
 import { request } from './client';
+import { textExcerpt } from './TextDisclosure';
 
 export interface IntegrationStatus {
   codex: {
@@ -236,7 +237,7 @@ export function WorkView({
               )}
             </span>
             <span className="run-details">
-              <strong>{item.task}</strong>
+              <strong>{textExcerpt(item.task)}</strong>
               <span>
                 {item.agentName} · {item.transport} · {date(item.createdAt)}
               </span>
@@ -265,7 +266,7 @@ export function WorkView({
         <Dialog title="Task result" wide onClose={() => setSelectedRun(null)}>
           <div className="dialog-body">
             <span className={`status-pill ${run.status}`}>{run.status}</span>
-            <h3 className="preview-title">{run.task}</h3>
+            <h3 className="preview-title task-result-title">{textExcerpt(run.task)}</h3>
             <button
               className="text-button"
               onClick={() => {
@@ -304,7 +305,9 @@ export function WorkView({
               </p>
             )}
             {run.output ? (
-              <pre className="result-output">{run.output}</pre>
+              <pre className="result-output" tabIndex={0} role="region" aria-label="Task output">
+                {run.output}
+              </pre>
             ) : (
               <p className="connection-note">
                 {run.status === 'failed'
@@ -312,6 +315,12 @@ export function WorkView({
                   : 'Waiting for the runtime to return its result…'}
               </p>
             )}
+            <details className="text-disclosure">
+              <summary>Read original task</summary>
+              <pre className="full-text" tabIndex={0} role="region" aria-label="Original task">
+                {run.task}
+              </pre>
+            </details>
             <footer className="dialog-actions">
               <button className="button" onClick={() => setSelectedRun(null)}>
                 Close

@@ -1,6 +1,6 @@
 {
   "name": "gitflash",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "description": "A local workspace for your company of AI agents",
   "type": "module",
   "license": "MIT",

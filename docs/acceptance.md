@@ -19,7 +19,16 @@ This is engineering evidence for a local technical alpha, not customer validatio
 
 Local machine: Apple M1 Pro, macOS arm64, Node 24.19.0. One installed-package smoke run took 1,285 ms total; the standard 100-role template preview and atomic apply took 24 ms through the HTTP API. A richer Operations definition with 100 complete role prompts, company charter and operating contract took 144 ms for preview/apply. All 100 full instructions and IDs survived export and restart.
 
-These are single-run wall-clock observations, not statistically significant benchmarks. They do not measure model latency, concurrent workers or browser paint time. The initial executor deliberately has concurrency one and a queue limit of 20. Creating a company starts zero runtimes.
+A separate read-only baseline on the published alpha.1 used macOS 15.6.1, the same M1 Pro (10 cores), 16 GiB RAM and Node 24.19.0. The live dataset contained three companies, 106 agents and nine completed work/run records. After five warm-ups per endpoint, 50 sequential HTTP/1.1 GETs measured request-to-complete-body time (JSON parsing excluded):
+
+| Endpoint     |       Payload |   Median |      p95 |  Maximum |
+| ------------ | ------------: | -------: | -------: | -------: |
+| `/api/state` | 305,073 bytes | 3.178 ms | 4.113 ms | 4.588 ms |
+| `/api/runs`  | 111,298 bytes | 4.723 ms | 8.122 ms | 8.460 ms |
+
+All 100 responses were HTTP 200; state, run and database hashes remained unchanged. Server RSS was 42.55 MiB before, 106.17 MiB afterward and 128.22 MiB at the largest sample. The database and its existing backup each occupied 11.375 MiB; WAL was empty. These are observed warm-process resources, not minimum requirements, browser memory, a continuous peak, provider cost or model performance. p95 is the nearest-rank 48th of 50 observations.
+
+The template-apply timings are single-run observations; the warm GET baseline is a finite sample on one machine. Neither measures model latency, concurrent workers or browser paint time. The initial executor deliberately has concurrency one and a queue limit of 20. Creating a company starts zero runtimes.
 
 The browser tree can find a role at the end of the 100-role company without losing its department and inspector. Shared agents have unique DOM row IDs in each company and preserve the selected company context. Desktop and narrow layouts, focus visibility, form labels, modal focus/escape and recovery messaging were inspected. A full screen-reader or assistive-technology audit is not claimed.
 

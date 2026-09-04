@@ -723,6 +723,9 @@ main:focus {
   margin-top: 7px;
   font-weight: 600;
 }
+.organization-header > div:first-child {
+  min-width: 0;
+}
 .organization-header p {
   color: #8a8e81;
   margin-top: 8px;
@@ -857,6 +860,11 @@ main:focus {
   line-height: 1.6;
   color: #919781;
   padding-top: 3px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 .root-counts {
   grid-column: 1/-1;
@@ -1825,6 +1833,45 @@ main:focus {
   line-height: 1.4;
   margin: 13px 0;
 }
+.purpose-text {
+  overflow-wrap: anywhere;
+}
+.task-result-title,
+.description-preview {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.text-disclosure {
+  margin-top: 12px;
+  min-width: 0;
+  font-size: 12px;
+}
+.text-disclosure > summary {
+  cursor: pointer;
+  width: fit-content;
+  color: #47513d;
+}
+.text-disclosure > summary:focus-visible {
+  outline: 2px solid #80731f;
+  outline-offset: 3px;
+}
+.full-text {
+  margin: 12px 0 0;
+  padding: 12px;
+  border: 1px solid #e4e8df;
+  border-radius: 6px;
+  background: #fafbf8;
+  color: #47513d;
+  font: inherit;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: min(20rem, 40dvh);
+  overflow: auto;
+}
 .preview-list {
   list-style: none;
   margin: 20px 0;
@@ -1919,6 +1966,8 @@ main:focus {
 .result-meta dd {
   margin: 0;
   color: #91aa73;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .result-output {
   white-space: pre-wrap;
