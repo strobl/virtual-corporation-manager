@@ -1,0 +1,10 @@
+import { build as bundle } from 'esbuild';
+import { build as web } from 'vite';
+import { chmod, mkdir } from 'node:fs/promises';
+import { writeNotices } from './licenses.mjs';
+await mkdir('dist', { recursive: true });
+const webOutput=await web();
+const serverOutput=await bundle({entryPoints:['src/cli/index.ts'], outfile:'dist/cli.js', bundle:true, metafile:true, platform:'node', target:'node24', format:'esm', packages:'bundle', banner:{js:'#!/usr/bin/env node\nimport { createRequire } from \'node:module\'; const require = createRequire(import.meta.url);'}, define:{__GITFLASH_VERSION__:JSON.stringify(JSON.parse(await (await import('node:fs/promises')).readFile('package.json','utf8')).version)}});
+const webInputs=(Array.isArray(webOutput)?webOutput:[webOutput]).flatMap(r=>r.output.flatMap(o=>o.type==='chunk'?Object.keys(o.modules):[]));
+await writeNotices([...webInputs,...Object.keys(serverOutput.metafile.inputs),'node_modules/tailwindcss/index.css','node_modules/tw-animate-css/dist/tw-animate.css']);
+await chmod('dist/cli.js', 0o755);
