@@ -2,7 +2,7 @@ import { DatabaseSync, backup as sqliteBackup } from 'node:sqlite';
 import { createHash, randomUUID } from 'node:crypto';
 import { chmodSync, closeSync, constants, copyFileSync, existsSync, linkSync, mkdirSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import type { ApplyResult, AuditEntry, ChangePreview, CompanyDefinition, DomainCommand, WorkspaceState, WorkspaceStore } from '../domain/contracts.js';
+import type { ApplyResult, AuditEntry, ChangePreview, CompanyDefinition, DomainCommand, UndoPreview, WorkspaceState, WorkspaceStore } from '../domain/contracts.js';
 import { DomainError, requireDomain as check } from '../domain/errors.js';
 import { emptyState, executeCommands, SCHEMA_VERSION, validateDefinition, validateState } from '../domain/model.js';
 
@@ -138,6 +138,57 @@ function assertRevision(baseRevision: number, state: WorkspaceState) {
   check(Number.isSafeInteger(baseRevision) && baseRevision >= 0, 'INVALID_INPUT', 'A valid workspace revision is required.');
   check(baseRevision === state.revision, 'STALE_PREVIEW', 'The company changed since this preview. Refresh and preview your changes again.');
 }
+function readUndoTarget(db: DatabaseSync, changeId: string, baseRevision: number) {
+  const current = readSnapshot(db); assertRevision(baseRevision, current);
+  check(typeof changeId === 'string' && changeId.length > 0, 'INVALID_INPUT', 'A change ID is required.');
+  const change = db.prepare('SELECT revision,undone,undoable,summary,beforeJson FROM changes WHERE id=?').get(changeId);
+  check(change, 'NOT_FOUND', 'Change not found.');
+  check(Number(change.revision) === current.revision && change.undone === 0 && change.undoable === 1, 'UNDO_UNAVAILABLE', 'Only the latest configuration change can be undone. Recorded work and acceptance are permanent evidence.');
+  return { current, restored: JSON.parse(String(change.beforeJson)) as WorkspaceState, summary: `Undo: ${change.summary}` };
+}
+
+/** Describe the actual inverse snapshot, including dated assignments and reporting references. */
+function undoEffects(current: WorkspaceState, restored: WorkspaceState): string[] {
+  type ConfigRow = { id: string } & Record<string, unknown>;
+  const collections = [
+    ['companies', 'company'], ['departments', 'department'], ['agents', 'agent'],
+    ['assignments', 'assignment'], ['relationships', 'relationship'],
+  ] as const;
+  const labels: Record<string, string> = { shortCode: 'Short code', companyId: 'Company', agentId: 'Agent',
+    departmentId: 'Department', managerId: 'Manager', isPrimary: 'Primary', fromCompanyId: 'From company',
+    toCompanyId: 'To company', startedAt: 'Started at', endedAt: 'Ended at', createdAt: 'Created at', updatedAt: 'Updated at' };
+  const fieldLabel = (field: string) => labels[field] ?? `${field[0]!.toUpperCase()}${field.slice(1)}`;
+  const valueLabel = (field: string, value: unknown, state: WorkspaceState): string => {
+    if (typeof value === 'string' && ['companyId', 'fromCompanyId', 'toCompanyId', 'agentId', 'managerId', 'departmentId'].includes(field)) {
+      const records = field === 'departmentId' ? state.departments : ['agentId', 'managerId'].includes(field) ? state.agents : state.companies;
+      const target = records.find(row => row.id === value);
+      if (target) return `${JSON.stringify(target.name)} [${value}]`;
+    }
+    return JSON.stringify(value) ?? '(missing)';
+  };
+  const identity = (kind: string, row: ConfigRow, state: WorkspaceState) => {
+    const name = typeof row.name === 'string' ? JSON.stringify(row.name)
+      : kind === 'assignment' ? `${valueLabel('agentId', row.agentId, state)} → ${valueLabel('companyId', row.companyId, state)}`
+      : `${String(row.kind)}: ${valueLabel('fromCompanyId', row.fromCompanyId, state)} → ${valueLabel('toCompanyId', row.toCompanyId, state)}`;
+    return `${kind} ${name} [${row.id}]`;
+  };
+  const details = (row: ConfigRow, state: WorkspaceState) => Object.keys(row).filter(field => field !== 'id')
+    .map(field => `${fieldLabel(field)}: ${valueLabel(field, row[field], state)}`).join('; ');
+  const effects: string[] = [];
+  for (const [collection, kind] of collections) {
+    const present = new Map((current[collection] as unknown as ConfigRow[]).map(row => [row.id, row]));
+    const target = new Map((restored[collection] as unknown as ConfigRow[]).map(row => [row.id, row]));
+    for (const [id, row] of present) {
+      const previous = target.get(id);
+      if (!previous) { effects.push(`Remove ${identity(kind, row, current)} — ${details(row, current)}`); continue; }
+      const fields = [...new Set([...Object.keys(row), ...Object.keys(previous)])].filter(field => field !== 'id' && JSON.stringify(row[field]) !== JSON.stringify(previous[field]));
+      if (fields.length) effects.push(`Restore ${identity(kind, row, current)} — ${fields.map(field =>
+        `${fieldLabel(field)}: ${valueLabel(field, row[field], current)} → ${valueLabel(field, previous[field], restored)}`).join('; ')}`);
+    }
+    for (const [id, row] of target) if (!present.has(id)) effects.push(`Restore removed ${identity(kind, row, restored)} — ${details(row, restored)}`);
+  }
+  return effects;
+}
 function verifyBackup(path: string): DatabaseSync {
   let db: DatabaseSync;
   try { db = new DatabaseSync(path, { readOnly: true }); } catch { throw new DomainError('INVALID_BACKUP', 'The file is not a readable SQLite backup.'); }
@@ -185,15 +236,20 @@ export function createWorkspaceStore(dataDir: string): WorkspaceStore {
         return { state: readSnapshot(db), changeId, replayed: false };
       });
     },
+    previewUndo(changeId: string, baseRevision: number): UndoPreview {
+      ensureOpen();
+      // This is a read-only description, not a persisted authorization token. The
+      // caller confirms with the same changeId/baseRevision; undo revalidates both
+      // inside its write transaction before restoring any configuration.
+      const { current, restored, summary } = readUndoTarget(db, changeId, baseRevision);
+      return { changeId, baseRevision, summary, changes: undoEffects(current, restored) };
+    },
     undo(changeId: string, baseRevision: number): WorkspaceState {
       ensureOpen(); return transaction(db, () => {
-        const current = readSnapshot(db); assertRevision(baseRevision, current);
-        const change = db.prepare('SELECT * FROM changes WHERE id=?').get(changeId); check(change, 'NOT_FOUND', 'Change not found.');
-        check(Number(change.revision) === current.revision && change.undone === 0 && change.undoable === 1, 'UNDO_UNAVAILABLE', 'Only the latest configuration change can be undone. Recorded work and acceptance are permanent evidence.');
-        const restored = JSON.parse(String(change.beforeJson)) as WorkspaceState; restored.revision = current.revision + 1;
+        const { current, restored, summary } = readUndoTarget(db, changeId, baseRevision); restored.revision = current.revision + 1;
         writeSnapshot(db, restored);
         db.prepare('UPDATE changes SET undone=1 WHERE id=?').run(changeId);
-        db.prepare('INSERT INTO changes (id,action,summary,revision,createdAt,beforeJson,afterJson,undoable) VALUES (?,?,?,?,?,?,?,0)').run(randomUUID(), 'change.undo', `Undo: ${change.summary}`, restored.revision, new Date().toISOString(), JSON.stringify({ ...current, history: [] }), JSON.stringify(restored));
+        db.prepare('INSERT INTO changes (id,action,summary,revision,createdAt,beforeJson,afterJson,undoable) VALUES (?,?,?,?,?,?,?,0)').run(randomUUID(), 'change.undo', summary, restored.revision, new Date().toISOString(), JSON.stringify({ ...current, history: [] }), JSON.stringify(restored));
         return readSnapshot(db);
       });
     },

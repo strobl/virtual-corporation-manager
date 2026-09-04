@@ -27,6 +27,7 @@ export type DomainCommand =
  | { type: 'work.record'; input: Omit<WorkRecord,'id'|'createdAt'> }
  | { type: 'work.accept'; id: string };
 export interface ChangePreview { id: string; baseRevision: number; summary: string; changes: string[]; createdAt: string }
+export interface UndoPreview { changeId: string; baseRevision: number; summary: string; changes: string[] }
 export interface DomainErrorShape { code: string; message: string; details?: unknown }
 export interface ApplyResult { state: WorkspaceState; changeId: string; replayed: boolean }
 export interface TemplateSummary { id: string; name: string; description: string; agentCount: number; departmentCount: number }
@@ -34,6 +35,7 @@ export interface WorkspaceStore {
  snapshot(): WorkspaceState;
  preview(commands: DomainCommand[], baseRevision: number, summary?: string): ChangePreview;
  apply(previewId: string): ApplyResult;
+ previewUndo(changeId: string, baseRevision: number): UndoPreview;
  undo(changeId: string, baseRevision: number): WorkspaceState;
  exportDefinition(): CompanyDefinition;
  backup(destination: string): Promise<void>;

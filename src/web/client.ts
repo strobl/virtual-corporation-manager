@@ -15,6 +15,13 @@ export class ApiError extends Error {
   }
 }
 
+export interface UndoPreview {
+  changeId: string;
+  baseRevision: number;
+  summary: string;
+  changes: string[];
+}
+
 let session: Promise<string> | null = null;
 async function token(): Promise<string> {
   session ??= fetch("/api/session", { credentials: "same-origin" })
@@ -79,4 +86,6 @@ export const client = {
     request<ApplyResult>("/api/apply", { previewId }),
   undo: (changeId: string, baseRevision: number) =>
     request<WorkspaceState>("/api/undo", { changeId, baseRevision }),
+  undoPreview: (changeId: string, baseRevision: number) =>
+    request<UndoPreview>("/api/undo/preview", { changeId, baseRevision }),
 };

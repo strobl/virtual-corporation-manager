@@ -134,7 +134,9 @@ describe('local SQLite company store', () => {
     const backups = readdirSync(join(dir,'backups')); expect(backups).toHaveLength(1); const old = new DatabaseSync(join(dir,'backups',backups[0]!)); expect(old.prepare('PRAGMA user_version').get()?.user_version).toBe(1); old.close();
     const checkDb = new DatabaseSync(join(dir,'workspace.sqlite')); expect(checkDb.prepare('SELECT COUNT(*) AS n FROM schema_migrations').get()?.n).toBe(3); checkDb.exec('PRAGMA foreign_keys=ON;');
     expect(() => checkDb.prepare('INSERT INTO departments VALUES (?,?,?,?,?)').run('bad','missing','No company','',null)).toThrow(); checkDb.close();
-    expect(statSync(join(dir,'workspace.sqlite')).mode & 0o777).toBe(0o600);
+    // POSIX modes do not model Windows access control. Windows files inherit the
+    // selected directory's OS ACLs; chmod does not guarantee Unix permission bits.
+    if (process.platform !== 'win32') expect(statSync(join(dir,'workspace.sqlite')).mode & 0o777).toBe(0o600);
   });
 
   it('refuses a second process store and recovers a stale process lock', () => {

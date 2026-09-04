@@ -1,12 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { createWorkspaceStore, restoreWorkspaceBackup } from '../src/db/store.js';
 import { createIntegrationService, exportBuzzTeam, validateBuzzTeam } from '../src/adapters/index.js';
 import { CodexEventCollector } from '../src/adapters/codex.js';
 import { executeProcess, runtimeEnvironment } from '../src/adapters/process.js';
+import * as runtimeProcess from '../src/adapters/process.js';
 import { redactError } from '../src/adapters/types.js';
 
 const cleanups: Array<() => Promise<void> | void> = [];
@@ -97,13 +98,19 @@ describe('optional task service (fixture execution; not live inference evidence)
     expect(service.runs()).toHaveLength(0);
   });
   it('discards provider stderr and error payloads instead of exposing private diagnostics', async () => {
-    const { directory, store, agentId } = fixture(); const executable = join(directory, 'fake-codex');
+    const { directory, store, agentId } = fixture(); const script = join(directory, 'fake-codex.cjs');
     const privateDiagnostic = 'provider-private-context-and-credential';
-    writeFileSync(executable, `#!/usr/bin/env node\nconst a=process.argv.slice(2);if(a.includes('--help')){console.log('--json --ephemeral --ignore-user-config --sandbox --skip-git-repo-check');}else if(a.includes('--version')){console.log('codex-cli 0.138.0');}else{console.error('${privateDiagnostic}');console.log(JSON.stringify({type:'error',message:'${privateDiagnostic}'}));process.exitCode=1;}\n`);
-    chmodSync(executable, 0o700);
-    const service = createIntegrationService(store, directory, { env: { PATH: dirname(process.execPath), GITFLASH_CODEX_PATH: executable } }); cleanups.push(() => service.close());
+    writeFileSync(script, `const a=process.argv.slice(2);if(a.includes('--help')){console.log('--json --ephemeral --ignore-user-config --sandbox --skip-git-repo-check');}else if(a.includes('--version')){console.log('codex-cli 0.138.0');}else{console.error('${privateDiagnostic}');console.log(JSON.stringify({type:'error',message:'${privateDiagnostic}'}));process.exitCode=1;}\n`);
+    // Windows cannot execute a POSIX shebang. Prefix this test's JS fixture with
+    // Node while retaining the real subprocess, stderr stream, and Codex parser.
+    const realExecuteProcess = runtimeProcess.executeProcess; const receivedStderr: string[] = [];
+    const launch = vi.spyOn(runtimeProcess, 'executeProcess').mockImplementation(async (_executable, args, options) => {
+      const result = await realExecuteProcess(process.execPath, [script, ...args], options); receivedStderr.push(result.stderr); return result;
+    }); cleanups.push(() => { launch.mockRestore(); });
+    const service = createIntegrationService(store, directory, { env: { ...runtimeEnvironment(process.env), GITFLASH_CODEX_PATH: process.execPath } }); cleanups.push(() => service.close());
     const run = await service.run({ agentId, task: 'Exercise failure reporting', requestId: 'request-provider-error' });
     await until(() => service.getRun(run.id)?.status === 'failed');
+    expect(receivedStderr.some(stderr => stderr.includes(privateDiagnostic))).toBe(true);
     expect(JSON.stringify(service.getRun(run.id))).not.toContain(privateDiagnostic);
     expect(service.getRun(run.id)?.error).toContain('did not return a successful');
     expect(store.snapshot().work).toHaveLength(0);

@@ -1,0 +1,2 @@
+# Preserve actual runtime evidence bytes and their recorded SHA-256 on every OS.
+docs/evidence/*-output.txt -text -whitespace

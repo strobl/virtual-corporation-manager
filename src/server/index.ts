@@ -65,6 +65,7 @@ export async function startServer(options:ServerOptions) {
     const template=path.match(/^\/api\/templates\/([a-z0-9-]+)\/preview$/);
     if(template) return json(res,store.preview([{type:'definition.import',definition:getTemplate(template[1])}],revision(input.baseRevision),`Create ${template[1]} company`));
     if(path==='/api/apply') return json(res,store.apply(requiredString(input.previewId,'previewId')));
+    if(path==='/api/undo/preview') return json(res,store.previewUndo(requiredString(input.changeId,'changeId'),revision(input.baseRevision)));
     if(path==='/api/undo') return json(res,store.undo(requiredString(input.changeId,'changeId'),revision(input.baseRevision)));
     if(path==='/api/runs') return json(res,await integration.run({agentId:requiredString(input.agentId,'agentId'),task:requiredString(input.task,'task'),requestId:requiredString(input.requestId,'requestId'),...(input.transport==='buzz'?{transport:'buzz' as const}:{})}),202);
     if(path==='/api/slack/connect') { await integration.connectSlack(); return json(res,await integration.status()); }

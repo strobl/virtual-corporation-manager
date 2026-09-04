@@ -36,7 +36,7 @@ import type {
 } from "../domain/contracts";
 import { DenseTree } from "../components/ds/DenseTree";
 import { CorporationOrgChart } from "../components/organization/CorporationOrgChart";
-import { client, request } from "./client";
+import { client, request, type UndoPreview } from "./client";
 import {
   companyAgents,
   companyForSelection,
@@ -101,6 +101,7 @@ export function App() {
   const [templatesOpen, setTemplatesOpen] = useState(false);
   const [advanced, setAdvanced] = useState<AdvancedTarget | null>(null);
   const [preview, setPreview] = useState<ChangePreview | null>(null);
+  const [undoPreview, setUndoPreview] = useState<UndoPreview | null>(null);
   const [pending, setPending] = useState<PendingChange | null>(null);
   const [runAgent, setRunAgent] = useState<Agent | null>(null);
   const [busy, setBusy] = useState(false);
@@ -269,11 +270,25 @@ export function App() {
     if (!state) return;
     setBusy(true);
     setError(null);
+    setModalError(null);
     try {
-      setState(await client.undo(id, state.revision));
-      announce("Configuration change undone.");
+      setUndoPreview(await client.undoPreview(id, state.revision));
     } catch (cause) {
       setError(message(cause));
+    } finally {
+      setBusy(false);
+    }
+  };
+  const confirmUndo = async () => {
+    if (!undoPreview || busy) return;
+    setBusy(true);
+    setModalError(null);
+    try {
+      setState(await client.undo(undoPreview.changeId, undoPreview.baseRevision));
+      setUndoPreview(null);
+      announce("Configuration change undone. Work evidence was retained.");
+    } catch (cause) {
+      setModalError(message(cause));
     } finally {
       setBusy(false);
     }
@@ -1377,6 +1392,22 @@ export function App() {
           onApply={() => void apply()}
           onRefresh={() => void refreshPreview()}
         />
+      )}
+      {undoPreview && (
+        <Dialog title="Review undo" wide onClose={() => { if (!busy) { setUndoPreview(null); setModalError(null); } }}>
+          <div className="dialog-body">
+            <div className="draft-label"><span /> Review · Nothing has been undone</div>
+            <h3 className="preview-title">{undoPreview.summary}</h3>
+            <p className="muted">Confirm these exact configuration reversals at revision {undoPreview.baseRevision}. A later change will require a new review.</p>
+            <ol className="preview-list">{undoPreview.changes.map((change, index) => <li key={index}><span className="change-number">{index + 1}</span>{change}</li>)}</ol>
+            <p className="preview-note"><ShieldCheck size={16} /> Real work and accepted evidence are retained. Undo does not reverse external actions.</p>
+            {modalError && <div className="error-box" role="alert"><p>{modalError}</p><p>Cancel and reopen Undo to review the current workspace.</p></div>}
+            <footer className="dialog-actions">
+              <button className="button" disabled={busy} onClick={() => { setUndoPreview(null); setModalError(null); }}>Cancel</button>
+              <button className="button primary" disabled={busy || Boolean(modalError)} onClick={() => void confirmUndo()}><Undo2 size={16} />{busy ? "Undoing…" : "Confirm undo"}</button>
+            </footer>
+          </div>
+        </Dialog>
       )}
       {templatesOpen && (
         <Dialog
