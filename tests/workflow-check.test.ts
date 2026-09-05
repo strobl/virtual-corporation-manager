@@ -1,9 +1,21 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { access, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import {
+  access,
+  mkdir,
+  mkdtemp,
+  readFile,
+  realpath,
+  rm,
+  symlink,
+  writeFile,
+} from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { executeProcess, findExecutable } from '../src/adapters/process.js';
-import { executeWorkflowCheck } from '../src/adapters/workflow-check.js';
+import {
+  executeWorkflowCheck,
+  resolveLinuxCodexSandboxFiles,
+} from '../src/adapters/workflow-check.js';
 
 vi.mock('../src/adapters/process.js', async (original) => {
   const actual = await original<typeof import('../src/adapters/process.js')>();
@@ -48,6 +60,37 @@ const run = (code: string, signal?: AbortSignal, options = {}) =>
     },
     options,
   );
+
+it.runIf(process.platform === 'darwin' || process.platform === 'linux')(
+  'resolves only exact Codex runtime files from a symlinked npm launcher',
+  async () => {
+    const root = join(directory, 'node_modules', '@openai', 'codex');
+    const nativeRoot = join(directory, 'node_modules', '@openai', `codex-linux-${process.arch}`);
+    const target =
+      process.arch === 'arm64' ? 'aarch64-unknown-linux-musl' : 'x86_64-unknown-linux-musl';
+    const entry = join(root, 'bin', 'codex.js');
+    const binary = join(nativeRoot, 'vendor', target, 'bin', 'codex');
+    await mkdir(join(root, 'bin'), { recursive: true });
+    await mkdir(join(nativeRoot, 'vendor', target, 'bin'), { recursive: true });
+    await writeFile(join(root, 'package.json'), JSON.stringify({ name: '@openai/codex' }));
+    await writeFile(
+      join(nativeRoot, 'package.json'),
+      JSON.stringify({ name: `@openai/codex-linux-${process.arch}` }),
+    );
+    await writeFile(entry, '#!/usr/bin/env node\n');
+    await writeFile(binary, 'synthetic native file, never executed');
+    const launcher = join(directory, 'codex');
+    await symlink(entry, launcher);
+    expect(await resolveLinuxCodexSandboxFiles(launcher)).toEqual([
+      await realpath(entry),
+      await realpath(binary),
+    ]);
+    expect(await resolveLinuxCodexSandboxFiles(binary)).toEqual([await realpath(binary)]);
+    // A missing platform binary must not broaden access to its parent tree.
+    await rm(binary);
+    await expect(resolveLinuxCodexSandboxFiles(launcher)).rejects.toMatchObject({ code: 'ENOENT' });
+  },
+);
 
 describe.runIf(process.platform === 'darwin' || process.platform === 'linux')(
   'fixed local workflow checker',

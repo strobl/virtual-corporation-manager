@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { mkdir, mkdtemp, realpath, rm, stat } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, realpath, rm, stat } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { dirname, isAbsolute, join } from 'node:path';
 import { executeProcess, findExecutable, runtimeEnvironment } from './process.js';
@@ -25,6 +26,59 @@ export interface WorkflowCheckResult {
 export interface WorkflowCheckOptions {
   timeoutMs?: number;
   maxBytes?: number;
+}
+
+/** Resolve only the operator-selected CLI and its official npm native entrypoint.
+ * Linux bubblewrap re-executes this native file inside the filesystem boundary.
+ * The package layout follows @openai/codex 0.138.0 bin/codex.js; never grant the
+ * surrounding installation, home directory or node_modules tree read access.
+ */
+export async function resolveLinuxCodexSandboxFiles(executable: string): Promise<string[]> {
+  const entry = await realpath(executable);
+  const files = [entry];
+  const packageRoot = dirname(dirname(entry));
+  const metadata = await readFile(join(packageRoot, 'package.json'), 'utf8')
+    .then((value) => JSON.parse(value) as { name?: string })
+    .catch(() => null);
+  if (metadata?.name !== '@openai/codex' || entry !== join(packageRoot, 'bin', 'codex.js'))
+    return files;
+  const target =
+    process.arch === 'x64'
+      ? 'x86_64-unknown-linux-musl'
+      : process.arch === 'arm64'
+        ? 'aarch64-unknown-linux-musl'
+        : null;
+  if (!target) return files;
+  let vendorRoot = join(packageRoot, 'vendor');
+  try {
+    const metadataPath = createRequire(entry).resolve(
+      `@openai/codex-linux-${process.arch}/package.json`,
+    );
+    vendorRoot = join(dirname(metadataPath), 'vendor');
+  } catch {
+    // The official CLI also supports an embedded vendor directory.
+  }
+  const nativeEntry = await realpath(join(vendorRoot, target, 'bin', 'codex'));
+  if (!(await stat(nativeEntry)).isFile())
+    throw new IntegrationError(
+      'sandbox-unavailable',
+      'The Codex native runtime file is unavailable. Reinstall the optional CLI with its platform dependency. No check was run.',
+    );
+  return [...new Set([...files, nativeEntry])];
+}
+
+export async function workflowCheckFilesystem(
+  command: string,
+  executable: string,
+): Promise<Record<string, string>> {
+  const filesystem: Record<string, string> = {
+    ':minimal': 'read',
+    ':workspace_roots': 'write',
+    [dirname(command)]: 'read',
+  };
+  if (process.platform === 'linux')
+    for (const file of await resolveLinuxCodexSandboxFiles(executable)) filesystem[file] = 'read';
+  return filesystem;
 }
 
 // This trusted launcher serializes child output instead of mixing a success marker
@@ -199,11 +253,7 @@ export async function executeWorkflowCheck(
     // Reuse the already-resolved Python runtime. A second Node launcher would
     // require Homebrew dylib/opt-symlink read grants unrelated to the fixed oracle.
     const nonce = randomUUID();
-    const filesystem: Record<string, string> = {
-      ':minimal': 'read',
-      ':workspace_roots': 'write',
-      [dirname(command)]: 'read',
-    };
+    const filesystem = await workflowCheckFilesystem(command, executable);
     const filesystemToml = `{${Object.entries(filesystem)
       .map(([key, value]) => `${JSON.stringify(key)}=${JSON.stringify(value)}`)
       .join(',')}}`;

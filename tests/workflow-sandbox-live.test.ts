@@ -1,9 +1,9 @@
 import { afterEach, expect, it } from 'vitest';
 import { access, mkdir, mkdtemp, readFile, realpath, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import { executeProcess, findExecutable, runtimeEnvironment } from '../src/adapters/process.js';
-import { executeWorkflowCheck } from '../src/adapters/workflow-check.js';
+import { executeWorkflowCheck, workflowCheckFilesystem } from '../src/adapters/workflow-check.js';
 
 // Explicit opt-in integration proof. No model invocation or login is required.
 // CI must install the pinned CLI and provide an installed Python >=3.8 interpreter.
@@ -28,11 +28,7 @@ async function reportSandboxStartupFailure(python: string): Promise<void> {
     TMP: stage,
     TEMP: stage,
   };
-  const filesystem = {
-    ':minimal': 'read',
-    ':workspace_roots': 'write',
-    [dirname(command)]: 'read',
-  };
+  const filesystem = await workflowCheckFilesystem(command, executable);
   const permissions = `{${Object.entries(filesystem)
     .map(([key, value]) => `${JSON.stringify(key)}=${JSON.stringify(value)}`)
     .join(',')}}`;
