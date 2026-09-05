@@ -7,6 +7,7 @@ import {
   Bot,
   Building2,
   CheckCircle2,
+  Clock3,
   ChevronRight,
   Download,
   GitBranch,
@@ -48,9 +49,10 @@ import {
 } from './model';
 import { Dialog, EntityEditor, PreviewDialog, type EditorTarget } from './Dialogs';
 import { CompanyMap } from './CompanyMap';
-import { TextDisclosure } from './TextDisclosure';
+import { TextDisclosure, textExcerpt } from './TextDisclosure';
 import { BrandMark } from './BrandMark';
-import { createWorkViewModel, getRunTargetCompany } from './work-view-model';
+import { createWorkViewModel, getRunTargetCompany, workAgentDestination } from './work-view-model';
+import { TimeTracker, TimezoneSettings } from './TimeTracker';
 import { AdvancedDialog, type AdvancedTarget } from './AdvancedDialogs';
 import {
   IntegrationsView,
@@ -60,11 +62,12 @@ import {
   type RunInfo,
 } from './Work';
 
-type Area = 'organization' | 'work' | 'integrations' | 'activity' | 'settings';
+type Area = 'organization' | 'work' | 'time' | 'integrations' | 'activity' | 'settings';
 type View = 'map' | 'reporting' | 'list';
 const AREA_NAMES: Record<Area, string> = {
   organization: 'Organization',
   work: 'Work',
+  time: 'Time Tracker',
   integrations: 'Integrations',
   activity: 'Activity',
   settings: 'Settings',
@@ -72,6 +75,7 @@ const AREA_NAMES: Record<Area, string> = {
 const AREAS = [
   { id: 'organization', icon: Building2 },
   { id: 'work', icon: Activity },
+  { id: 'time', icon: Clock3 },
   { id: 'integrations', icon: PlugZap },
 ] as const;
 type PendingChange =
@@ -116,7 +120,11 @@ export function App() {
       drawerClose.current?.focus();
     } else if (drawerUsed.current) menuButton.current?.focus();
   }, [navOpen]);
-  const [showInspector, setShowInspector] = useState(true);
+  const [showInspector, setShowInspector] = useState(false);
+  const [historicalIdentity, setHistoricalIdentity] = useState<{
+    agentId?: string;
+    companyId: string;
+  } | null>(null);
   const [archived, setArchived] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -190,7 +198,7 @@ export function App() {
     setSelection(
       value.kind === 'agent' && !value.companyId && companyId ? { ...value, companyId } : value,
     );
-    setShowInspector(true);
+    setShowInspector(value.kind !== 'company');
     setNavOpen(false);
   };
   const openAdvanced = (target: AdvancedTarget) => {
@@ -305,6 +313,24 @@ export function App() {
     setArea(value);
     setNavOpen(false);
   };
+  const openAgentContext = (id: string, originCompanyId: string) => {
+    if (!state) return;
+    if (workAgentDestination(state, id, originCompanyId).kind === 'historical') {
+      setHistoricalIdentity({ agentId: id, companyId: originCompanyId });
+      return;
+    }
+    select({ kind: 'agent', id, companyId: originCompanyId });
+    setArea('organization');
+  };
+  const openCompanyContext = (id: string) => {
+    if (!state?.companies.some((row) => row.id === id && row.status === 'active')) {
+      setHistoricalIdentity({ companyId: id });
+      return;
+    }
+    select({ kind: 'company', id });
+    setShowInspector(true);
+    setArea('organization');
+  };
 
   return (
     <div className="gitflash" style={{ '--brand-accent': brand.accent } as React.CSSProperties}>
@@ -355,7 +381,10 @@ export function App() {
         </button>
         <a className="brand" href="/" aria-label={`${brand.name} home`}>
           <BrandMark size={36} decorative />
-          <strong>{brand.name}</strong>
+          <span className="brand-copy">
+            <strong>{brand.name}</strong>
+            <small>Virtual Corporation Manager</small>
+          </span>
           <span className="local-badge">local</span>
         </a>
         <nav className="primary-nav" aria-label="Primary">
@@ -605,105 +634,69 @@ export function App() {
                     </div>
                   ) : (
                     <>
-                      <section className="organization-header">
-                        <div>
-                          <span className="eyebrow">YOUR COMPANY · YOUR NEXT MOVE</span>
-                          <h1>{company?.name ?? 'Your organization'}</h1>
-                          <TextDisclosure
-                            text={
-                              company?.description ||
-                              'A clear view of the people, agents, and teams behind your work.'
-                            }
-                          />
-                        </div>
-                        <div className="company-control-actions">
-                          <img
-                            className="company-flash"
-                            src="/flash-character.svg"
-                            width={84}
-                            height={98}
-                            alt=""
-                          />
-                          <div className="organization-actions">
-                            <button
-                              className="button"
-                              onClick={() =>
-                                openEditor({
-                                  kind: 'department',
-                                  companyId: companyId ?? undefined,
-                                })
-                              }
-                              disabled={!companyId}
-                            >
-                              <Plus size={15} />
-                              Department
-                            </button>
-                            <button
-                              className="button primary"
-                              onClick={() =>
-                                openEditor({
-                                  kind: 'agent',
-                                  companyId: companyId ?? undefined,
-                                  departmentId: selectedDepartment?.id,
-                                })
-                              }
-                              disabled={!companyId}
-                            >
-                              <Plus size={15} />
-                              Agent
-                            </button>
+                      <section className="organization-header compact-company-header">
+                        <div
+                          className="compact-company-context"
+                          style={{ borderLeftColor: company?.color || brand.accent }}
+                        >
+                          <BrandMark size={32} decorative />
+                          <div>
+                            <span className="eyebrow">Your corporation</span>
+                            <h1>{company?.name ?? 'Your organization'}</h1>
+                            <p>
+                              {textExcerpt(company?.description ?? '', 140) ||
+                                'A company structure. Work starts with a task.'}
+                            </p>
                           </div>
+                        </div>
+                        <div className="organization-actions">
+                          <button
+                            className="button"
+                            onClick={() =>
+                              openEditor({ kind: 'department', companyId: companyId ?? undefined })
+                            }
+                            disabled={!companyId}
+                          >
+                            <Plus size={14} /> Department
+                          </button>
+                          <button
+                            className="button primary"
+                            onClick={() =>
+                              openEditor({
+                                kind: 'agent',
+                                companyId: companyId ?? undefined,
+                                departmentId: selectedDepartment?.id,
+                              })
+                            }
+                            disabled={!companyId}
+                          >
+                            <Plus size={14} /> Agent
+                          </button>
                         </div>
                       </section>
                       <div
-                        className="company-instruments"
+                        className="company-summary-strip"
                         aria-label={`Activity for ${company?.name ?? 'this company'}`}
                       >
-                        <div className="company-instrument">
-                          <span>
-                            <Bot size={16} />
-                            Configured roles
-                          </span>
-                          <strong>{agents.filter((row) => row.kind === 'agent').length}</strong>
-                          <small>
-                            {state.departments.filter((row) => row.companyId === companyId).length}{' '}
-                            departments
-                          </small>
-                        </div>
-                        <div className="company-instrument">
-                          <span>
-                            <Activity size={16} />
-                            Running
-                          </span>
-                          <strong>{companyWork?.stats.running ?? 0}</strong>
-                          <small>{companyWork?.stats.queued ?? 0} queued</small>
-                        </div>
+                        <span>
+                          {agents.filter((row) => row.kind === 'agent').length} configured roles ·{' '}
+                          {state.departments.filter((row) => row.companyId === companyId).length}{' '}
+                          departments
+                        </span>
+                        <span>
+                          {companyWork?.stats.running ?? 0} running ·{' '}
+                          {companyWork?.stats.queued ?? 0} queued
+                        </span>
                         <button
                           className={`company-instrument instrument-review${companyWork?.stats.reviewable ? ' instrument-review-active' : ''}`}
                           onClick={() => navigate('work')}
                         >
-                          <span>
-                            <ArrowUpRight size={16} />
-                            Needs your review
-                          </span>
+                          <span>Review work</span>
                           <strong>{companyWork?.stats.reviewable ?? 0}</strong>
-                          <small>
-                            {companyWork?.stats.reviewable ? 'Review work' : 'View company work'}{' '}
-                            <ArrowRight size={13} />
-                          </small>
                         </button>
-                        <div className="company-instrument">
-                          <span>
-                            <CheckCircle2 size={16} />
-                            Accepted
-                          </span>
-                          <strong>{companyWork?.stats.accepted ?? 0}</strong>
-                          <small>Results you approved</small>
-                        </div>
-                      </div>
-                      <div className="company-scope-note">
-                        <ShieldCheck size={13} />
-                        Saved configuration stays idle until you run a task.
+                        <button className="button" onClick={() => navigate('time')}>
+                          <Clock3 size={14} /> Time Tracker
+                        </button>
                       </div>
                       <div className="view-toolbar">
                         <div className="view-tabs" role="tablist" aria-label="Organization view">
@@ -748,7 +741,10 @@ export function App() {
                               state={state}
                               companyId={companyId}
                               selection={selection}
-                              onSelect={select}
+                              onSelect={(value) => {
+                                select(value);
+                                setShowInspector(true);
+                              }}
                               onCreateDepartment={() =>
                                 openEditor({ kind: 'department', companyId })
                               }
@@ -832,6 +828,12 @@ export function App() {
                               >
                                 <Pencil size={12} />
                                 Edit details
+                              </button>
+                              <button
+                                className="button small-button"
+                                onClick={() => navigate('time')}
+                              >
+                                <Clock3 size={13} /> View delivery hours
                               </button>
                             </div>
                             {selectedAgent ? (
@@ -1082,11 +1084,18 @@ export function App() {
                   onAccept={(id, title) =>
                     void command([{ type: 'work.accept', id }], `Accept result: ${title}`)
                   }
-                  onSelectAgent={(id) => {
-                    select({ kind: 'agent', id });
-                    setArea('organization');
-                  }}
+                  onSelectAgent={openAgentContext}
                   onRefresh={() => void refresh()}
+                />
+              )}
+              {area === 'time' && (
+                <TimeTracker
+                  state={state}
+                  selectedCompanyId={companyId}
+                  selectedAgentId={selectedAgent?.id ?? null}
+                  onChanged={refresh}
+                  onOpenAgent={openAgentContext}
+                  onOpenCompany={openCompanyContext}
                 />
               )}
               {area === 'integrations' && (
@@ -1216,6 +1225,7 @@ export function App() {
                     </div>
                   </div>
                   <div className="settings-grid">
+                    <TimezoneSettings revision={state.revision} onChanged={refresh} />
                     <section className="settings-card">
                       <ShieldCheck size={24} />
                       <h3>Local storage</h3>
@@ -1337,6 +1347,47 @@ export function App() {
           onApply={() => void apply()}
           onRefresh={() => void refreshPreview()}
         />
+      )}
+      {historicalIdentity && state && (
+        <Dialog title="Historical company context" onClose={() => setHistoricalIdentity(null)}>
+          <div className="dialog-body">
+            <p>
+              This record belongs to its original company. An archived, removed, or ended assignment
+              is not redirected to another company.
+            </p>
+            <dl className="time-facts">
+              <dt>Company</dt>
+              <dd>
+                {state.companies.find((row) => row.id === historicalIdentity.companyId)?.name ??
+                  'Historical company'}{' '}
+                · {historicalIdentity.companyId}
+              </dd>
+              {historicalIdentity.agentId && (
+                <>
+                  <dt>Member</dt>
+                  <dd>
+                    {state.agents.find((row) => row.id === historicalIdentity.agentId)?.name ??
+                      runs.find(
+                        (row) =>
+                          row.agentId === historicalIdentity.agentId &&
+                          row.companyId === historicalIdentity.companyId,
+                      )?.agentName ??
+                      'Historical member'}{' '}
+                    · {historicalIdentity.agentId}
+                  </dd>
+                </>
+              )}
+            </dl>
+            <p>
+              The recorded output, delivery hours, and history remain attached to these identities.
+            </p>
+            <div className="dialog-actions">
+              <button className="button" onClick={() => setHistoricalIdentity(null)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </Dialog>
       )}
       {undoPreview && (
         <Dialog

@@ -169,13 +169,47 @@ try {
   assert.equal(state.work.length, 0);
   const exported = await (await fetch(app.url + '/api/export')).json();
   assert.equal(exported.agents.length, 101);
+  const emptyTime = await (await fetch(app.url + '/api/time')).json();
+  assert.equal(emptyTime.entries.length, 0);
+  assert.equal(emptyTime.catalog.length, 124);
+  const booking = (hours, requestId) => ({
+    type: 'entry.create',
+    requestId,
+    input: {
+      companyId,
+      agentId,
+      date: emptyTime.today,
+      hours,
+      description: 'Synthetic packaged acceptance entry; not actual delivered work.',
+    },
+  });
+  const firstBooking = await post('/api/time/mutate', booking(0.1, 'packed-time-1'));
+  await post('/api/time/mutate', booking(0.2, 'packed-time-2'));
+  assert.deepEqual(await post('/api/time/mutate', booking(0.1, 'packed-time-1')), firstBooking);
+  const savedTime = await (await fetch(app.url + '/api/time')).json();
+  assert.equal(savedTime.entries.length, 2);
+  assert.equal(
+    savedTime.entries.reduce((sum, row) => sum + row.tenths, 0),
+    3,
+  );
+  assert.equal(savedTime.history.length, 2);
+  assert.equal((await (await fetch(app.url + '/api/state')).json()).work.length, 0);
   await stop(app);
   app = await start(entry, data);
   const reopened = await (await fetch(app.url + '/api/state')).json();
   assert.equal(reopened.agents.length, 101);
   assert(reopened.agents.some((a) => a.id === agentId));
   assert(reopened.companies.some((c) => c.id === companyId));
+  const reopenedTime = await (await fetch(app.url + '/api/time')).json();
+  assert.deepEqual(reopenedTime.entries, savedTime.entries);
+  assert.deepEqual(reopenedTime.history, savedTime.history);
   await stop(app);
+  const timeExport = join(temp, 'delivery-hours.json');
+  await cli(entry, ['time-export', '--data-dir', data, '--output', timeExport]);
+  const exportedTime = JSON.parse(await readFile(timeExport, 'utf8'));
+  assert.equal(exportedTime.format, 'gitflash-delivery-hours');
+  assert.equal(exportedTime.version, 1);
+  assert.deepEqual(exportedTime.entries, savedTime.entries);
   const backup = join(temp, 'backup.sqlite');
   await cli(entry, ['backup', '--data-dir', data, '--output', backup]);
   const restored = join(temp, 'restored');
@@ -185,6 +219,19 @@ try {
   assert.deepEqual(recovered.agents, reopened.agents);
   assert.deepEqual(recovered.assignments, reopened.assignments);
   assert.deepEqual(recovered.history, reopened.history);
+  const recoveredTime = await (await fetch(app.url + '/api/time')).json();
+  assert.deepEqual(recoveredTime.entries, savedTime.entries);
+  assert.deepEqual(recoveredTime.catalog, savedTime.catalog);
+  assert.deepEqual(recoveredTime.history, savedTime.history);
+  assert.equal(recoveredTime.timezone, savedTime.timezone);
+  const restoredSession = await (await fetch(app.url + '/api/session')).json();
+  const replayResponse = await fetch(app.url + '/api/time/mutate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-GitFlash-Token': restoredSession.token },
+    body: JSON.stringify(booking(0.1, 'packed-time-1')),
+  });
+  assert.equal(replayResponse.status, 200);
+  assert.deepEqual(await replayResponse.json(), firstBooking);
   await stop(app);
   const dataBeforeUninstall = await readFile(join(data, 'workspace.sqlite'));
   command([
@@ -214,8 +261,11 @@ try {
       'packaged CLI and all referenced assets',
       'company and agent creation through API',
       '100-agent template atomic apply',
+      '124 shared catalog defaults; synthetic 0.1 + 0.2 hours sum exactly to 0.3',
+      'time request replay, restart and CLI time-export preserve exact entries and history',
       'restart IDs preserved',
       'SQLite backup and fresh restore preserve agents assignments history',
+      'SQLite restore preserves catalog, time history and original replay receipt',
       'uninstall preserves workspace data outside the package',
       'no seeded work claimed',
     ],

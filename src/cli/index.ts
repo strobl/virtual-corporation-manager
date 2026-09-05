@@ -8,12 +8,12 @@ import { createWorkspaceStore, restoreWorkspaceBackup } from '../db/store';
 import { brand } from '../brand';
 declare const __GITFLASH_VERSION__: string;
 const version = typeof __GITFLASH_VERSION__ === 'undefined' ? 'development' : __GITFLASH_VERSION__;
-const help = `${brand.name} ${version} — your company of AI agents\n\nUsage: gitflash [start|doctor|backup|restore|export] [options]\n\n  --data-dir <path>   Workspace directory (default: ~/.gitflash)\n  --port <number>     Local port (default: 4310)\n  --no-open           Print the URL without opening a browser\n  --output <path>     Destination for backup or export\n  --from <path>       SQLite backup to restore; stop GitFlash first\n  --help, -h          Show help\n  --version          Show version\n\nThe local core needs no account or network. Optional agent runtimes have\ntheir own installation, authentication and usage requirements.\n`;
+const help = `${brand.name} ${version} — Virtual Corporation Manager\n\nUsage: gitflash [start|doctor|backup|restore|export|time-export] [options]\n\n  --data-dir <path>   Workspace directory (default: ~/.gitflash)\n  --port <number>     Local port (default: 4310)\n  --no-open           Print the URL without opening a browser\n  --output <path>     Destination for backup or export\n  --from <path>       SQLite backup to restore; stop GitFlash first\n  --help, -h          Show help\n  --version          Show version\n\nexport saves company configuration; time-export saves the delivery-hours\nledger, catalog and history. Use backup/restore for full workspace recovery.\nStop the workspace before running these file commands.\n\nThe local core needs no account or network. Optional agent runtimes have\ntheir own installation, authentication and usage requirements.\n`;
 function parse(args: string[]) {
   const values: Record<string, string | boolean> = {};
   let command = 'start';
   if (args[0] && !args[0].startsWith('-')) command = args.shift()!;
-  if (!['start', 'doctor', 'backup', 'restore', 'export'].includes(command))
+  if (!['start', 'doctor', 'backup', 'restore', 'export', 'time-export'].includes(command))
     throw new Error(`Unknown command: ${command}. Use --help.`);
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -65,7 +65,7 @@ async function main() {
     console.log(`Workspace restored in ${dataDir}. Start GitFlash to inspect it.`);
     return;
   }
-  if (command === 'backup' || command === 'export') {
+  if (command === 'backup' || command === 'export' || command === 'time-export') {
     if (!values['--output'])
       throw new Error(
         'Choose a destination with --output <path>. Stop the running workspace first.',
@@ -82,11 +82,23 @@ async function main() {
     try {
       if (command === 'backup') await store.backup(output);
       else
-        await writeFile(output, JSON.stringify(store.exportDefinition(), null, 2) + '\n', {
-          mode: 0o600,
-          flag: 'wx',
-        });
-      console.log(`${command === 'backup' ? 'Backup' : 'Company definition'} saved to ${output}`);
+        await writeFile(
+          output,
+          JSON.stringify(
+            command === 'time-export'
+              ? { format: 'gitflash-delivery-hours', version: 1, ...store.time.snapshot() }
+              : store.exportDefinition(),
+            null,
+            2,
+          ) + '\n',
+          {
+            mode: 0o600,
+            flag: 'wx',
+          },
+        );
+      console.log(
+        `${command === 'backup' ? 'Backup' : command === 'time-export' ? 'Delivery-hours export' : 'Company definition'} saved to ${output}`,
+      );
     } finally {
       store.close();
     }
@@ -108,6 +120,8 @@ async function main() {
             revision: s.revision,
             companies: s.companies.length,
             agents: s.agents.length,
+            timeEntries: store.time.snapshot().entries.length,
+            timezone: store.time.snapshot().timezone,
             localCore: 'ready',
             optionalRuntimes: 'Check Integrations in the console; no external calls were made.',
           },

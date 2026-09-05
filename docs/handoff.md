@@ -1,6 +1,6 @@
 # Technical handoff and known limits
 
-GitFlash 0.1.0-alpha.2 is a local technical alpha. The maintainer is [strobl](https://github.com/strobl). Source, issues, pull requests, CI and release artifacts live in [this repository](https://github.com/strobl/gitflash).
+This checkout is unpublished local candidate 0.1.0-alpha.3-local.2. Public alpha.2 remains a separate immutable release. The new candidate restores Time Tracker and the compact Virtual Corporation Manager identity; its installed-package evidence must be assessed independently. The maintainer is [strobl](https://github.com/strobl). Source, issues, pull requests, CI and release artifacts live in [this repository](https://github.com/strobl/gitflash).
 
 ## Ownership and change process
 

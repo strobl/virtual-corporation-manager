@@ -1,6 +1,21 @@
 import type { Company, WorkRecord, WorkspaceState } from '../domain/contracts';
 import type { RunInfo } from './Work';
 
+/** Historical work keeps its company; never fall back to another live assignment. */
+export function workAgentDestination(state: WorkspaceState, agentId: string, companyId: string) {
+  const current =
+    state.agents.some((row) => row.id === agentId && row.status === 'active') &&
+    state.companies.some((row) => row.id === companyId && row.status === 'active') &&
+    state.assignments.some(
+      (row) => row.agentId === agentId && row.companyId === companyId && !row.endedAt,
+    );
+  return {
+    kind: current ? ('organization' as const) : ('historical' as const),
+    agentId,
+    companyId,
+  };
+}
+
 /** Mirror the runtime's current primary/first assignment choice, without changing provenance. */
 export function getRunTargetCompany(state: WorkspaceState, agentId: string): Company | null {
   const agent = state.agents.find(

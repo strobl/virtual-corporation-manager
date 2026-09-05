@@ -1,5 +1,7 @@
 # GitFlash
 
+**Local candidate `0.1.0-alpha.3-local.2`.** This unpublished iteration adds Time Tracker and the compact Virtual Corporation Manager identity. It does not replace public alpha.2. To inspect a supplied candidate archive, install that exact file with `npm install --global ./gitflash-0.1.0-alpha.3-local.2.tgz`, then start it with a separate `--data-dir`. The public release install link below still installs alpha.2, which does not contain this new Time Tracker.
+
 **Build a company. Put it to work.**
 
 GitFlash is a free, open-source local workspace for a company of AI agents. Create your organization, see who owns what, and give a configured agent a concrete task. Your company, reviewed changes and actual work results live in SQLite on your computer.
@@ -26,6 +28,7 @@ Download/install requires network access. After installation, company creation, 
 3. Use the organization tree, map, list and inspector to understand the company. Select an agent to edit its role or assignments.
 4. To produce work, open **Integrations** and check an optional runtime. For Codex, install and authenticate its CLI separately, then refresh status.
 5. Select an agent, choose **Run task**, describe the output you need and submit. Inspect the actual output, run ID, duration and hash in **Work**. Accept a result only after reviewing it.
+6. Open **Time Tracker** to book and correct delivery hours, inspect their basis and compare a week or another period. [Time Tracker and local agent API](docs/time-tracker.md) explains explicit hours, catalog references and labelled fallback estimates. Hours are separate from execution duration and output acceptance.
 
 Configuring 100 roles does not start 100 processes. The initial executor runs one task at a time and queues at most 20. Creating or importing a company never starts inference. Optional services use your own provider access and allowance; GitFlash does not make those services free. Read [integration setup and boundaries](docs/integrations.md).
 
@@ -64,8 +67,8 @@ npm start -- --data-dir ./scratch-company
 
 The packaged smoke test installs the actual tarball with npm offline, creates a company and agent, applies the 100-role template, restarts and restores a backup. CI runs the checks across macOS, Linux and Windows on the minimum and latest Node 24.x. A green build is distinct from an independently observed human pilot.
 
-Read [CONTRIBUTING](CONTRIBUTING.md), [architecture](docs/architecture.md), [release acceptance](docs/acceptance.md) and [known limitations and handoff](docs/handoff.md). Public branding is configured in `src/brand.ts`. VCM (Virtual Corporation Manager) is the internal product name.
+Read [CONTRIBUTING](CONTRIBUTING.md), [architecture](docs/architecture.md), [release acceptance](docs/acceptance.md) and [known limitations and handoff](docs/handoff.md). Public branding is configured in `src/brand.ts`. Virtual Corporation Manager is the visible product descriptor; GitFlash is the public brand.
 
 ## License and provenance
 
-MIT for GitFlash application code. Useful organization, inspector and domain work was selectively adapted from the owner's prior prototype. The private history, hosted infrastructure and live data were excluded. Complete upstream notices for bundled dependencies and adapted component patterns are in [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md).
+MIT for GitFlash application code. Useful organization, inspector and domain work was selectively adapted from the owner's prior prototype. Private history, hosted infrastructure and private/customer records were excluded. The Time Tracker bundles 124 owner-authorized Shared catalog definitions from the live prototype. Catalog provenance and complete upstream notices for bundled dependencies and adapted component patterns are in [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md).

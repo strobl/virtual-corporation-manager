@@ -3,6 +3,7 @@ import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { readFile, stat } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import type { DomainCommand, WorkspaceStore } from '../domain/contracts';
+import type { TimeCommand, TimeIngressEntry, TimeIngressResult } from '../time/contracts';
 import { createWorkspaceStore } from '../db/store';
 import { getTemplate, listTemplates } from '../company/templates';
 import { createIntegrationService } from '../adapters/index';
@@ -125,6 +126,19 @@ export async function startServer(options: ServerOptions) {
         if (path === '/api/session') return json(res, { token });
         if (path === '/api/health') return json(res, { ok: true, local: true });
         if (path === '/api/state') return json(res, store.snapshot());
+        if (path === '/api/time') return json(res, store.time.snapshot());
+        if (path === '/api/time/catalog') return json(res, store.time.snapshot().catalog);
+        if (path === '/api/time/export') {
+          res.setHeader(
+            'Content-Disposition',
+            'attachment; filename="gitflash-delivery-hours.json"',
+          );
+          return json(res, {
+            format: 'gitflash-delivery-hours',
+            version: 1,
+            ...store.time.snapshot(),
+          });
+        }
         if (path === '/api/templates') return json(res, listTemplates());
         if (path === '/api/export') {
           res.setHeader('Content-Disposition', 'attachment; filename="gitflash-company.json"');
@@ -160,6 +174,39 @@ export async function startServer(options: ServerOptions) {
         if (!req.headers['content-type']?.startsWith('application/json'))
           throw new HttpError('INVALID_CONTENT_TYPE', 'Send application/json.', 415);
         const input = await body(req);
+        if (path === '/api/time/mutate') {
+          return json(res, store.time.mutate(input as unknown as TimeCommand, 'manual'));
+        }
+        if (path === '/api/time/ingest') {
+          const entries = 'entries' in input ? input.entries : [input];
+          if (!Array.isArray(entries) || entries.length === 0 || entries.length > 50)
+            throw new HttpError('INVALID_BATCH', 'Provide between 1 and 50 time entries.', 400);
+          const results: TimeIngressResult[] = entries.map((value: unknown, index) => {
+            try {
+              if (!value || typeof value !== 'object' || Array.isArray(value))
+                throw new HttpError('INVALID_INPUT', 'Each time entry must be a JSON object.', 400);
+              const { requestId, ...entry } = value as TimeIngressEntry;
+              const receipt = store.time.mutate(
+                { type: 'entry.create', requestId, input: entry },
+                'agent',
+              );
+              return { index, ok: true, receipt };
+            } catch (error) {
+              const failure = error as { code?: string; message?: string };
+              return {
+                index,
+                ok: false,
+                error: {
+                  code: failure.code ?? 'TIME_WRITE_FAILED',
+                  message: failure.code
+                    ? (failure.message ?? 'The entry could not be recorded.')
+                    : 'The entry could not be recorded.',
+                },
+              };
+            }
+          });
+          return json(res, { results }, results.every((result) => result.ok) ? 201 : 207);
+        }
         if (path === '/api/preview') {
           if (
             !Array.isArray(input.commands) ||

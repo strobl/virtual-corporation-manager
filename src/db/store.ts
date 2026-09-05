@@ -27,6 +27,12 @@ import type {
 } from '../domain/contracts.js';
 import { DomainError, requireDomain as check } from '../domain/errors.js';
 import {
+  createTimeStore,
+  TIME_MIGRATION,
+  seedTimeCatalog,
+  validateTimeData,
+} from '../time/store.js';
+import {
   emptyState,
   executeCommands,
   SCHEMA_VERSION,
@@ -56,6 +62,7 @@ const MIGRATIONS = [
   `CREATE TABLE integration_runs (id TEXT PRIMARY KEY, request_id TEXT NOT NULL UNIQUE, info TEXT NOT NULL CHECK(json_valid(info)), context TEXT NOT NULL CHECK(json_valid(context)));
    ALTER TABLE changes ADD COLUMN undoable INTEGER NOT NULL DEFAULT 1 CHECK(undoable IN (0,1));
    UPDATE changes SET undoable=0 WHERE action='change.undo' OR json_extract(beforeJson,'$.work') IS NOT json_extract(afterJson,'$.work');`,
+  TIME_MIGRATION,
 ];
 function digest(sql: string) {
   return createHash('sha256').update(sql).digest('hex');
@@ -175,6 +182,7 @@ function initialize(db: DatabaseSync, dataDir: string) {
     );
     for (let i = currentVersion; i < MIGRATIONS.length; i += 1) {
       db.exec(MIGRATIONS[i]!);
+      if (i === 3) seedTimeCatalog(db);
       db.prepare('INSERT INTO schema_migrations VALUES (?,?,?)').run(
         i + 1,
         digest(MIGRATIONS[i]!),
@@ -240,6 +248,7 @@ function readSnapshot(db: DatabaseSync, schemaVersion = SCHEMA_VERSION): Workspa
   return state;
 }
 function validateDatabaseContents(db: DatabaseSync, schemaVersion: number) {
+  if (schemaVersion >= 4) validateTimeData(db);
   check(
     db.prepare('PRAGMA foreign_key_check').all().length === 0,
     'INVALID_DATABASE',
@@ -615,7 +624,18 @@ export function createWorkspaceStore(dataDir: string): WorkspaceStore {
   }
   let closed = false;
   const ensureOpen = () => check(!closed, 'STORE_CLOSED', 'This workspace has been closed.');
+  const time = createTimeStore(db, () => readSnapshot(db));
   return {
+    time: {
+      snapshot() {
+        ensureOpen();
+        return time.snapshot();
+      },
+      mutate(command, source) {
+        ensureOpen();
+        return time.mutate(command, source);
+      },
+    },
     snapshot() {
       ensureOpen();
       return readSnapshot(db);

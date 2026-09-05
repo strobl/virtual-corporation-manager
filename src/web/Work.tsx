@@ -208,7 +208,7 @@ export function WorkView({
   initialRunId?: string | null;
   selectedCompanyName?: string | null;
   onScopeChange?: (scope: 'company' | 'all') => void;
-  onSelectAgent: (id: string) => void;
+  onSelectAgent: (id: string, companyId: string) => void;
   onRefresh: () => void;
   onAccept: (recordId: string, title: string) => void;
 }) {
@@ -395,7 +395,7 @@ export function WorkView({
             <button
               className="text-button work-result-agent"
               onClick={() => {
-                onSelectAgent(run.agentId);
+                onSelectAgent(run.agentId, run.companyId);
                 setSelectedRun(null);
               }}
             >

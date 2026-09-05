@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-alpha.3-local.2 — local review candidate
+
+- Restore a local Time Tracker with multiple dated delivery-hour entries, catalog references and labelled fallback estimates, corrections/voids/history, weekly and period views, and loopback agent ingestion.
+- Add schema 4 and preserve time data through configuration edits, preview/undo, restart and full SQLite recovery. Add a separate time JSON export.
+- Bring the company structure earlier in the manager view, preserve work-result company context, and apply the compact corporation identity.
+- This is an unpublished local candidate. Its version and bytes do not replace public alpha.2.
+
 ## 0.1.0-alpha.2
 
 - Keep long task briefs in an accessible disclosure so execution evidence and results remain reachable.

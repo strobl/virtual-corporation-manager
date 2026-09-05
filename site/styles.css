@@ -915,3 +915,32 @@ footer nav {
     scroll-behavior: auto;
   }
 }
+
+/* Compact corporation identity; the descriptor is real, selectable text. */
+.identity-lockup {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.identity-lockup img {
+  display: block;
+  width: 144px;
+  height: 32px;
+  object-fit: contain;
+  object-position: left;
+}
+.identity-lockup > span {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+@media (max-width: 480px) {
+  .identity-lockup img {
+    width: 124px;
+    height: 28px;
+  }
+  .identity-lockup > span {
+    font-size: 10px;
+  }
+}

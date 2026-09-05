@@ -3,7 +3,7 @@ import type { WorkspaceState } from '../domain/contracts';
 import type { Selection } from './model';
 import { companyAgents } from './model';
 import { textExcerpt } from './TextDisclosure';
-import { brand } from '../brand';
+import { BrandMark } from './BrandMark';
 
 /** Department composition builds on the original company's progressive disclosure. */
 export function CompanyMap({
@@ -49,36 +49,42 @@ export function CompanyMap({
   ];
   return (
     <div className="company-map" data-testid="company-map">
-      <div className="map-label">
-        <Layers3 size={14} /> Your organization · Saved configuration
+      <div className="map-context">
+        <h2>
+          <BrandMark size={16} decorative /> Departments & responsibilities
+        </h2>
+        <button
+          className="text-button"
+          onClick={() => onSelect({ kind: 'company', id: company.id })}
+        >
+          Company details <ChevronRight size={14} />
+        </button>
       </div>
-      <button
-        className={`company-root ${selection?.kind === 'company' && selection.id === company.id ? 'is-selected' : ''}`}
-        onClick={() => onSelect({ kind: 'company', id: company.id })}
-      >
-        <span className="company-symbol" style={{ backgroundColor: company.color || brand.accent }}>
-          <Building2 size={20} />
-        </span>
-        <span>
-          <span className="eyebrow">{company.shortCode}</span>
-          <strong>{company.name}</strong>
-        </span>
-        <ChevronRight size={17} className="muted" />
-        <span className="root-purpose">
-          {textExcerpt(company.description, 180) || 'Select to define your company’s purpose.'}
-        </span>
-        <span className="root-counts">
-          <span>
-            <Layers3 size={13} />
-            {departments.length} departments
-          </span>
-          <span>
-            <Bot size={13} />
-            {agents.filter((agent) => agent.kind === 'agent').length} agents
-          </span>
-        </span>
-      </button>
-      <div className="map-trunk" aria-hidden="true" />
+      {state.relationships.some(
+        (row) => !row.endedAt && (row.fromCompanyId === companyId || row.toCompanyId === companyId),
+      ) && (
+        <div className="map-relationships" aria-label="Company relationships">
+          {state.relationships
+            .filter(
+              (row) =>
+                !row.endedAt && (row.fromCompanyId === companyId || row.toCompanyId === companyId),
+            )
+            .map((row) => {
+              const otherId = row.fromCompanyId === companyId ? row.toCompanyId : row.fromCompanyId;
+              return (
+                <span key={row.id}>
+                  {row.kind === 'ownership'
+                    ? row.fromCompanyId === companyId
+                      ? 'Owns'
+                      : 'Owned by'
+                    : 'Collaborates with'}{' '}
+                  {state.companies.find((company) => company.id === otherId)?.name ?? otherId}
+                  {row.percentage !== null ? ` · ${row.percentage}%` : ''}
+                </span>
+              );
+            })}
+        </div>
+      )}
       <div className="department-grid">
         {groups.map((group) => (
           <section
@@ -107,8 +113,21 @@ export function CompanyMap({
               <ChevronRight size={14} />
             </button>
             <p className="department-purpose">
-              {group.description || 'Define this department’s responsibilities.'}
+              {textExcerpt(group.description, 180) || 'Define this department’s responsibilities.'}
             </p>
+            {group.managerId && (
+              <div className="department-lead">
+                <UsersRound size={12} />
+                Lead:{' '}
+                <button
+                  className="text-button"
+                  onClick={() => onSelect({ kind: 'agent', id: group.managerId!, companyId })}
+                >
+                  {state.agents.find((agent) => agent.id === group.managerId)?.name ??
+                    'Assigned agent'}
+                </button>
+              </div>
+            )}
             <div className="agent-cluster">
               {group.agents.slice(0, 8).map((agent) => (
                 <button
@@ -154,14 +173,6 @@ export function CompanyMap({
               )}
               {group.agents.length === 0 && <span className="muted small">No agents yet</span>}
             </div>
-            {group.managerId && (
-              <div className="department-lead">
-                <UsersRound size={12} />
-                Led by{' '}
-                {state.agents.find((agent) => agent.id === group.managerId)?.name ??
-                  'an assigned agent'}
-              </div>
-            )}
           </section>
         ))}
         <button className="add-department-card" onClick={onCreateDepartment}>

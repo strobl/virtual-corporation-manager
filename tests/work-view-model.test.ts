@@ -14,10 +14,47 @@ import {
   getRunTargetCompany,
   initialRunForScope,
   runDisplayState,
+  workAgentDestination,
 } from '../src/web/work-view-model';
 import * as api from '../src/web/client';
 
 afterEach(() => vi.restoreAllMocks());
+
+describe('historical Work to Agent navigation', () => {
+  it('uses the run company even when another company is current primary', () => {
+    const state = workspace();
+    state.assignments.push({
+      id: 'secondary-a',
+      agentId: 'shared-agent',
+      companyId: 'a',
+      isPrimary: false,
+      startedAt: createdAt,
+      endedAt: null,
+    });
+    expect(workAgentDestination(state, 'shared-agent', 'a')).toEqual({
+      kind: 'organization',
+      agentId: 'shared-agent',
+      companyId: 'a',
+    });
+  });
+  it('uses a historical identity receipt instead of redirecting to a different live company', () => {
+    const state = workspace();
+    expect(workAgentDestination(state, 'shared-agent', 'a')).toMatchObject({
+      kind: 'historical',
+      companyId: 'a',
+    });
+    state.companies[1].status = 'archived';
+    expect(workAgentDestination(state, 'shared-agent', 'b')).toMatchObject({
+      kind: 'historical',
+      companyId: 'b',
+    });
+    expect(workAgentDestination(state, 'removed-agent', 'b')).toMatchObject({
+      kind: 'historical',
+      agentId: 'removed-agent',
+      companyId: 'b',
+    });
+  });
+});
 
 const createdAt = '2026-09-05T08:00:00Z';
 function run(id: string, patch: Partial<RunInfo> = {}): RunInfo {
