@@ -167,6 +167,17 @@ try {
   const templateMs = performance.now() - templateStart;
   assert.equal(state.agents.filter((a) => a.status === 'active').length, 101);
   assert.equal(state.work.length, 0);
+  const workflows = await (await fetch(app.url + '/api/workflows')).json();
+  assert.equal(workflows.length, 1);
+  assert.equal(workflows[0].id, 'PS-001');
+  assert.equal(workflows[0].stages.length, 5);
+  assert.equal(workflows[0].maxRepairCandidates, 2);
+  assert.ok(workflows[0].help.includes('PS-001'));
+  for (const stage of workflows[0].stages)
+    assert.equal(state.agents.filter((a) => a.role === stage.role).length, 1);
+  const templates = await (await fetch(app.url + '/api/templates')).json();
+  assert.equal(templates.find((t) => t.id === 'product-studio').agentCount, 5);
+  assert.deepEqual(await (await fetch(app.url + '/api/jobs')).json(), []);
   const exported = await (await fetch(app.url + '/api/export')).json();
   assert.equal(exported.agents.length, 101);
   const emptyTime = await (await fetch(app.url + '/api/time')).json();

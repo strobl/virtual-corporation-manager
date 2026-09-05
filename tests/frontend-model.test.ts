@@ -10,6 +10,8 @@ import {
   parseSelection,
   selectionKey,
   selectedTreeRows,
+  roleLabel,
+  agentInitials,
 } from '../src/web/model';
 import { buildOrgPyramid } from '../src/lib/organization/org-pyramid';
 import { CorporationOrgChart } from '../src/components/organization/CorporationOrgChart';
@@ -68,6 +70,32 @@ function companyOf100(): WorkspaceState {
 }
 
 describe('local frontend organization adapter', () => {
+  it('presents operational roles without changing stored workflow keys', () => {
+    const state = companyOf100();
+    state.agents[0]!.role = 'ao.role.delivery-manager';
+    expect(toSnapshot(state).members[0]!.role).toBe('Delivery Manager');
+    expect(state.agents[0]!.role).toBe('ao.role.delivery-manager');
+    expect(roleLabel('ao.role.customer-success')).toBe('Customer Success');
+    expect(roleLabel('Principal UX Designer')).toBe('Principal UX Designer');
+    expect(organizationTree(state, 'Delivery Manager')[0]?.children?.[0]?.children?.[0]?.id).toBe(
+      'company:company/agent:agent-0',
+    );
+  });
+
+  it('gives the five Product Studio seats distinct initials without altering ordinary names', () => {
+    expect(
+      [
+        'PS-DM · Delivery Manager',
+        'PS-REQ · Requirements Analyst',
+        'PS-BUILD · Software Builder',
+        'PS-QA · Quality Reviewer',
+        'PS-DOC · Handoff Editor',
+      ].map(agentInitials),
+    ).toEqual(['DM', 'RA', 'SB', 'QR', 'HE']);
+    expect(agentInitials(' Zoë Müller ')).toBe('ZM');
+    expect(agentInitials('A')).toBe('A');
+    expect(agentInitials('')).toBe('');
+  });
   it('preserves all 100 agents and their department and reporting identities', () => {
     const state = companyOf100();
     const snapshot = toSnapshot(state);

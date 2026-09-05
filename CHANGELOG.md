@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.3-local.3 — workflow review candidate
+
+- Ship complete reviewed Product Studio 1.2.2 role/job/input/help content and a five-seat starter; the 100-agent company includes the same operational seats.
+- Create real files across five observed runtime sessions, enforce independent checks and bounded repairs, and require explicit owner review.
+- Preserve artifact bytes, provenance, stop decisions and retry receipts in schema 5, including full backup/restore. Add reviewed ZIP downloads.
+- Retain the complete delivery-hours Time Tracker and apply the approved Little Powerhouse identity.
+- Keep public main/release/site unchanged pending candidate review.
+
 ## 0.1.0-alpha.3-local.2 — local review candidate
 
 - Restore a local Time Tracker with multiple dated delivery-hour entries, catalog references and labelled fallback estimates, corrections/voids/history, weekly and period views, and loopback agent ingestion.

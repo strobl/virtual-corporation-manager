@@ -26,6 +26,7 @@ import type {
   WorkspaceStore,
 } from '../domain/contracts.js';
 import { DomainError, requireDomain as check } from '../domain/errors.js';
+import { JOB_MIGRATION, validateJobData } from '../jobs/store.js';
 import {
   createTimeStore,
   TIME_MIGRATION,
@@ -63,6 +64,7 @@ const MIGRATIONS = [
    ALTER TABLE changes ADD COLUMN undoable INTEGER NOT NULL DEFAULT 1 CHECK(undoable IN (0,1));
    UPDATE changes SET undoable=0 WHERE action='change.undo' OR json_extract(beforeJson,'$.work') IS NOT json_extract(afterJson,'$.work');`,
   TIME_MIGRATION,
+  JOB_MIGRATION,
 ];
 function digest(sql: string) {
   return createHash('sha256').update(sql).digest('hex');
@@ -249,6 +251,7 @@ function readSnapshot(db: DatabaseSync, schemaVersion = SCHEMA_VERSION): Workspa
 }
 function validateDatabaseContents(db: DatabaseSync, schemaVersion: number) {
   if (schemaVersion >= 4) validateTimeData(db);
+  if (schemaVersion >= 5) validateJobData(db);
   check(
     db.prepare('PRAGMA foreign_key_check').all().length === 0,
     'INVALID_DATABASE',

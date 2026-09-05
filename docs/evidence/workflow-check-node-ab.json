@@ -1,0 +1,96 @@
+{
+  "format": "gitflash-checker-node-ab",
+  "version": 1,
+  "recordedAt": "2026-09-05T09:06:02.294Z",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "affectedPackageSha256": "6ae5db91af9a42b3a6725dbe9f1759bd7ff379c4c63435cf07be8009f3911c35",
+  "boundary": "Read-only incident export plus isolated local subprocess tests. No model request, live DB mutation, installed process restart or package rebuild.",
+  "originalProfile": {
+    "filesystem": {
+      ":minimal": "read",
+      ":workspace_roots": "write",
+      "<Node binary directory>": "read",
+      "/System/Library/OpenSSL": "read"
+    },
+    "network": false
+  },
+  "launcherOnlyControl": [
+    {
+      "node": "24.19.0",
+      "exitCode": 0,
+      "stdout": "launcher OK",
+      "stderr": ""
+    },
+    {
+      "node": "26.0.0",
+      "exitCode": 134,
+      "stdout": "",
+      "diagnostic": "dyld: Library not loaded: @rpath/libnode.147.dylib; Homebrew node/26.0.0/bin/../lib/libnode.147.dylib blocked by sandbox"
+    }
+  ],
+  "boundedDependencyTrials": "Read-only canonical loaded dylib files and exact install-name file grants still failed at Homebrew opt symlink traversal. No such expanded grants were retained.",
+  "correctedProfile": {
+    "filesystem": {
+      ":minimal": "read",
+      ":workspace_roots": "write",
+      "<trusted Python directory>": "read"
+    },
+    "network": false
+  },
+  "correctedHarness": {
+    "runtime": "Service-selected Python >=3.8",
+    "flags": ["-I", "-B", "-c"],
+    "childInvocation": "subprocess.Popen with argv array, shell=False, stdin=DEVNULL",
+    "capture": "selectors read both pipes; combined 512000-byte limit; UTF-8 decoding after chunks are joined",
+    "receipt": "fixed serialized wrapper plus invocation nonce; child output is nested data",
+    "startupFailure": "No receipt or abnormal exit remains NOT RUN; sanitized exit/cause guidance is returned."
+  },
+  "correctedActualSandbox": [
+    {
+      "parentNode": "24.19.0",
+      "distribution": "bundled",
+      "python": "3.8.9",
+      "codex": "0.138.0",
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "startedAtLocal": "2026-09-05 11:04:07 Europe/Berlin"
+    },
+    {
+      "parentNode": "26.0.0",
+      "distribution": "Homebrew",
+      "python": "3.8.9",
+      "codex": "0.138.0",
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "startedAtLocal": "2026-09-05 11:04:07 Europe/Berlin"
+    }
+  ],
+  "assertions": [
+    "Checker exit 0 retained as completed/0.",
+    "Checker exit 1 retained as completed/1 with failing output.",
+    "A real stage file was written and read back.",
+    "Sibling file write was denied and no sibling file existed.",
+    "TCP connection to 127.0.0.1:9 was denied."
+  ],
+  "targetedTests": {
+    "passed": 20,
+    "skipped": 1,
+    "failed": 0,
+    "typecheck": "passed"
+  },
+  "sourceSha256": {
+    "src/adapters/workflow-codex.ts": "de00d9527a8a8c7ba480a6614034a22de5737374b4cb9479f35fdee3024f4854",
+    "src/adapters/workflow-check.ts": "e693d7730f8015e3d05f3f06b408a2305dea139fe5f9d82dd9d9d8f3754147d2",
+    "tests/workflow-codex.test.ts": "1b66514423b08d9ac147602f513783516773aefb647f8598140271fcb57219c3",
+    "tests/workflow-check.test.ts": "e65c0adf72543d2afd22fa7dd6f9bedac0168ccde67dc091446783efdae4384c",
+    "tests/workflow-sandbox-live.test.ts": "b8d996d057c4e95472dbf9fffaaf2b74555b248ccec8d7fb3d5b188c8739d5a7"
+  },
+  "limits": [
+    "macOS arm64 only in this A/B; Linux needs its actual CI sandbox result.",
+    "Python must itself be usable under the declared sandbox; unsupported Python dependencies fail with diagnostics.",
+    "Receipt provenance is a trusted wrapper boundary, not a cryptographic signature or correctness guarantee.",
+    "The fixed oracle and candidate hashes remain workflow-service responsibilities.",
+    "The Git ceiling prevents implicit repository discovery; it is not an OS read-isolation boundary."
+  ]
+}

@@ -7,12 +7,14 @@ import type { TimeCommand, TimeIngressEntry, TimeIngressResult } from '../time/c
 import { createWorkspaceStore } from '../db/store';
 import { getTemplate, listTemplates } from '../company/templates';
 import { createIntegrationService } from '../adapters/index';
+import { createJobService, type JobServiceOptions } from '../jobs/service';
 
 export interface ServerOptions {
   dataDir: string;
   port?: number;
   webDir: string;
   store?: WorkspaceStore;
+  jobs?: JobServiceOptions;
 }
 class HttpError extends Error {
   constructor(
@@ -84,6 +86,14 @@ export async function startServer(options: ServerOptions) {
     if (!options.store) store.close();
     throw error;
   }
+  let jobs: ReturnType<typeof createJobService>;
+  try {
+    jobs = createJobService(store, options.dataDir, options.jobs);
+  } catch (error) {
+    await integration.close();
+    if (!options.store) store.close();
+    throw error;
+  }
   const token = randomBytes(32).toString('hex');
   let port = options.port ?? 4310;
   const webDir = resolve(options.webDir);
@@ -140,6 +150,40 @@ export async function startServer(options: ServerOptions) {
           });
         }
         if (path === '/api/templates') return json(res, listTemplates());
+        if (path === '/api/workflows') return json(res, jobs.workflows());
+        if (path === '/api/jobs') return json(res, jobs.list());
+        const jobGet = path.match(
+          /^\/api\/jobs\/([a-zA-Z0-9-]+)(?:\/(export|deliverables|artifacts)(?:\/([a-zA-Z0-9-]+))?)?$/,
+        );
+        if (jobGet) {
+          if (jobGet[2] === 'deliverables') {
+            const bytes = jobs.download(jobGet[1]);
+            res.writeHead(200, {
+              'Content-Type': 'application/zip',
+              'Cache-Control': 'no-store',
+              'Content-Disposition': 'attachment; filename="gitflash-PS-001.zip"',
+            });
+            return res.end(bytes);
+          }
+          if (jobGet[2] === 'export') {
+            res.setHeader(
+              'Content-Disposition',
+              'attachment; filename="gitflash-workflow-evidence.json"',
+            );
+            return json(res, jobs.export(jobGet[1]));
+          }
+          if (jobGet[2] === 'artifacts' && jobGet[3]) {
+            const artifact = jobs.artifact(jobGet[1], jobGet[3]);
+            res.writeHead(200, {
+              'Content-Type': 'application/octet-stream',
+              'Cache-Control': 'no-store',
+              'Content-Disposition': `attachment; filename="${artifact.path.split('/').at(-1)}"`,
+              'X-Content-SHA256': artifact.sha256,
+            });
+            return res.end(artifact.content);
+          }
+          return json(res, jobs.get(jobGet[1]));
+        }
         if (path === '/api/export') {
           res.setHeader('Content-Disposition', 'attachment; filename="gitflash-company.json"');
           return json(res, store.exportDefinition());
@@ -174,6 +218,30 @@ export async function startServer(options: ServerOptions) {
         if (!req.headers['content-type']?.startsWith('application/json'))
           throw new HttpError('INVALID_CONTENT_TYPE', 'Send application/json.', 415);
         const input = await body(req);
+        if (path === '/api/jobs')
+          return json(
+            res,
+            jobs.start({
+              companyId: requiredString(input.companyId, 'companyId'),
+              workflowId: requiredString(input.workflowId, 'workflowId'),
+              requestId: requiredString(input.requestId, 'requestId'),
+              acceptanceOwner: requiredString(input.acceptanceOwner, 'acceptanceOwner'),
+            }),
+            202,
+          );
+        const jobAction = path.match(/^\/api\/jobs\/([a-zA-Z0-9-]+)\/(cancel|retry|review)$/);
+        if (jobAction) {
+          if (jobAction[2] === 'cancel') return json(res, jobs.cancel(jobAction[1]));
+          if (jobAction[2] === 'retry')
+            return json(res, jobs.retry(jobAction[1], input.requestId), 202);
+          return json(
+            res,
+            jobs.review(jobAction[1], {
+              decision: requiredString(input.decision, 'decision'),
+              note: requiredString(input.note, 'note'),
+            }),
+          );
+        }
         if (path === '/api/time/mutate') {
           return json(res, store.time.mutate(input as unknown as TimeCommand, 'manual'));
         }
@@ -335,6 +403,7 @@ export async function startServer(options: ServerOptions) {
       });
     });
   } catch (error) {
+    await jobs.close();
     await integration.close();
     store.close();
     throw error;
@@ -344,11 +413,13 @@ export async function startServer(options: ServerOptions) {
     server,
     store,
     integration,
+    jobs,
     url: `http://127.0.0.1:${port}`,
     port,
     close: async () => {
       if (closed) return;
       closed = true;
+      await jobs.close();
       await integration.close();
       await new Promise<void>((resolve, reject) =>
         server.close((error) => (error ? reject(error) : resolve())),

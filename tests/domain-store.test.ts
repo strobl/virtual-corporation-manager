@@ -193,7 +193,7 @@ describe('local SQLite company store', () => {
     expect(new Set(second.agents.map((a) => a.id)).size).toBe(200);
     expect(second.companies.map((c) => c.shortCode)).toEqual(['STUDIO', 'STUDIO-2']);
     expect(validateDefinition(store.exportDefinition()).agents).toHaveLength(200);
-    expect(listTemplates().map((x) => x.agentCount)).toEqual([20, 100]);
+    expect(listTemplates().map((x) => x.agentCount)).toEqual([5, 20, 100]);
     expect(getTemplate('studio-20').agents).toHaveLength(20);
   });
 
@@ -324,11 +324,11 @@ describe('local SQLite company store', () => {
     store.close();
     const db = new DatabaseSync(join(dir, 'workspace.sqlite'));
     db.exec(
-      'DROP TABLE time_requests; DROP TABLE time_history; DROP TABLE time_entries; DROP TABLE time_catalog; DROP TABLE time_meta; DROP INDEX unique_work_run; DROP INDEX work_company_date; DROP INDEX agents_department; DROP INDEX assignments_company; DROP INDEX changes_revision; DROP TABLE integration_runs; ALTER TABLE changes DROP COLUMN undoable; DELETE FROM schema_migrations WHERE version>1; PRAGMA user_version=1;',
+      'DROP TABLE workflow_requests; DROP TABLE workflow_artifacts; DROP TABLE workflow_jobs; DROP TABLE time_requests; DROP TABLE time_history; DROP TABLE time_entries; DROP TABLE time_catalog; DROP TABLE time_meta; DROP INDEX unique_work_run; DROP INDEX work_company_date; DROP INDEX agents_department; DROP INDEX assignments_company; DROP INDEX changes_revision; DROP TABLE integration_runs; ALTER TABLE changes DROP COLUMN undoable; DELETE FROM schema_migrations WHERE version>1; PRAGMA user_version=1;',
     );
     db.close();
     const reopened = open(dir);
-    expect(reopened.snapshot().schemaVersion).toBe(4);
+    expect(reopened.snapshot().schemaVersion).toBe(5);
     expect(reopened.snapshot().companies).toHaveLength(1);
     reopened.close();
     const backups = readdirSync(join(dir, 'backups'));
@@ -337,7 +337,7 @@ describe('local SQLite company store', () => {
     expect(old.prepare('PRAGMA user_version').get()?.user_version).toBe(1);
     old.close();
     const checkDb = new DatabaseSync(join(dir, 'workspace.sqlite'));
-    expect(checkDb.prepare('SELECT COUNT(*) AS n FROM schema_migrations').get()?.n).toBe(4);
+    expect(checkDb.prepare('SELECT COUNT(*) AS n FROM schema_migrations').get()?.n).toBe(5);
     checkDb.exec('PRAGMA foreign_keys=ON;');
     expect(() =>
       checkDb
@@ -454,7 +454,7 @@ describe('local SQLite company store', () => {
     store.close();
     const legacy = new DatabaseSync(join(dir, 'workspace.sqlite'));
     legacy.exec(
-      'DROP TABLE time_requests; DROP TABLE time_history; DROP TABLE time_entries; DROP TABLE time_catalog; DROP TABLE time_meta; DROP INDEX unique_work_run; DROP INDEX work_company_date; DROP INDEX agents_department; DROP INDEX assignments_company; DROP INDEX changes_revision; DROP TABLE integration_runs; ALTER TABLE changes DROP COLUMN undoable; DELETE FROM schema_migrations WHERE version>1; PRAGMA user_version=1; CREATE INDEX work_company_date ON work(companyId);',
+      'DROP TABLE workflow_requests; DROP TABLE workflow_artifacts; DROP TABLE workflow_jobs; DROP TABLE time_requests; DROP TABLE time_history; DROP TABLE time_entries; DROP TABLE time_catalog; DROP TABLE time_meta; DROP INDEX unique_work_run; DROP INDEX work_company_date; DROP INDEX agents_department; DROP INDEX assignments_company; DROP INDEX changes_revision; DROP TABLE integration_runs; ALTER TABLE changes DROP COLUMN undoable; DELETE FROM schema_migrations WHERE version>1; PRAGMA user_version=1; CREATE INDEX work_company_date ON work(companyId);',
     );
     legacy.close();
     expect(() => createWorkspaceStore(dir)).toThrow();

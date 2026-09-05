@@ -915,7 +915,7 @@ describe('schema-3 Time Tracker upgrade', () => {
     const store = open(dir);
     const after = rows(dir, oldTables);
     expect(after.schema_migrations.slice(0, 3)).toEqual(before.schema_migrations);
-    expect(after.schema_migrations).toHaveLength(4);
+    expect(after.schema_migrations).toHaveLength(5);
     for (const table of oldTables.filter((t) => t !== 'schema_migrations'))
       expect(after[table]).toEqual(before[table]);
     expect(store.time.snapshot()).toMatchObject({

@@ -1,0 +1,182 @@
+{
+  "format": "gitflash-workflow-sandbox-evidence",
+  "version": 1,
+  "observedAt": "2026-09-05T08:40:15Z",
+  "scope": "Local synthetic sandbox and adapter checks; no provider/model invocation, production data or owner acceptance",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "node": "24.19.0",
+  "codex": "codex-cli 0.138.0",
+  "python": "3.8.9",
+  "fixtures": "Isolated temporary directories; removed after checks",
+  "commands": [
+    "codex --version",
+    "codex exec --help",
+    "codex sandbox --help",
+    "codex <explicit feature/config overrides> features list",
+    "codex sandbox --permissions-profile gitflash-check --include-managed-config --cd <stage> -c <fixed workspace-write, minimal-read, network-disabled profile> -- <trusted Node launcher> <resolved Python> <fixed check arguments>",
+    "GITFLASH_TEST_LOCAL_SANDBOX=1 node node_modules/vitest/vitest.mjs run tests/workflow-codex.test.ts tests/workflow-check.test.ts",
+    "GITFLASH_LIVE_SANDBOX=1 node node_modules/vitest/vitest.mjs run tests/workflow-sandbox-live.test.ts"
+  ],
+  "observations": {
+    "scopedTypecheck": "strict TypeScript check passed for both adapters and all three owned test files",
+    "adapterAndNodeSandboxTests": {
+      "passed": 14,
+      "failed": 0
+    },
+    "livePythonSandboxTest": {
+      "passed": 1,
+      "failed": 0
+    },
+    "stageFileWrite": "succeeded; content read back",
+    "siblingFileWrite": "denied; no outside file created",
+    "localTcpConnection": "denied with EPERM; no external host contacted",
+    "checkerExitZero": "status completed, exitCode 0",
+    "checkerExitOne": "status completed, exitCode 1; retained failing check output",
+    "unavailableChecker": "status failed, exitCode null; no ordinary test result",
+    "timeoutAndCancellation": "bounded live fixture process groups stopped; no successful completion invented",
+    "providerFailure": "partial command evidence retained; provider stderr excluded",
+    "utf8": "split multibyte output preserved",
+    "modelAssertions": "final text does not create command receipts"
+  },
+  "verifiedDisabledFeatures": [
+    "apps",
+    "plugins",
+    "hooks",
+    "browser_use",
+    "browser_use_external",
+    "in_app_browser",
+    "computer_use",
+    "image_generation",
+    "multi_agent",
+    "memories",
+    "chronicle",
+    "shell_snapshot"
+  ],
+  "providerSettings": {
+    "sandbox": "workspace-write",
+    "approval": "never; escalation denied",
+    "ignoreUserConfig": true,
+    "ignoreRules": false,
+    "webSearch": "disabled",
+    "shellNetwork": false,
+    "shellInheritance": "none; explicit local executable path, stage .runtime/home HOME/USERPROFILE and .runtime/tmp TMPDIR/TMP/TEMP",
+    "parentEnvironment": "saved authentication HOME/CODEX_HOME retained; TMPDIR/TMP/TEMP use stage .runtime/tmp",
+    "shellProfile": false,
+    "gitDiscovery": "GIT_CEILING_DIRECTORIES includes stage and parent; GIT_CONFIG_NOSYSTEM=1. This bounds ordinary discovery, not explicit user-directed Git path access."
+  },
+  "fixedCheckerSettings": {
+    "namedProfile": "gitflash-check",
+    "managedRequirementsIncluded": true,
+    "network": false,
+    "writeScope": "stage directory",
+    "readScope": "minimal runtime paths and the trusted Python executable directory; no additional Node, Homebrew or system OpenSSL grants",
+    "authentication": "separate empty temporary CODEX_HOME; no login copied",
+    "shell": false,
+    "receipt": "Fixed Python harness serializes bounded child stdout/stderr, observed normal exit and invocation nonce. Child output is nested content, never interpreted as a receipt or a pass.",
+    "launcher": "The trusted resolved Python >=3.8 executable launches a fixed stdlib harness with -I -B; no Node process runs inside the sandbox.",
+    "childOutputLimitBytes": 512000
+  },
+  "registryAvailability": {
+    "package": "@openai/codex@0.138.0",
+    "integrity": "sha512-m5vUQeN+oFkCt594xbVujSzzT3CiihFuRXlbQfqJ7sEXH4yNeY99e6ryqFZgQSz/deQcaVbjhhO/TR0YJ1Vsjg==",
+    "verifiedBinaryVersions": ["0.138.0-linux-x64", "0.138.0-darwin-arm64", "0.138.0-darwin-x64"],
+    "method": "npm view; no installation performed by this review"
+  },
+  "sourceSha256": {
+    "src/adapters/workflow-codex.ts": "de00d9527a8a8c7ba480a6614034a22de5737374b4cb9479f35fdee3024f4854",
+    "src/adapters/workflow-check.ts": "e693d7730f8015e3d05f3f06b408a2305dea139fe5f9d82dd9d9d8f3754147d2",
+    "tests/workflow-codex.test.ts": "1b66514423b08d9ac147602f513783516773aefb647f8598140271fcb57219c3",
+    "tests/workflow-check.test.ts": "e65c0adf72543d2afd22fa7dd6f9bedac0168ccde67dc091446783efdae4384c",
+    "tests/workflow-sandbox-live.test.ts": "b8d996d057c4e95472dbf9fffaaf2b74555b248ccec8d7fb3d5b188c8739d5a7"
+  },
+  "revisionUpdates": [
+    {
+      "observedAt": "2026-09-05T08:52:27Z",
+      "scope": "Adapter identity receipt, immediate session persistence hook and reserved runtime storage; controlled Node subprocess fixtures only",
+      "command": "node node_modules/vitest/vitest.mjs run tests/workflow-codex.test.ts",
+      "adapterTests": {
+        "passed": 12,
+        "failed": 0
+      },
+      "scopedTypecheck": "strict TypeScript passed for workflow-codex.ts and its test file",
+      "observations": [
+        "First observed thread.started exclusively writes WORKFLOW-EXECUTION.json before invoking the synchronous onSession persistence hook; duplicate same-session events do not invoke the hook again.",
+        "A changed second session, existing identity receipt or receipt creation race stops the stage without overwriting evidence.",
+        "A throwing persistence hook stops with a sanitized error while retaining observed session and identity file.",
+        "Fresh .runtime/home and .runtime/tmp directories are created before any CLI probe; preexisting runtime paths are refused.",
+        "Controlled subprocess temporary cache writes were read back under .runtime/tmp and absent from stage root; shell HOME/TMP argument mappings were inspected.",
+        "The CLI parent retains its saved authentication HOME/CODEX_HOME; only shell HOME/USERPROFILE are isolated. No credentials are copied."
+      ],
+      "earlierProviderSourceSha256": {
+        "src/adapters/workflow-codex.ts": "910d6aecbc26306b0aeb2cfa42e3019336d48484a6c70fdc67bcfcff57a0efad",
+        "tests/workflow-codex.test.ts": "557d6359a2ba662d5e527271be0a4e879b0f40d089420994a1ae62f9529adb33"
+      },
+      "provenanceBoundary": "The original 08:40 observations remain earlier evidence. The fixed-checker adapter and live sandbox test sources are unchanged; the sourceSha256 map now records current files. This update does not claim a live model run or actual xcrun behavior under the revised provider environment. Root owns installed iteration verification."
+    },
+    {
+      "recordedAt": "2026-09-05T09:06:02.292Z",
+      "scope": "Node 24 versus Homebrew Node 26 startup correction; actual local Codex sandbox and trusted Python only. No provider run, live database change, package build or owner acceptance.",
+      "incidentPackageSha256": "6ae5db91af9a42b3a6725dbe9f1759bd7ff379c4c63435cf07be8009f3911c35",
+      "cause": "The previous trusted Node launcher failed before Python invocation under Homebrew Node 26: dyld reported libnode.147.dylib blocked by the sandbox. The bundled Node 24 launcher succeeded under the identical original profile.",
+      "implementation": "Use the service-selected Python for the trusted receipt harness. No library permissions were broadened. Startup errors report an exit code and bounded static cause class without disclosing raw stderr.",
+      "command": "GITFLASH_PYTHON_PATH=<trusted Xcode Python> node node_modules/vitest/vitest.mjs run tests/workflow-check.test.ts tests/workflow-codex.test.ts",
+      "adapterTests": {
+        "passed": 20,
+        "skipped": 1,
+        "failed": 0
+      },
+      "scopedTypecheck": "Strict TypeScript passed for both adapters and all three owned test files.",
+      "actualSandbox": [
+        {
+          "parentNode": "24.19.0",
+          "distribution": "bundled",
+          "python": "3.8.9",
+          "codex": "0.138.0",
+          "testsPassed": 1,
+          "testsFailed": 0,
+          "startedAtLocal": "2026-09-05 11:04:07 Europe/Berlin"
+        },
+        {
+          "parentNode": "26.0.0",
+          "distribution": "Homebrew",
+          "python": "3.8.9",
+          "codex": "0.138.0",
+          "testsPassed": 1,
+          "testsFailed": 0,
+          "startedAtLocal": "2026-09-05 11:04:07 Europe/Berlin"
+        }
+      ],
+      "actualSandboxAssertions": [
+        "Checker exit 0 retained as completed/0.",
+        "Checker exit 1 retained as completed/1 with failing output.",
+        "A real stage file was written and read back.",
+        "Sibling file write was denied and no sibling file existed.",
+        "TCP connection to 127.0.0.1:9 was denied."
+      ],
+      "gitDiscovery": "A stage-only ceiling was experimentally insufficient at exact stage cwd. Stage plus parent ceilings passed a real synthetic Git regression at stage root and a nested directory; the no-ceiling control found the synthetic parent repository.",
+      "previousSourceSha256": {
+        "src/adapters/workflow-codex.ts": "39a96db132d4b492056a83826212cb6f07d29c511f7a88941648d0db77a63ee1",
+        "src/adapters/workflow-check.ts": "b61e81ea9255ea680d6b6c7abacfc5f01029e48fea62334ee9c4473069306770",
+        "tests/workflow-codex.test.ts": "e67d364150b3bf28edb922218e71be4058c9afa5d6e65497686c8e881f56b2df",
+        "tests/workflow-check.test.ts": "9935e5edd231477b6c06a7f1457cabd52eb5671347f62f16ffcd30f2df58be16",
+        "tests/workflow-sandbox-live.test.ts": "b8d996d057c4e95472dbf9fffaaf2b74555b248ccec8d7fb3d5b188c8739d5a7"
+      },
+      "provenanceBoundary": "The earlier records and their timestamps remain historical. Current source hashes refer to this revision. These are source-level adapter and local sandbox checks, not a rebuilt tarball or a new provider rehearsal. All temporary fixtures were removed."
+    }
+  ],
+  "limits": [
+    "No live model stage or multi-stage workflow was run in this review.",
+    "Linux uses the same required CLI interface but needs actual CI proof before a supported workflow claim.",
+    "Native Windows fixed workflow checking is explicitly unavailable; local core support is separate.",
+    "Provider workspace-write is not OS-user read isolation; saved CLI authentication remains available to the CLI.",
+    "Command receipts report runtime observations, not independent correctness or human acceptance.",
+    "The workflow service must retain fixed oracle provenance and rehash candidate/oracle files after checking.",
+    "The macOS system Python launcher emits cache-denial diagnostics; checks still returned their observed 0/1 exit statuses."
+  ],
+  "sources": [
+    "https://learn.chatgpt.com/docs/non-interactive-mode",
+    "https://learn.chatgpt.com/docs/config-file/config-reference",
+    "https://learn.chatgpt.com/docs/permissions"
+  ]
+}

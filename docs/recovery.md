@@ -10,7 +10,7 @@ Stop the running GitFlash server with **Ctrl+C**, then choose a new backup filen
 gitflash backup --output ./gitflash-backup.sqlite
 ```
 
-The command saves a verified, consistent SQLite copy containing company configuration, work records, audit history, pending previews, the execution ledger, delivery hours, catalog revisions and time request receipts. Existing destination files are never overwritten. The separate `runs/` text artifacts are not required to recover saved outputs: those outputs are also in the database and remain available in the Work view.
+The command saves a verified, consistent SQLite copy containing company configuration, work records, audit history, pending previews, the execution ledger, delivery hours, catalog revisions, time request receipts and complete workflow jobs/artifact bytes. Existing destination files are never overwritten. The separate `runs/` text artifacts are not required to recover saved outputs: those outputs are also in the database and remain available in the Work view.
 
 Runtime installations, provider login stores and environment credentials are external prerequisites. A workspace backup does not copy them. The backup does contain your company instructions, task context and results.
 
@@ -24,7 +24,7 @@ gitflash doctor
 gitflash --no-open
 ```
 
-Open the printed local URL. Check the expected companies, agents, Work results and Time Tracker entries/history. `doctor` reports the database schema, revision and entity counts without making external model requests.
+Open the printed local URL. Check the expected companies, agents, Work results, Product Studio jobs and downloads, and Time Tracker entries/history. `doctor` reports the database schema, revision and entity counts without making external model requests.
 
 Restore acquires the workspace lock and verifies SQLite integrity, foreign keys, migration checksums, company invariants and execution-record identities before replacing the current database. It retains the previous readable workspace under `backups/before-restore-*.sqlite`. An unreadable current database is preserved byte for byte, together with any WAL/SHM sidecars, in a `backups/before-restore-unreadable-*` directory. That directory is recovery evidence, not a verified SQLite backup.
 
@@ -44,7 +44,7 @@ Import that JSON through **Settings → Import a company definition**, review th
 2. Install the desired published GitFlash release.
 3. Run `gitflash doctor`, then start GitFlash and inspect the company and Work views.
 
-Opening an older supported workspace runs its migrations automatically. GitFlash first saves a `backups/before-schema-*.sqlite` copy, then applies pending schema changes and journal entries in one transaction. A failed migration leaves the previous schema and data in place. The current release supports database schema 4 and refuses a newer schema rather than changing it.
+Opening an older supported workspace runs its migrations automatically. GitFlash first saves a `backups/before-schema-*.sqlite` copy, then applies pending schema changes and journal entries in one transaction. A failed migration leaves the previous schema and data in place. The current release supports database schema 5 and refuses a newer schema rather than changing it.
 
 To return to an earlier release, restore the backup created before that upgrade and use the compatible older GitFlash version. Installing old code over a newer database is not a downgrade procedure.
 
@@ -62,3 +62,5 @@ To return to an earlier release, restore the backup created before that upgrade 
 Do not delete `workspace.sqlite-wal` or `workspace.sqlite-shm` from a running or crashed workspace to clear an error. They may belong to committed data. Use the stopped-workspace recovery commands so SQLite can preserve and verify the state.
 
 Time Tracker JSON exports are inspectable ledger/catalog/history snapshots, not complete restore files. Use SQLite backup/restore to recover replay receipts and the entire workspace together. Company-definition export remains configuration only. See [Time Tracker](time-tracker.md).
+
+Schema 5 adds workflow job/context records, artifact bytes and retry receipts. Restore verifies hashes, byte counts and job/stage ownership of every artifact. Completed stage evidence is retained; interrupted workflows require an explicit bounded retry rather than automatic provider replay. Disposable workflow directories are not needed to download recovered outputs.

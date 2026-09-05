@@ -1,5 +1,5 @@
 /** Public identity lives in one place. No account or remote service is required. */
-const heroLines = ['Your company.', 'In your hands.'] as const;
+const heroLines = ['Big ambition.', 'Meet your little company.'] as const;
 
 export const brand = {
   name: 'GitFlash',
@@ -7,12 +7,14 @@ export const brand = {
   heroLines,
   tagline: heroLines.join(' '),
   descriptor: 'Virtual Corporation Manager',
-  explanation: 'Build the structure of your AI company. Assign work. Review the results.',
-  accent: '#F4A340',
-  ink: '#202824',
-  wood: '#C9A576',
-  face: '#F6DDB5',
+  explanation:
+    'Build a company of AI agents. Give every role a purpose, direct the work, and keep the results in your hands.',
+  accent: '#EF3B24',
+  ink: '#1C211F',
+  cream: '#F7F1E5',
+  cobalt: '#244ADD',
+  butter: '#F9CE55',
   markPath:
-    'M16 8H54.6Q56.4 8 55.1 9.3L50 14H54Q56 14 56 16V22Q56 24 54 24H28V30H43Q45 30 45 32V41Q45 43 43 43H28V54Q28 56 26 56H12Q10 56 10 54V14Q10 8 16 8Z',
+    'M10 8H22Q24 8 24 10V16H54Q56 16 56 18V26Q56 28 54 28H24V36H46Q48 36 48 38V46Q48 48 46 48H24V54Q24 56 22 56H10Q8 56 8 54V10Q8 8 10 8Z',
   repository: 'https://github.com/strobl/gitflash',
 };

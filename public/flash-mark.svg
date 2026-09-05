@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="title desc">
-  <title id="title">GitFlash corporation mark</title>
-  <desc id="desc">One compact F: a vertical stem joins a long upper beam and shorter middle beam. A shallow diagonal notch belongs to the upper right contour.</desc>
-  <path fill="#202824" d="M16 8H54.6Q56.4 8 55.1 9.3L50 14H54Q56 14 56 16V22Q56 24 54 24H28V30H43Q45 30 45 32V41Q45 43 43 43H28V54Q28 56 26 56H12Q10 56 10 54V14Q10 8 16 8Z"/>
+  <title id="title">GitFlash — The Little Powerhouse</title>
+  <desc id="desc">A tall company tower with two projecting work floors. One stepped, open architectural F; no face or separate lightning symbol.</desc>
+  <path fill="#EF3B24" d="M10 8H22Q24 8 24 10V16H54Q56 16 56 18V26Q56 28 54 28H24V36H46Q48 36 48 38V46Q48 48 46 48H24V54Q24 56 22 56H10Q8 56 8 54V10Q8 8 10 8Z"/>
 </svg>

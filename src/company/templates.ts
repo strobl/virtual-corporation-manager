@@ -1,3 +1,5 @@
+import { studioContent } from '../jobs/content.js';
+import { productStudioTemplate } from './product-studio.js';
 import type { CompanyDefinition, TemplateSummary } from '../domain/contracts.js';
 import { DomainError } from '../domain/errors.js';
 import { validateDefinition } from '../domain/model.js';
@@ -303,16 +305,27 @@ const roleScopes = [
 ] as const;
 
 export function listTemplates(): TemplateSummary[] {
-  return [20, 100].map((count) => ({
-    id: `studio-${count}`,
-    name: `${count}-agent Product Studio`,
-    description: `A software delivery studio with 10 departments and ${count} distinct configured roles. Activation is optional and requires a supported external runtime.`,
-    agentCount: count,
-    departmentCount: 10,
-  }));
+  return [
+    {
+      id: 'product-studio',
+      name: 'Product Studio (5 seats)',
+      description:
+        'Start a real software job with five roles, downloadable files, independent QA and owner review.',
+      agentCount: 5,
+      departmentCount: 1,
+    },
+    ...[20, 100].map((count) => ({
+      id: `studio-${count}`,
+      name: `${count}-agent Product Studio`,
+      description: `A software delivery studio with 10 departments and ${count} distinct configured roles. Activation is optional and requires a supported external runtime.`,
+      agentCount: count,
+      departmentCount: 10,
+    })),
+  ];
 }
 
 export function getTemplate(id: string): CompanyDefinition {
+  if (id === 'product-studio') return productStudioTemplate();
   const summary = listTemplates().find((t) => t.id === id);
   if (!summary) throw new DomainError('NOT_FOUND', `Unknown company template: ${id}`);
   const now = new Date().toISOString();
@@ -353,20 +366,38 @@ export function getTemplate(id: string): CompanyDefinition {
     });
     for (let roleIndex = 0; roleIndex < perDepartment; roleIndex += 1) {
       const agentId = `agent-${departmentIndex}-${roleIndex}`;
-      const role = department.roles[roleIndex]!;
+      const stageKey =
+        summary.agentCount === 100
+          ? (
+              {
+                '0-1': 'intake',
+                '1-3': 'requirements',
+                '3-1': 'build',
+                '6-0': 'qa',
+                '0-8': 'handoff',
+              } as Record<string, keyof typeof studioContent.stages>
+            )[`${departmentIndex}-${roleIndex}`]
+          : undefined;
+      const operational = stageKey ? studioContent.stages[stageKey] : undefined;
+      const fullRole = operational ? studioContent.rolePrompts[operational.role] : undefined;
+      const role = operational?.role ?? department.roles[roleIndex]!;
       const scope = roleScopes[departmentIndex]![roleIndex]!;
       definition.agents.push({
         id: agentId,
-        name: role,
+        name: fullRole?.name ?? role,
         role,
         kind: 'agent',
-        instructions: `You are the ${role} in the ${department.name} department of Product Studio. ${department.mission} Your specific ownership: ${scope}. Work only within the assigned task and available tools. State assumptions and blockers; never invent access, completed execution, customer evidence or test results. Produce ${department.output}. Include evidence and clear next steps. ${roleIndex === 0 ? 'Coordinate department work, delegate bounded tasks and review acceptance evidence before reporting completion.' : `Hand your result to the ${department.roles[0]} with the evidence needed for review.`} External publishing, spending and communication require the operator's explicit authorization.`,
-        responsibilities: [
-          scope,
-          department.mission,
-          `Produce ${department.output}.`,
-          'Record sources, checks performed, remaining uncertainty and handoff details.',
-        ],
+        instructions:
+          fullRole?.instructions ??
+          `You are the ${role} in the ${department.name} department of Product Studio. ${department.mission} Your specific ownership: ${scope}. Work only within the assigned task and available tools. State assumptions and blockers; never invent access, completed execution, customer evidence or test results. Produce ${department.output}. Include evidence and clear next steps. ${roleIndex === 0 ? 'Coordinate department work, delegate bounded tasks and review acceptance evidence before reporting completion.' : `Hand your result to the ${department.roles[0]} with the evidence needed for review.`} External publishing, spending and communication require the operator's explicit authorization.`,
+        responsibilities: fullRole
+          ? [scope, ...fullRole.responsibilities]
+          : [
+              scope,
+              department.mission,
+              `Produce ${department.output}.`,
+              'Record sources, checks performed, remaining uncertainty and handoff details.',
+            ],
         departmentId,
         managerId:
           departmentIndex === 0 && roleIndex === 0 ? null : roleIndex === 0 ? 'agent-0-0' : leadId,

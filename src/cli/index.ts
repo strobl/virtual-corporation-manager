@@ -50,9 +50,9 @@ async function main() {
     return;
   }
   const [nodeMajor, nodeMinor] = process.versions.node.split('.').map(Number);
-  if (!((nodeMajor === 24 && nodeMinor >= 14) || nodeMajor >= 26))
+  if (!((nodeMajor === 24 && nodeMinor >= 14) || nodeMajor === 26))
     throw new Error(
-      'GitFlash requires Node.js 24.14+ (24.x) or 26+. Install a supported Node.js release and retry.',
+      'GitFlash requires Node.js 24.14+ (24.x) or 26.x. Install a supported Node.js release and retry.',
     );
   const dataDir = resolve(
     String(

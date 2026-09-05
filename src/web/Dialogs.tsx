@@ -3,6 +3,7 @@ import { X, ArrowRight, Check, Undo2 } from 'lucide-react';
 import type { ChangePreview, DomainCommand, WorkspaceState } from '../domain/contracts';
 import type { Selection } from './model';
 import { companyAgents } from './model';
+import { textExcerpt } from './TextDisclosure';
 
 export function Dialog({
   title,
@@ -323,7 +324,24 @@ export function PreviewDialog({
           {preview.changes.map((change, index) => (
             <li key={index}>
               <span className="change-number">{index + 1}</span>
-              {change}
+              {change.length > 500 ? (
+                <div className="preview-change">
+                  <p>{textExcerpt(change, 400)}</p>
+                  <details className="text-disclosure">
+                    <summary>Read full change</summary>
+                    <pre
+                      className="full-text"
+                      tabIndex={0}
+                      role="region"
+                      aria-label={`Full change ${index + 1}`}
+                    >
+                      {change}
+                    </pre>
+                  </details>
+                </div>
+              ) : (
+                change
+              )}
             </li>
           ))}
         </ol>

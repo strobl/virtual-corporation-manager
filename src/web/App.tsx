@@ -44,6 +44,7 @@ import {
   parseSelection,
   selectionKey,
   selectedTreeRows,
+  roleLabel,
   toSnapshot,
   type Selection,
 } from './model';
@@ -53,6 +54,8 @@ import { TextDisclosure, textExcerpt } from './TextDisclosure';
 import { BrandMark } from './BrandMark';
 import { createWorkViewModel, getRunTargetCompany, workAgentDestination } from './work-view-model';
 import { TimeTracker, TimezoneSettings } from './TimeTracker';
+import { JobsView } from './Jobs';
+import type { JobInfo } from '../jobs/contracts';
 import { AdvancedDialog, type AdvancedTarget } from './AdvancedDialogs';
 import {
   IntegrationsView,
@@ -89,8 +92,10 @@ export function App() {
   const [templates, setTemplates] = useState<TemplateSummary[]>([]);
   const [status, setStatus] = useState<IntegrationStatus | null>(null);
   const [runs, setRuns] = useState<RunInfo[]>([]);
+  const [jobs, setJobs] = useState<JobInfo[]>([]);
   const [area, setArea] = useState<Area>('organization');
   const [workScope, setWorkScope] = useState<'company' | 'all'>('company');
+  const [workMode, setWorkMode] = useState<'jobs' | 'tasks'>('jobs');
   const [view, setView] = useState<View>('map');
   const [selection, setSelection] = useState<Selection | null>(() =>
     parseSelection(new URLSearchParams(location.search).get('selected') ?? ''),
@@ -133,6 +138,7 @@ export function App() {
       client.templates(),
       request<IntegrationStatus>('/api/integrations'),
       request<RunInfo[]>('/api/runs'),
+      request<JobInfo[]>('/api/jobs'),
     ]);
     if (results[0].status === 'fulfilled') {
       setState(results[0].value);
@@ -141,6 +147,7 @@ export function App() {
     if (results[1].status === 'fulfilled') setTemplates(results[1].value);
     if (results[2].status === 'fulfilled') setStatus(results[2].value);
     if (results[3].status === 'fulfilled') setRuns(results[3].value);
+    if (results[4].status === 'fulfilled') setJobs(results[4].value);
     setLoading(false);
   }, []);
   useEffect(() => {
@@ -189,6 +196,10 @@ export function App() {
   const companyId = state ? companyForSelection(state, selection) : null;
   const company = state?.companies.find((row) => row.id === companyId);
   const companyWork = state ? createWorkViewModel(state, runs, companyId) : null;
+  const companyJobs = jobs.filter((job) => job.companyId === companyId);
+  const companyReviewCount =
+    (companyWork?.stats.reviewable ?? 0) +
+    companyJobs.filter((job) => job.status === 'waiting_owner').length;
   const runCompany = state && runAgent ? getRunTargetCompany(state, runAgent.id) : null;
   const tree = useMemo(() => (state ? organizationTree(state, query) : []), [state, query]);
   const snapshot = useMemo(() => (state ? toSnapshot(state) : null), [state]);
@@ -248,6 +259,15 @@ export function App() {
     try {
       const result = await client.apply(preview.id);
       setState(result.state);
+      if (pending?.kind === 'template' && pending.id === 'product-studio') {
+        const created = result.state.companies.find(
+          (company) => !state?.companies.some((previous) => previous.id === company.id),
+        );
+        if (created) setSelection({ kind: 'company', id: created.id });
+        setWorkScope('company');
+        setWorkMode('jobs');
+        setArea('work');
+      }
       setPreview(null);
       setPending(null);
       announce(
@@ -303,13 +323,17 @@ export function App() {
     (agent) =>
       (!selectedDepartment || agent.departmentId === selectedDepartment.id) &&
       (!query ||
-        [agent.name, agent.role, ...agent.responsibilities].some((value) =>
+        [agent.name, agent.role, roleLabel(agent.role), ...agent.responsibilities].some((value) =>
           value.toLowerCase().includes(query.toLowerCase()),
         )),
   );
   const navigate = (value: Area) => {
     setInitialRunId(null);
-    if (value === 'work') setWorkScope('company');
+    if (value === 'work') {
+      setWorkScope('company');
+      if (companyJobs.some((job) => job.status === 'waiting_owner')) setWorkMode('jobs');
+      else if (companyWork?.stats.reviewable) setWorkMode('tasks');
+    }
     setArea(value);
     setNavOpen(false);
   };
@@ -380,10 +404,15 @@ export function App() {
           <X size={18} />
         </button>
         <a className="brand" href="/" aria-label={`${brand.name} home`}>
-          <BrandMark size={36} decorative />
           <span className="brand-copy">
-            <strong>{brand.name}</strong>
-            <small>Virtual Corporation Manager</small>
+            <img
+              className="brand-lockup"
+              src="/gitflash-wordmark.svg"
+              width={170}
+              height={40}
+              alt=""
+            />
+            <small>{brand.descriptor}</small>
           </span>
           <span className="local-badge">local</span>
         </a>
@@ -397,12 +426,12 @@ export function App() {
             >
               <Icon size={17} />
               {AREA_NAMES[id]}
-              {id === 'work' && !!companyWork?.stats.reviewable && (
+              {id === 'work' && companyReviewCount > 0 && (
                 <span
                   className="activity-count"
-                  aria-label={`${companyWork.stats.reviewable} results need your review in ${companyWork.scopeName}`}
+                  aria-label={`${companyReviewCount} results need your review in ${company?.name ?? 'this company'}`}
                 >
-                  {companyWork.stats.reviewable}
+                  {companyReviewCount}
                 </span>
               )}
             </button>
@@ -597,8 +626,8 @@ export function App() {
                             className="welcome-flash"
                             src="/flash-character.svg"
                             width={300}
-                            height={350}
-                            alt="Flash, the GitFlash character"
+                            height={300}
+                            alt="The GitFlash company tower and work floors"
                           />
                           <div className="flash-role role-product">
                             <span aria-hidden="true">P</span>Product
@@ -684,15 +713,19 @@ export function App() {
                           departments
                         </span>
                         <span>
-                          {companyWork?.stats.running ?? 0} running ·{' '}
-                          {companyWork?.stats.queued ?? 0} queued
+                          {(companyWork?.stats.running ?? 0) +
+                            companyJobs.filter((job) => job.status === 'running').length}{' '}
+                          running ·{' '}
+                          {(companyWork?.stats.queued ?? 0) +
+                            companyJobs.filter((job) => job.status === 'queued').length}{' '}
+                          queued
                         </span>
                         <button
-                          className={`company-instrument instrument-review${companyWork?.stats.reviewable ? ' instrument-review-active' : ''}`}
+                          className={`company-instrument instrument-review${companyReviewCount ? ' instrument-review-active' : ''}`}
                           onClick={() => navigate('work')}
                         >
                           <span>Review work</span>
-                          <strong>{companyWork?.stats.reviewable ?? 0}</strong>
+                          <strong>{companyReviewCount}</strong>
                         </button>
                         <button className="button" onClick={() => navigate('time')}>
                           <Clock3 size={14} /> Time Tracker
@@ -813,7 +846,7 @@ export function App() {
                                 {selectedAgent?.name ?? selectedDepartment?.name ?? company.name}
                               </h2>
                               <p>
-                                {selectedAgent?.role ??
+                                {(selectedAgent ? roleLabel(selectedAgent.role) : null) ??
                                   (selectedDepartment ? 'Department' : company.shortCode)}
                               </p>
                               <button
@@ -989,7 +1022,7 @@ export function App() {
                                             </span>
                                             <span>
                                               <strong>{agent.name}</strong>
-                                              <small>{agent.role}</small>
+                                              <small>{roleLabel(agent.role)}</small>
                                             </span>
                                             <ChevronRight size={12} />
                                           </button>
@@ -1071,22 +1104,51 @@ export function App() {
                 </>
               )}
               {area === 'work' && (
-                <WorkView
-                  companyId={workScope === 'all' ? null : companyId}
-                  selectedCompanyName={company?.name ?? null}
-                  onScopeChange={(scope) => {
-                    setInitialRunId(null);
-                    setWorkScope(scope);
-                  }}
-                  initialRunId={initialRunId}
-                  state={state}
-                  runs={runs}
-                  onAccept={(id, title) =>
-                    void command([{ type: 'work.accept', id }], `Accept result: ${title}`)
-                  }
-                  onSelectAgent={openAgentContext}
-                  onRefresh={() => void refresh()}
-                />
+                <>
+                  <nav className="work-mode-nav" aria-label="Work views">
+                    <button aria-pressed={workMode === 'jobs'} onClick={() => setWorkMode('jobs')}>
+                      Company jobs
+                    </button>
+                    <button
+                      aria-pressed={workMode === 'tasks'}
+                      onClick={() => setWorkMode('tasks')}
+                    >
+                      Individual tasks
+                    </button>
+                  </nav>
+                  {workMode === 'jobs' ? (
+                    <JobsView
+                      state={state}
+                      companyId={workScope === 'all' ? null : companyId}
+                      selectedCompanyId={companyId}
+                      selectedCompanyName={company?.name ?? null}
+                      status={status}
+                      onScopeChange={setWorkScope}
+                      onTemplate={(id) => void prepare({ kind: 'template', id })}
+                      onIntegrations={() => navigate('integrations')}
+                      onTime={() => navigate('time')}
+                      onRefresh={() => void refresh()}
+                      onJobsChanged={setJobs}
+                    />
+                  ) : (
+                    <WorkView
+                      companyId={workScope === 'all' ? null : companyId}
+                      selectedCompanyName={company?.name ?? null}
+                      onScopeChange={(scope) => {
+                        setInitialRunId(null);
+                        setWorkScope(scope);
+                      }}
+                      initialRunId={initialRunId}
+                      state={state}
+                      runs={runs}
+                      onAccept={(id, title) =>
+                        void command([{ type: 'work.accept', id }], `Accept result: ${title}`)
+                      }
+                      onSelectAgent={openAgentContext}
+                      onRefresh={() => void refresh()}
+                    />
+                  )}
+                </>
               )}
               {area === 'time' && (
                 <TimeTracker
@@ -1287,7 +1349,9 @@ export function App() {
           )}
         </main>
         <footer className="workspace-footer">
-          <span>{brand.name} · Your AI company, on your computer</span>
+          <span>
+            {brand.name} · {brand.descriptor}
+          </span>
           <span>
             {state ? `Revision ${state.revision}` : 'Local workspace'}
             <span className="footer-divider">/</span>Open source
@@ -1516,6 +1580,7 @@ export function App() {
             setSelection({ kind: 'company', id: startedRun.companyId });
             setInitialRunId(startedRun.id);
             setWorkScope('company');
+            setWorkMode('tasks');
             setArea('work');
             announce('Task recorded. Opened its company and run.');
           }}
@@ -1567,7 +1632,7 @@ function AgentList({
                   {agent.name}
                 </button>
               </td>
-              <td>{agent.role}</td>
+              <td>{roleLabel(agent.role)}</td>
               <td>
                 {state.departments.find((row) => row.id === agent.departmentId)?.name ??
                   'Company level'}

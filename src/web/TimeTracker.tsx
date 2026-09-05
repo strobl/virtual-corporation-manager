@@ -12,6 +12,7 @@ import type {
 } from '../time/contracts';
 import { request } from './client';
 import { Dialog } from './Dialogs';
+import { roleLabel } from './model';
 import {
   addTimeDays,
   aggregateTime,
@@ -383,7 +384,9 @@ export function TimeTracker({
                       >
                         {member.name}
                       </button>
-                      <small>{member.archived ? 'Historical identity' : member.role}</small>
+                      <small>
+                        {member.archived ? 'Historical identity' : roleLabel(member.role)}
+                      </small>
                     </th>
                     {dates.map((date) => {
                       const rows = byCell.get(`${member.id}:${date}`) ?? [];

@@ -7,3 +7,6 @@ docs/evidence/*-output.txt
 # Preserve the supplied native wordmark outlines byte for byte.
 public/gitflash-wordmark.svg
 site/gitflash-wordmark.svg
+
+# Byte-exact reviewed Ops source documents and manifests.
+docs/agent-operations/

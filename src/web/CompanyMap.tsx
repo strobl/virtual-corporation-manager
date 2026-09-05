@@ -1,7 +1,7 @@
 import { Bot, ChevronRight, Layers3, Plus, Building2, UsersRound } from 'lucide-react';
 import type { WorkspaceState } from '../domain/contracts';
 import type { Selection } from './model';
-import { companyAgents } from './model';
+import { agentInitials, companyAgents, roleLabel } from './model';
 import { textExcerpt } from './TextDisclosure';
 import { BrandMark } from './BrandMark';
 
@@ -133,8 +133,8 @@ export function CompanyMap({
                 <button
                   key={agent.id}
                   onClick={() => onSelect({ kind: 'agent', id: agent.id })}
-                  aria-label={`${agent.name} — ${agent.role}`}
-                  title={`${agent.name} · ${agent.role}`}
+                  aria-label={`${agent.name} — ${roleLabel(agent.role)}`}
+                  title={`${agent.name} · ${roleLabel(agent.role)}`}
                   className={`agent-avatar ${selection?.kind === 'agent' && selection.id === agent.id ? 'is-selected' : ''}`}
                 >
                   <span
@@ -144,15 +144,11 @@ export function CompanyMap({
                     }
                     aria-hidden="true"
                   >
-                    {agent.name
-                      .split(/\s+/)
-                      .map((word) => word[0])
-                      .slice(0, 2)
-                      .join('')}
+                    {agentInitials(agent.name)}
                   </span>
                   <span className="agent-avatar-caption">
                     <strong>{agent.name}</strong>
-                    <small>{agent.role}</small>
+                    <small>{roleLabel(agent.role)}</small>
                   </span>
                 </button>
               ))}

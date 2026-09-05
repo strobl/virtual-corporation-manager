@@ -2,6 +2,14 @@
 @source "../";
 @import 'tw-animate-css';
 
+@font-face {
+  font-family: 'GitFlash Rubik';
+  src: url('/fonts/Rubik-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Adapted design tokens from strobl/org-manager-console, commit 7edae2ad.
  * Original structure and layout are retained; GitFlash uses its own warm light palette. */
 
@@ -112,27 +120,25 @@
 }
 
 :root {
-  --flash-canvas: #f3f0e7;
+  --flash-canvas: #f7f1e5;
   --flash-surface: #ffffff;
-  --flash-surface-muted: #faf8f2;
-  --flash-ink: #202824;
-  --flash-brand: #f4a340;
-  --flash-brand-hover: #efb467;
-  --flash-brand-border: #805718;
-  --flash-teal: #2e7467;
-  --flash-wood: #c9a576;
+  --flash-surface-muted: #fbf8f1;
+  --flash-ink: #1c211f;
+  --flash-brand: #ef3b24;
+  --flash-brand-border: #bd2c19;
+  --flash-teal: #244add;
   --flash-muted: #56625b;
   --flash-border: #d3d8d0;
-  --flash-soft: #e8ece5;
+  --flash-soft: #eee8dd;
   --flash-control: #748177;
-  --flash-hover: #f7f8f4;
-  --flash-selected: #f8e2c4;
+  --flash-hover: #f6f0e5;
+  --flash-selected: #f9ce55;
   --flash-console-control: #34433a;
   --flash-console-border: #94a79b;
-  --flash-stage-surface: #e8dfcd;
-  --flash-stage-border: #c8c1ad;
-  --flash-teal-soft: #e1ece4;
-  --flash-teal-ink: #205647;
+  --flash-stage-surface: #f7f1e5;
+  --flash-stage-border: #ef3b24;
+  --flash-teal-soft: #ecefff;
+  --flash-teal-ink: #244add;
   --flash-amber-soft: #f3dec0;
   --flash-amber-ink: #674217;
   --flash-violet-soft: #e4deef;
@@ -222,8 +228,8 @@
   --card-foreground: var(--flash-ink);
   --popover: var(--flash-surface);
   --popover-foreground: var(--flash-ink);
-  --primary: var(--flash-brand);
-  --primary-foreground: var(--flash-ink);
+  --primary: var(--flash-ink);
+  --primary-foreground: var(--flash-canvas);
   --secondary: var(--flash-soft);
   --secondary-foreground: var(--flash-ink);
   --muted: var(--flash-soft);
@@ -243,8 +249,8 @@
 
   --sidebar: var(--flash-surface-muted);
   --sidebar-foreground: var(--flash-ink);
-  --sidebar-primary: var(--flash-brand);
-  --sidebar-primary-foreground: var(--flash-ink);
+  --sidebar-primary: var(--flash-ink);
+  --sidebar-primary-foreground: var(--flash-canvas);
   --sidebar-accent: var(--flash-selected);
   --sidebar-accent-foreground: var(--flash-ink);
   --sidebar-border: var(--flash-border);
@@ -355,6 +361,7 @@ p {
   min-height: 100dvh;
   line-height: 1.55;
   --gf-accent: var(--brand-accent, var(--flash-brand));
+  --flash-brand: var(--brand-accent, #ef3b24);
 }
 .sidebar {
   position: fixed;
@@ -1626,6 +1633,16 @@ main:focus {
 .preview-list li:last-child {
   border-bottom: 0;
 }
+.preview-change {
+  min-width: 0;
+  flex: 1;
+}
+.preview-change > p {
+  white-space: normal;
+}
+.preview-change .full-text {
+  max-height: 320px;
+}
 .change-number {
   font-size: 9px;
   color: var(--flash-muted);
@@ -2208,7 +2225,7 @@ main:focus {
     top: 7px;
   }
 }
-/* Component treatments from the accepted Flash design. Layout and responsive behavior are preserved. */
+/* The Little Powerhouse identity. Operational layouts and semantic status colors are preserved. */
 body,
 .gitflash,
 .workspace {
@@ -2225,6 +2242,7 @@ body,
 .brand {
   height: 86px;
   gap: 10px;
+  position: relative;
 }
 .brand strong {
   font-size: 23px;
@@ -2260,8 +2278,8 @@ body,
   background: var(--flash-selected);
 }
 .activity-count {
-  background: var(--flash-brand);
-  color: var(--flash-ink);
+  background: var(--flash-ink);
+  color: var(--flash-canvas);
 }
 .topbar {
   background: var(--flash-canvas);
@@ -2292,13 +2310,13 @@ body,
   background: var(--flash-hover);
 }
 .button.primary {
-  background: var(--flash-brand);
-  color: var(--flash-ink);
-  border-color: var(--flash-brand-border);
+  background: var(--flash-ink);
+  color: var(--flash-canvas);
+  border-color: var(--flash-ink);
 }
 .button.primary:hover {
-  background: var(--flash-brand-hover);
-  color: var(--flash-ink);
+  background: #343b36;
+  color: var(--flash-canvas);
   border-color: var(--flash-ink);
 }
 .button.large {
@@ -2350,14 +2368,15 @@ textarea:focus-visible,
   max-width: 1320px;
 }
 .welcome h1 {
+  font-family: 'GitFlash Rubik', var(--console-font-sans);
   font-size: clamp(42px, 4.4vw, 68px);
-  line-height: 1.06;
-  letter-spacing: -2.7px;
-  font-weight: 720;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  font-weight: 700;
   margin: 20px 0 24px;
 }
 .welcome h1 span {
-  color: var(--flash-teal);
+  color: var(--flash-ink);
 }
 .welcome-copy > p {
   font-size: 16px;
@@ -2494,7 +2513,7 @@ textarea:focus-visible,
   margin-top: 9px;
 }
 .organization-header .eyebrow {
-  color: var(--flash-brand);
+  color: var(--flash-selected);
   font-size: 9px;
 }
 .organization-header p {
@@ -3572,12 +3591,18 @@ select[aria-invalid='true'] {
   flex-direction: column;
   gap: 2px;
 }
+.brand-lockup {
+  width: 170px;
+  height: 40px;
+  display: block;
+  flex-shrink: 0;
+}
 .brand-copy strong {
   font-size: 20px;
 }
 .brand-copy small {
-  font-size: 9px;
-  line-height: 1.25;
+  font-size: 12px;
+  line-height: 1.35;
   color: var(--flash-muted);
   white-space: normal;
 }
@@ -3585,6 +3610,9 @@ select[aria-invalid='true'] {
   font-size: 8px;
   letter-spacing: 0;
   padding: 0 3px;
+  position: absolute;
+  right: 16px;
+  top: 15px;
 }
 .topbar {
   height: 54px;
@@ -4266,7 +4294,7 @@ select[aria-invalid='true'] {
     font-size: 18px;
   }
   .brand-copy small {
-    font-size: 8px;
+    font-size: 12px;
   }
   .time-analytics-grid {
     grid-template-columns: 1fr;

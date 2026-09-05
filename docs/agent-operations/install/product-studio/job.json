@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "id": "PS-001",
+  "title": "Stock alert export",
+  "description": "Build and independently check a small local stock-alert utility using synthetic inventory data; hand four usable files to the actual owner for explicit acceptance.",
+  "companyTemplateId": "product-studio",
+  "maxRepairCandidates": 2,
+  "files": {
+    "brief": "brief.md",
+    "requirements": "requirements.md",
+    "input": "input.json",
+    "expected": "expected.json"
+  },
+  "stages": [
+    {
+      "id": "intake",
+      "role": "ao.role.delivery-manager",
+      "prompt": "Validate the shipped PS-001 brief, inputs, exact PS-A1\u2013A5 rubric, actual user-start authority and available Python >=3.8 capability. Name PS-BUILD, a different executing PS-QA identity and the actual human acceptance owner. Keep one accountable PS-DM job owner. Record action-specific permissions, source versions and the next checkpoint; missing essential authority/input routes to the manager without invented approval."
+    },
+    {
+      "id": "requirements",
+      "role": "ao.role.requirements-analyst",
+      "prompt": "Preserve the exact PS-A1\u2013A5 text and supplied synthetic input/expected output. Confirm a versioned matrix covering normal, threshold, empty, invalid, duplicate, Unicode/order and non-mutation cases. Give the same criterion version to PS-BUILD and PS-QA; do not silently change behavior or invent requirements."
+    },
+    {
+      "id": "build",
+      "role": "ao.role.software-builder",
+      "prompt": "Create stock_alert.py with reorder_items(products), test_stock_alert.py, expected.json and a short USAGE.md in the fresh job workspace. Use Python >=3.8 standard library only. Use only shipped brief/requirements/input/expected data plus the current role/company/contract context; do not inspect archived reference code, old tests or prior PASS reports. Run meaningful local checks if available and retain actual commands, output and exact candidate version. Report limitations truthfully; no network, deployment, customer message or business transaction."
+    },
+    {
+      "id": "qa",
+      "role": "ao.role.quality-reviewer",
+      "prompt": "Use a different executing identity from the candidate producer. Inspect or run meaningful independent checks against the exact fresh candidate and report every original PS-A1\u2013A5 criterion as PASS, FAIL or NOT RUN with provenance. A reported defect without establishing candidate/version evidence remains NOT RUN; missing required evidence may separately FAIL completeness. Supplied authoritative evidence is labelled supplied, never your executed test. Apply the preserved severe-evidence stop gate first, then the narrowest action-specific request/repair permission. Requests do not increment repair_attempt. Never use old QA as fresh evidence or infer actual owner acceptance."
+    },
+    {
+      "id": "handoff",
+      "role": "ao.role.handoff-editor",
+      "prompt": "Assemble the exact independently reviewed candidate, four usable deliverables, checks, usage and limitations for PS-DM and the actual human owner. Preserve evidence origins for requirements/reproduction/qa/delivery framework artifacts. Any substantive candidate change requires independent re-review. Keep waiting_owner until an actual owner decision accepts the exact reviewed version. Do not send externally, deploy or claim this handoff itself is acceptance."
+    }
+  ],
+  "deliverables": [
+    "stock_alert.py",
+    "test_stock_alert.py",
+    "expected.json",
+    "USAGE.md"
+  ],
+  "checks": [
+    {
+      "id": "PS-A1",
+      "description": "Include a product only when stock is strictly less than reorder_point. At equality, omit it."
+    },
+    {
+      "id": "PS-A2",
+      "description": "Quantity is reorder_point minus stock, integer; emit `{sku, quantity}` sorted by SKU in ascending lexicographic order. Do not modify the input."
+    },
+    {
+      "id": "PS-A3",
+      "description": "SKU is a nonempty string with no surrounding whitespace and unique, case-sensitive. stock/reorder_point are integers >=0; booleans are invalid. Invalid input raises ValueError before returning any result. Empty product list returns []."
+    },
+    {
+      "id": "PS-A4",
+      "description": "Required fields must exist, input must be a list and each product a dictionary. Additional fields may exist and are ignored. Unicode SKUs are allowed; Python lexical order applies."
+    },
+    {
+      "id": "PS-A5",
+      "description": "Evidence includes normal, threshold, empty, invalid, duplicate and non-mutation cases. No claims about a real customer, money saved or deployment."
+    }
+  ],
+  "prerequisites": {
+    "python": ">=3.8",
+    "stdlibOnly": true
+  },
+  "acceptanceCriteria": [
+    {
+      "id": "PS-A1",
+      "description": "Include a product only when stock is strictly less than reorder_point. At equality, omit it."
+    },
+    {
+      "id": "PS-A2",
+      "description": "Quantity is reorder_point minus stock, integer; emit `{sku, quantity}` sorted by SKU in ascending lexicographic order. Do not modify the input."
+    },
+    {
+      "id": "PS-A3",
+      "description": "SKU is a nonempty string with no surrounding whitespace and unique, case-sensitive. stock/reorder_point are integers >=0; booleans are invalid. Invalid input raises ValueError before returning any result. Empty product list returns []."
+    },
+    {
+      "id": "PS-A4",
+      "description": "Required fields must exist, input must be a list and each product a dictionary. Additional fields may exist and are ignored. Unicode SKUs are allowed; Python lexical order applies."
+    },
+    {
+      "id": "PS-A5",
+      "description": "Evidence includes normal, threshold, empty, invalid, duplicate and non-mutation cases. No claims about a real customer, money saved or deployment."
+    }
+  ],
+  "ownerReviewRequired": true,
+  "packageId": "gitflash-agent-operations",
+  "packageVersion": "1.2.2",
+  "companyContentId": "ao.company.product-studio",
+  "seatBindings": [
+    {
+      "seat_id": "PS-DM",
+      "canonical_seat_id": "ao.seat.product-studio.ops-01",
+      "role_id": "ao.role.delivery-manager"
+    },
+    {
+      "seat_id": "PS-REQ",
+      "canonical_seat_id": "ao.seat.product-studio.product-04",
+      "role_id": "ao.role.requirements-analyst"
+    },
+    {
+      "seat_id": "PS-BUILD",
+      "canonical_seat_id": "ao.seat.product-studio.frontend-02",
+      "role_id": "ao.role.software-builder"
+    },
+    {
+      "seat_id": "PS-QA",
+      "canonical_seat_id": "ao.seat.product-studio.quality-01",
+      "role_id": "ao.role.quality-reviewer"
+    },
+    {
+      "seat_id": "PS-DOC",
+      "canonical_seat_id": "ao.seat.product-studio.ops-09",
+      "role_id": "ao.role.handoff-editor"
+    }
+  ],
+  "rolePromptInventory": "../../roles/index.json",
+  "rolePromptPolicy": "Load the canonical full prompt from roles/index.json by role ID for every stage. Stage.prompt is a bounded task supplement, not a replacement for that role prompt.",
+  "additionalFrameworkArtifacts": [
+    {
+      "path": "requirements.md",
+      "origin": "Shipped input, then requirements-seat confirmed/versioned if needed; no independently executed requirements step inferred from file existence."
+    },
+    {
+      "path": "reproduction.md",
+      "origin": "New producer record of actually performed commands and outputs."
+    },
+    {
+      "path": "qa.md",
+      "origin": "New independent reviewer result with candidate version, original criteria and evidence provenance."
+    },
+    {
+      "path": "delivery.md",
+      "origin": "New handoff packet assembled from the exact reviewed artifacts; no acceptance inferred."
+    }
+  ],
+  "inputIsolation": {
+    "filesBase": "This job.json directory",
+    "contextBase": "Package root",
+    "sharedContext": [
+      "operating-contract.md",
+      "companies/product-studio/company.md",
+      "companies/product-studio/workflows.md",
+      "install/product-studio/brief.md",
+      "install/product-studio/requirements.md"
+    ],
+    "producerInputAllowlist": [
+      "operating-contract.md",
+      "companies/product-studio/company.md",
+      "companies/product-studio/workflows.md",
+      "install/product-studio/brief.md",
+      "install/product-studio/requirements.md",
+      "roles/software-builder.md",
+      "install/product-studio/input.json",
+      "install/product-studio/expected.json"
+    ],
+    "producerInputExclusions": [
+      "examples/product-studio/stock_alert.py",
+      "examples/product-studio/test_stock_alert.py",
+      "examples/product-studio/producer-result.md",
+      "examples/product-studio/reproduction.md",
+      "examples/product-studio/qa.md",
+      "examples/product-studio/delivery.md",
+      "tests/evidence/*",
+      "pmo/*"
+    ],
+    "policy": "The complete archive retains old examples and proof for provenance. Those are reference-only, are excluded from the producer assignment, and cannot supply a new PASS or acceptance. This content allowlist is not an access-control implementation; the Engineering adapter must enforce any claimed isolation."
+  },
+  "startAuthorization": "Only an actual user Start PS-001 action authorizes this bounded local workflow: production, local standard-library checks, ordinary internal evidence requests needed by assigned stages, and at most two repair candidates for ordinary verified defects. maxRepairCandidates is a ceiling, not independent authority; a narrower action-specific task permission overrides it. No external action, automatic owner acceptance or severe-incident recovery is authorized by Start. Preserve actual request and executed-repair counts separately.",
+  "automationEvidence": "This shipped definition is not execution evidence. Engineering must verify actual installed setup, dispatch, automatic/manual handoffs, independent QA and explicit owner acceptance against these exact bytes."
+}
