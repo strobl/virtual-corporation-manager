@@ -3,6 +3,6 @@ export const brand = {
   name: 'VCM',
   productName: 'Virtual Corporation Manager',
   descriptor: 'Virtual Corporation Manager',
-  accent: '#2857E8',
-  repository: 'https://github.com/strobl/gitflash',
+  accent: '#087D6A',
+  repository: 'https://github.com/strobl/virtual-corporation-manager',
 };

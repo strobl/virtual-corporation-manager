@@ -4,17 +4,25 @@ import type { ChangePreview, DomainCommand, WorkspaceState } from '../domain/con
 import type { Selection } from './model';
 import { companyAgents } from './model';
 import { textExcerpt } from './TextDisclosure';
+import {
+  agentCompanyIds,
+  agentContextOptions,
+  companyContextLabel,
+  filterAgentOptions,
+} from './agent-context';
 
 export function Dialog({
   title,
   children,
   onClose,
   wide = false,
+  closeDisabled = false,
 }: {
   title: string;
   children: ReactNode;
   onClose: () => void;
   wide?: boolean;
+  closeDisabled?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = `dialog-${title.toLowerCase().replace(/\W/g, '-')}`;
@@ -37,12 +45,17 @@ export function Dialog({
       className={`gf-dialog ${wide ? 'gf-dialog-wide' : ''}`}
       onCancel={(event) => {
         event.preventDefault();
-        onClose();
+        if (!closeDisabled) onClose();
       }}
     >
       <header className="dialog-header">
         <h2 id={titleId}>{title}</h2>
-        <button className="icon-button" aria-label="Close dialog" onClick={onClose}>
+        <button
+          className="icon-button"
+          aria-label="Close dialog"
+          onClick={onClose}
+          disabled={closeDisabled}
+        >
           <X size={18} />
         </button>
       </header>
@@ -101,6 +114,7 @@ export function EntityEditor({
   const [managerId, setManagerId] = useState(
     (target.kind === 'department' ? department?.managerId : agent?.managerId) ?? '',
   );
+  const [managerQuery, setManagerQuery] = useState('');
   const companyId = target.companyId ?? company?.id ?? '';
   const departmentCompanyIds = new Set(
     target.kind === 'agent' && target.id
@@ -115,6 +129,11 @@ export function EntityEditor({
       : companyId
         ? companyAgents(state, companyId).filter((row) => row.id !== target.id)
         : [];
+  const managerOptions = agentContextOptions(state, people);
+  const matchingManagers = filterAgentOptions(managerOptions, managerQuery);
+  const visibleManagers = filterAgentOptions(managerOptions, managerQuery, managerId);
+  const selectedManager = managerOptions.find((row) => row.id === managerId);
+  const editingCompanyIds = agent ? agentCompanyIds(state, agent.id) : [companyId];
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     let command: DomainCommand;
@@ -170,6 +189,26 @@ export function EntityEditor({
               : 'Define what this agent owns and how it should work.'}{' '}
           You will review before saving.
         </p>
+        {target.kind === 'agent' && (
+          <p className="muted">
+            <strong>Company: </strong>
+            {(companyId ? [companyId] : editingCompanyIds)
+              .map((id) => companyContextLabel(state, id))
+              .join(' / ') || 'Choose a company first'}
+            {editingCompanyIds.some((id) => id !== companyId) && companyId && (
+              <>
+                <br />
+                <small>
+                  Also assigned to:{' '}
+                  {editingCompanyIds
+                    .filter((id) => id !== companyId)
+                    .map((id) => companyContextLabel(state, id))
+                    .join(' / ')}
+                </small>
+              </>
+            )}
+          </p>
+        )}
         <label>
           Name
           <input
@@ -193,8 +232,9 @@ export function EntityEditor({
               Short code
               <input
                 required
-                pattern="[A-Za-z0-9][A-Za-z0-9_-]{1,15}"
-                maxLength={16}
+                pattern="[A-Za-z0-9]([A-Za-z0-9_]|-){0,23}"
+                minLength={1}
+                maxLength={24}
                 value={shortCode}
                 onChange={(e) => setShortCode(e.target.value)}
                 placeholder="ACME"
@@ -253,7 +293,7 @@ export function EntityEditor({
                   .map((row) => (
                     <option key={row.id} value={row.id}>
                       {departmentCompanyIds.size > 1
-                        ? `${state.companies.find((company) => company.id === row.companyId)?.name} / `
+                        ? `${companyContextLabel(state, row.companyId)} / `
                         : ''}
                       {row.name}
                     </option>
@@ -263,17 +303,46 @@ export function EntityEditor({
           </>
         )}
         {target.kind !== 'company' && (
-          <label>
-            {target.kind === 'department' ? 'Department lead' : 'Reports to'}
-            <select value={managerId} onChange={(e) => setManagerId(e.target.value)}>
-              <option value="">No manager</option>
-              {people.map((row) => (
-                <option key={row.id} value={row.id}>
-                  {row.name} · {row.role}
-                </option>
-              ))}
-            </select>
-          </label>
+          <>
+            <label>
+              {target.kind === 'department' ? 'Find a department lead' : 'Find a manager'}
+              <input
+                type="search"
+                value={managerQuery}
+                placeholder="Name, role, company or department"
+                onChange={(event) => setManagerQuery(event.target.value)}
+              />
+            </label>
+            <label>
+              {target.kind === 'department' ? 'Department lead' : 'Reports to'}
+              <select value={managerId} onChange={(e) => setManagerId(e.target.value)}>
+                <option value="">No manager</option>
+                {visibleManagers.map((row) => (
+                  <option key={row.id} value={row.id}>
+                    {row.label}
+                    {managerQuery.trim() &&
+                    row.id === managerId &&
+                    !matchingManagers.some((match) => match.id === row.id)
+                      ? ' (current selection)'
+                      : ''}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {selectedManager && <p className="muted small">Selected: {selectedManager.label}</p>}
+            {managerQuery.trim() && (
+              <p className="muted small" role="status">
+                {matchingManagers.length} matching{' '}
+                {matchingManagers.length === 1 ? 'agent' : 'agents'}. Your current selection stays
+                available.
+              </p>
+            )}
+            {target.kind === 'agent' && (
+              <p className="muted small">
+                The reporting line applies across this agent’s company assignments.
+              </p>
+            )}
+          </>
         )}
         {error && (
           <p className="error-box" role="alert">
@@ -298,6 +367,7 @@ export function PreviewDialog({
   preview,
   busy,
   error,
+  recovery = null,
   onClose,
   onApply,
   onRefresh,
@@ -305,20 +375,33 @@ export function PreviewDialog({
   preview: ChangePreview;
   busy: boolean;
   error: string | null;
+  recovery?: 'retry' | 'refresh' | null;
   onClose: () => void;
   onApply: () => void;
   onRefresh: () => void;
 }) {
   return (
-    <Dialog title="Review your changes" wide onClose={onClose}>
+    <Dialog
+      title="Review your changes"
+      wide
+      onClose={onClose}
+      closeDisabled={busy || recovery === 'retry'}
+    >
       <div className="dialog-body">
         <div className="draft-label">
-          <span /> Draft · Nothing has been saved
+          <span />{' '}
+          {recovery === 'retry' ? 'Save confirmation pending' : 'Draft · Nothing has been saved'}
         </div>
         <h3 className="preview-title">{preview.summary}</h3>
         <p className="muted">
-          Review {preview.changes.length} items below. Everything is saved together when you
-          confirm; your current organization stays intact until then.
+          {recovery === 'retry' ? (
+            'The save response was interrupted. These changes may already be saved. Retry this same save to confirm its result before creating another draft.'
+          ) : (
+            <>
+              Review {preview.changes.length} items below. Everything is saved together when you
+              confirm; your current organization stays intact until then.
+            </>
+          )}
         </p>
         <ol className="preview-list">
           {preview.changes.map((change, index) => (
@@ -352,18 +435,30 @@ export function PreviewDialog({
         {error && (
           <div className="error-box" role="alert">
             <p>{error}</p>
-            <button className="button" onClick={onRefresh} disabled={busy}>
-              Refresh preview
-            </button>
+            {recovery !== 'retry' && (
+              <button className="button" onClick={onRefresh} disabled={busy}>
+                Refresh preview
+              </button>
+            )}
           </div>
         )}
         <footer className="dialog-actions">
-          <button className="button" disabled={busy} onClick={onClose}>
+          <button className="button" disabled={busy || recovery === 'retry'} onClick={onClose}>
             Discard draft
           </button>
-          <button className="button primary" disabled={busy || Boolean(error)} onClick={onApply}>
+          <button
+            className="button primary"
+            disabled={busy || (Boolean(error) && recovery !== 'retry')}
+            onClick={onApply}
+          >
             <Check size={16} />
-            {busy ? 'Applying…' : 'Apply changes'}
+            {busy
+              ? recovery === 'retry'
+                ? 'Confirming…'
+                : 'Applying…'
+              : recovery === 'retry'
+                ? 'Retry save'
+                : 'Apply changes'}
           </button>
         </footer>
       </div>

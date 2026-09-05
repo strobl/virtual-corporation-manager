@@ -1,14 +1,12 @@
 # VCM — Virtual Corporation Manager
 
-**Run a task. Review the result.**
+**Set up your virtual corporation.**
 
-VCM is a free, open-source local workspace. Run a task, inspect its files and evidence, track delivery hours, and manage the company behind the work. Your company, reviewed changes and actual results live in SQLite on your computer.
+Create agents, define reporting lines and log delivery hours in one place. VCM is a free, open-source local workspace for your corporations, departments and agents. Your company configuration, reviewed changes and recorded work live in SQLite on your computer.
 
-**Preparation status, 5 September 2026: UNPUBLISHED local release candidate `0.1.0-alpha.3`.** This candidate packages the VCM task entry screen, delivery-hours Time Tracker and Product Studio workflows for alpha.3. The current public alpha.2 release remains unchanged; it does not contain this interface, the Time Tracker or the company file workflows. At preparation, this version is not yet available as a public release. The release page and verified public download determine any later publication status. See [release notes](CHANGELOG.md) and [acceptance evidence](docs/acceptance.md) for scope and exact candidate checks.
+**Preparation status, 5 September 2026: UNPUBLISHED corporation-first candidate `0.1.0-alpha.4-local.1`.** This checkout implements the corporation setup and overview journey described below, alongside the existing Time Tracker and optional Product Studio workflows. The public alpha.2 release remains an older artifact; it does not contain this interface, the Time Tracker or the company file workflows. An earlier alpha.3 archive also predates this redesign. Use the supplied candidate's exact source revision and checksum; the version string alone does not identify its interface. The release page and verified public download determine any later publication status. See [acceptance evidence](docs/acceptance.md) and [UI review scope](docs/vcm-ui-preview.md).
 
-This is a **technical alpha**. The first company job is an included synthetic Product Studio exercise that produces `stock_alert.py`, exporting `reorder_items(products)`, plus tests and review evidence. It uses fictional inventory in `input.json`; it does not connect to inventory systems or place orders. Optional Codex execution requires your own runtime access. Buzz native team import has been exercised; Buzz task dispatch and Slack round trips remain experimental. No customer or human-pilot validation is claimed.
-
-The selected public destination is `virtualcorporationmanager.com`; domain activation and publication are not asserted here. The repository, npm package, CLI command and default data directory retain their existing `gitflash` identifiers. GitFlash's separate FDE website stays unchanged.
+The repository is [strobl/virtual-corporation-manager](https://github.com/strobl/virtual-corporation-manager). The npm package, CLI command, environment variables and default data directory keep their `gitflash` identifiers. The selected public destination is `virtualcorporationmanager.com`; domain activation is not asserted here. GitFlash's separate FDE website stays unchanged.
 
 ## Install and start
 
@@ -19,7 +17,7 @@ The local core and Time Tracker support macOS, Linux and native Windows. The opt
 These commands require the exact candidate archive supplied for review. They do not download a published VCM release:
 
 ```sh
-npm install --offline --ignore-scripts --prefix ./gitflash-preview ./gitflash-0.1.0-alpha.3.tgz
+npm install --offline --ignore-scripts --prefix ./gitflash-preview ./gitflash-0.1.0-alpha.4-local.1.tgz
 node ./gitflash-preview/node_modules/gitflash/dist/cli.js --data-dir ./my-company
 ```
 
@@ -27,35 +25,33 @@ Use the exact supplied archive above and its matching handoff checksum, or build
 
 The CLI prints a loopback URL and opens VCM in your browser. If the browser does not open, visit the printed URL. Nothing needs to be deployed. The installed package includes its runtime JavaScript and browser assets; it has no npm runtime dependencies or database compiler step.
 
-Obtaining the archive or installing source dependencies requires network access; the supplied archive can be installed offline as shown above. After installation, company creation, templates, editing, organization views, preview/apply/undo and recovery work without an account or external connection. There is no mandatory Supabase, hosted authentication, billing, cloud inference or telemetry.
+Downloading a release, cloning the repository or obtaining uncached source dependencies requires network access; the supplied archive can be installed offline as shown above. After installation, company creation, templates, editing, organization views, preview/apply/undo and recovery work without an account or external connection. There is no mandatory Supabase, hosted authentication, billing, cloud inference or telemetry.
 
-## Choose what to do
+## Set up your corporation
 
-The **Home** screen has four working entry points:
+1. Open **Your corporations** and choose **Set up a corporation**. Give the corporation a name, short code and optional purpose.
+2. Start with an empty structure or choose **Use small team** for two editable departments and three agents. Add or edit names, roles, departments, reporting relationships, responsibilities and instructions.
+3. Review the identity and structure, then choose **Review changes**. The server validates the definition and presents the resulting changes. **Apply changes** saves them together and opens the new **Company overview**. Back keeps the entered fields; cancelling or discarding before Apply creates no company.
+4. Use **Add agent**, **Add department** and **Manage organization** to maintain the real team. Selecting an agent exposes its company, department and manager context, plus its responsibilities and instructions. Reporting lines and company ownership are separate relationships.
+5. Choose **Log time** from the company or agent context to open the delivery-hours form. Saving an entry is explicit. **Time Tracker** provides the weekly ledger, reference estimates, corrections, history and analytics.
 
-| Action                   | Where it takes you                                                                                                                          |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Run a task**           | The Product Studio job form. An empty workspace first opens company templates; review and apply a template to continue.                     |
-| **Review results**       | Existing company jobs or individual task results, including items waiting for your review. An empty workspace explains the next setup step. |
-| **Track delivery hours** | The Time Tracker, with manual entries, reference estimates, corrections, history and analytics.                                             |
-| **Set up a company**     | The company editor and its reviewed configuration change. Organization views and templates remain available.                                |
+Returning to **Your corporations** shows the saved corporations with agent/department counts and current-week recorded hours. Opening a corporation selects its own overview and hours. An empty corporation has a direct path to add its first agent; it has no invented work or activity.
 
-## Run the first task
+The shared Time Tracker catalog contains 124 reference definitions. Its human-equivalent delivery hours describe booked effort, with explicit, catalog or fallback-estimate basis. Runtime duration and accepting a result never create hours. Follow the [first-company guide](docs/first-company.md) and [Time Tracker guide](docs/time-tracker.md).
 
-1. On **Home**, choose **Run a task**. If you have no company, select **Product Studio (5 seats)** for the shortest included workflow, or the **100-agent Product Studio** for a larger organization. Review and apply the structure.
-2. Review the included synthetic brief, acceptance criteria and supplied inputs in the job form. If the selected company lacks the five required roles, choose **Preview Product Studio** and review the template.
-3. Name the person or responsible role who will review the result. Inspect the five roles, optional Codex/Python prerequisites and bounded execution permission, then explicitly choose **Start job**. Opening the form or applying a company template does not start execution.
-4. The Delivery Manager, Requirements Analyst, Software Builder, independent Quality Reviewer and Handoff Editor create real files in separate runtime sessions. A fixed independent oracle verifies the exact candidate. Failed checks never become owner acceptance.
-5. Open **Home → Review results** or **Work → Company jobs**. Download **reviewed files (.zip)**, inspect the utility and evidence, then explicitly accept or reject with a note. Follow the complete [first-company guide](docs/first-company.md) and [workflow contract](docs/product-studio.md).
-6. Individual tasks remain available from an agent or **Work → Individual tasks**. They use the original read-only, text-output route with their own saved receipts.
+## Optional work execution
 
-Use **Home → Track delivery hours** to book human-equivalent delivery hours separately. The shared catalog contains 124 reference definitions; manual corrections retain their history. [Time Tracker](docs/time-tracker.md) explains the basis, overrides and local agent API. Runtime duration does not create hours.
+Company setup requires no VCM account or provider connection. **Work** and **Integrations** provide separate optional execution paths after the corporation exists.
 
-Configuring 100 roles does not start 100 processes. One company workflow runs at a time with at most three active/queued jobs. Its roles execute sequentially; the separate individual-task queue supports one additional active task and at most 20 outstanding tasks. Creating or importing a company never starts inference. Optional services use your own access and allowance. [Integration setup and boundaries](docs/integrations.md) distinguishes this supported route from deferred Buzz/Slack evidence.
+The included **Product Studio (5 seats)** and **100-agent Product Studio** templates are available from **Your corporations → Browse company templates**, and from **Organization → Templates**. Review and apply one to create its company, then open **Work → Company jobs → Set up first job**. Review the synthetic brief, five required roles and prerequisites; name the acceptance owner and explicitly choose **Start job**. Opening the form or applying a template does not start execution.
+
+The PS-001 exercise produces `stock_alert.py`, exporting `reorder_items(products)`, plus tests and review evidence. It uses fictional inventory in `input.json`; it does not connect to inventory systems or place orders. Inspect the exact artifacts and QA record in **Work → Company jobs**, download the reviewed files, and separately accept or reject the result with a note. Individual read-only text tasks remain available from an agent or **Work → Individual tasks**. See the [workflow contract](docs/product-studio.md).
+
+Configuring 100 roles does not start 100 processes. One company workflow runs at a time with at most three active/queued jobs. Its roles execute sequentially; the separate individual-task queue supports one additional active task and at most 20 outstanding tasks. Optional Codex execution requires your own runtime access and allowance. Buzz native team import has been exercised; Buzz task dispatch and Slack round trips remain experimental. No customer or human-pilot validation is claimed. [Integration setup and boundaries](docs/integrations.md) identifies the supported and experimental paths.
 
 ## Safe, reviewable changes
 
-Configuration changes have a persisted preview. Confirmation applies the reviewed batch atomically; outdated previews are refused. Repeated confirmation cannot duplicate a change. Version-aware undo preserves real work evidence and does not reverse external actions.
+Configuration changes have a persisted preview. Confirmation applies the reviewed batch atomically; outdated previews are refused. A stale first review refreshes the workspace revision while keeping the entered definition. If an Apply response is interrupted, **Retry save** confirms the same preview receipt; refreshing or discarding that uncertain save is blocked until its outcome is known. The tab retains the receipt for recovery after a reload. Repeating that same receipt does not duplicate a change. Version-aware undo preserves real work evidence and does not reverse external actions.
 
 The company model includes departments and managers, primary and additional dated agent assignments, and separate ownership and collaboration relationships. JSON definition import validates the complete structure and creates fresh IDs. A definition carries configuration, not credentials or invented work history.
 
@@ -78,8 +74,8 @@ To remove the application, stop it and run `npm uninstall --prefix ./gitflash-pr
 ## Contribute
 
 ```sh
-git clone https://github.com/strobl/gitflash.git
-cd gitflash
+git clone https://github.com/strobl/virtual-corporation-manager.git
+cd virtual-corporation-manager
 npm ci --ignore-scripts
 npm run check
 npm run test:package

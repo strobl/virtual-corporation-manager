@@ -1873,6 +1873,7 @@ main:focus {
   }
   .inspector {
     width: 100%;
+    scroll-margin-top: 72px;
     border-left: 0;
     border-top: 1px solid var(--flash-border);
   }
@@ -4073,6 +4074,20 @@ select[aria-invalid='true'] {
 .time-form select,
 .time-form textarea {
   max-width: 100%;
+}
+.time-entry-identity {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.time-entry-identity label,
+.time-entry-identity label:last-child {
+  min-width: 0;
+  max-width: none;
+}
+@media (max-width: 600px) {
+  .time-entry-identity {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .time-full-text {
   white-space: pre-wrap;

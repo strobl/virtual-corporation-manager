@@ -1,4 +1,8 @@
-# VCM alpha.3 release candidate acceptance
+# VCM candidate acceptance
+
+**Current candidate, 5 September 2026:** `0.1.0-alpha.4-local.1` adds corporation-first setup, company and reporting views, contextual agent placement and recorded-hours navigation. It also fixes company selection after an uncertain save by returning the original change's created company IDs on replay. SQLite schema remains **5**. Its exact source, package checksum, installed-browser review and independent acceptance are recorded in the accompanying candidate evidence. The alpha.3 results below remain historical evidence for their identified bytes; they do not establish acceptance of this newer interface. The current candidate has not been published or run through final-revision remote CI.
+
+## Historical alpha.3 release candidate
 
 **Preparation status, 5 September 2026:** This page concerns **0.1.0-alpha.3**, an **unpublished local release candidate** with SQLite schema **5**. It packages the accepted VCM task-first interface, delivery-hours Time Tracker and Product Studio file workflows. The public alpha.2 artifact remains a separate older release with schema 3. This is engineering acceptance, not customer validation, a human usability pilot or a security certification.
 

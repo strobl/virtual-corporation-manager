@@ -6,7 +6,7 @@
  * who is above whom? It never draws holdings, PropCos or ownership; those are
  * Layer A (the Corporate Structure Explorer). People and agents are the only
  * nodes, and the default Pyramid layout makes the reporting depth obvious at
- * a glance: one row per level, top leader centred at the top.
+ * a glance: one row per reporting depth, with roots at level zero.
  */
 import { useMemo, useState } from 'react';
 import {
@@ -28,18 +28,6 @@ const LAYOUT_LABELS: Record<OrgChartLayout, string> = {
   tree: 'Tree',
   manager: 'Manager',
 };
-
-const LEVEL_CAPTIONS = [
-  'Company lead',
-  'Department heads',
-  'Team leads',
-  'Seniors & specialists',
-  'Individual contributors',
-];
-
-function levelCaption(level: number): string {
-  return LEVEL_CAPTIONS[level] ?? `Level ${level}`;
-}
 
 function KindBadge({ kind }: { kind: OrgPerson['kind'] }) {
   return (
@@ -79,7 +67,7 @@ function PersonCard({
       <span className="truncate text-micro text-muted-foreground">{person.role || '—'}</span>
       <span className="flex flex-wrap items-center gap-1 text-micro text-muted-foreground">
         <KindBadge kind={person.kind} />
-        <span>Level {person.level}</span>
+        <span>Reporting level {person.level}</span>
       </span>
       <span className="truncate text-micro tabular-nums text-muted-foreground">
         {person.directReportIds.length} direct
@@ -281,10 +269,11 @@ export function CorporationOrgChart({
                     className="rounded-xl border border-border bg-surface-header/40 px-3 py-2"
                   >
                     <header className="mb-1.5 flex items-baseline gap-2">
-                      <h4 className="text-xs font-semibold text-foreground">Level {level}</h4>
+                      <h4 className="text-xs font-semibold text-foreground">
+                        Reporting level {level}
+                      </h4>
                       <span className="text-micro text-muted-foreground">
-                        {levelCaption(level)} · {row.length}{' '}
-                        {row.length === 1 ? 'member' : 'members'}
+                        {row.length} {row.length === 1 ? 'member' : 'members'}
                       </span>
                     </header>
                     {groupByDepartment ? (

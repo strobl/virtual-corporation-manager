@@ -1,6 +1,6 @@
 {
   "name": "gitflash",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4-local.1",
   "description": "A local workspace for your company of AI agents",
   "type": "module",
   "license": "MIT",
@@ -22,7 +22,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/strobl/gitflash.git"
+    "url": "git+https://github.com/strobl/virtual-corporation-manager.git"
   },
   "scripts": {
     "dev": "vite --host 127.0.0.1",

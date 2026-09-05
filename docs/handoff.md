@@ -1,8 +1,8 @@
-# VCM alpha.3 release handoff and known limits
+# VCM corporation-first handoff and known limits
 
-**Preparation status, 5 September 2026:** This checkout is the **unpublished local release candidate 0.1.0-alpha.3**, using SQLite schema **5**. It includes the accepted VCM task-first interface, delivery-hours Time Tracker and bounded Product Studio file workflows. The technical repository, package, command and default workspace directory retain their `gitflash` identifiers. The public alpha.2 release is a separate older artifact. Candidate source, package, platform checks and installed workflow evidence must be identified independently; see [acceptance status](acceptance.md).
+**Preparation status, 5 September 2026:** This checkout is the **unpublished corporation-first successor 0.1.0-alpha.4-local.1**, using SQLite schema **5**. It implements **Your corporations → Set up a corporation → Review changes → Apply changes → Company overview**, with real agent/reporting context and recorded delivery hours. Work execution remains optional and secondary. The package, command, environment variables and default workspace directory retain their `gitflash` identifiers; the repository is now `strobl/virtual-corporation-manager`. Public alpha.2 and the earlier frozen alpha.3 archive are separate artifacts. Identify this candidate's source, package, platform checks and browser evidence independently; see [acceptance status](acceptance.md).
 
-The maintainer is [strobl](https://github.com/strobl). Source, issues, pull requests, CI and release artifacts live in [this repository](https://github.com/strobl/gitflash). Publication is a separate review decision. A candidate branch, green unit suite or working local preview does not by itself update the public release or landing page.
+The maintainer is [strobl](https://github.com/strobl). Source, issues, pull requests, CI and release artifacts live in [this repository](https://github.com/strobl/virtual-corporation-manager). Publication is a separate review decision. A candidate branch, green unit suite or working local preview does not by itself update the public release or landing page.
 
 ## Ownership and change process
 
@@ -12,9 +12,11 @@ Use one issue or linked work order for each change. Describe the observed trigge
 
 ## Accepted evidence and remaining release checks
 
-The accompanying alpha.3 release manifest binds the local source commit, tarball hash, file comparison and installed-package receipt. [Acceptance](acceptance.md) attributes the accepted VCM browser/data review, prior actual five-stage runtime results, independent contributor run and 15-job platform matrix to their exact earlier revisions. The alpha.3 preparation changes release metadata and documentation; its rebuilt runtime/CLI must differ only in exact version literals, while browser assets and canonical Ops content remain identical. No provider run is repeated or implied by packaging.
+The earlier alpha.3 release manifest binds its own frozen source, archive hash and installed-package receipt. Those bytes predate this corporation-first successor. [Acceptance](acceptance.md) attributes earlier browser/data review, five-stage runtime results, contributor checks and the platform matrix to their exact revisions. This successor changes browser code, active documentation and repository metadata; its package must receive a new source/archive binding and rendered review. Existing runtime execution, Time Tracker persistence and canonical Ops source contracts are retained. No provider run is repeated or implied by the redesign.
 
-Exact-release-revision CI remains pending because this local candidate is not pushed. Once publication is authorized, the existing PR must receive the reviewed successor, pass the required matrix, and bind the eventual tag and public artifact to the verified source. The public asset must then be downloaded and installed independently. A planned URL is not current availability. Publication of a release and deployment or domain activation of a website are separate actions.
+The current UI uses the canonical corporation-frame SVG identity. Setup uses the existing definition import and atomic preview/apply path. A stale first review refreshes its base without losing the entered definition. An uncertain save retains the same preview receipt and offers **Retry save**, including after tab reload; it does not generate a new import until the server definitely rejects the original save. The new company's overview is selected against the successful preview's exact company baseline. These paths require exact-candidate browser acceptance alongside their focused recovery checks.
+
+At this preparation snapshot, exact-release-revision CI remains pending because this local candidate is not pushed. Once publication is authorized, the existing PR must receive the reviewed successor, pass the required matrix, and bind the eventual tag and public artifact to the verified source. The public asset must then be downloaded and installed independently. A planned URL is not current availability. Publication of a release and deployment or domain activation of a website are separate actions.
 
 Public alpha.2 uses schema 3; upgrading to alpha.3 uses the already tested migration to schema 5. Stop the old workspace and make a verified backup before upgrade. Do not open an upgraded database with the older binary; follow [recovery and rollback](recovery.md). Linux workflow-sandbox proof remains separate from local-core CI, and native Windows workflow checking is unavailable.
 
@@ -34,7 +36,7 @@ Credentials stay in the operator's local environment. Do not paste them into an 
 
 ## Limits to keep visible
 
-- GitFlash supports one local owner and one writer per workspace. Shared/LAN hosting and multi-user authorization are unsupported.
+- VCM supports one local owner and one writer per workspace. Shared/LAN hosting and multi-user authorization are unsupported.
 - Configuring 100 roles starts no runtimes. One company workflow runs at a time, with three active/queued jobs allowed; the separate individual-task queue runs at most one additional task and permits 20 outstanding requests.
 - Individual tasks use a read-only sandbox and return text. Company jobs use workspace-write stage directories, real files, fixed independent checking and separate role sessions. Neither sandbox is a separate OS user or a guarantee of full read isolation.
 - The company workflow checks Python/sandbox capability before provider use. Its fixed checker requires macOS or Linux; native Windows support covers the local company and Time Tracker core.

@@ -15,6 +15,9 @@ import {
 } from '../src/web/model';
 import { buildOrgPyramid } from '../src/lib/organization/org-pyramid';
 import { CorporationOrgChart } from '../src/components/organization/CorporationOrgChart';
+import { AgentPlacement } from '../src/web/AgentPlacement';
+import { EntityEditor } from '../src/web/Dialogs';
+import { agentContextOptions, filterAgentOptions } from '../src/web/agent-context';
 
 function companyOf100(): WorkspaceState {
   const createdAt = '2026-09-04T12:00:00Z';
@@ -183,5 +186,144 @@ describe('local frontend organization adapter', () => {
     expect(html).toContain('data-testid="org-level-1"');
     expect(html).not.toContain('org-person-editor');
     expect(html).not.toContain('Credits');
+    expect(html).toContain('Reporting level 0');
+    expect(html).toContain('Reporting level 1');
+    expect(html).not.toContain('Department heads');
+    expect(html).not.toContain('Team leads');
+    expect(html).not.toContain('Company lead');
+  });
+
+  it('distinguishes globally available same-name managers by company code without changing IDs', () => {
+    const state = companyOf100();
+    state.companies[0].name = 'Product Studio';
+    state.companies[0].shortCode = 'STUDIO';
+    state.companies.push({ ...state.companies[0], id: 'second', shortCode: 'STUDIO-2' });
+    state.departments.push({
+      ...state.departments[0],
+      id: 'second-department',
+      companyId: 'second',
+      managerId: 'second-manager',
+    });
+    const manager = { ...state.agents[0], id: 'second-manager', departmentId: 'second-department' };
+    state.agents.push(manager);
+    state.assignments.push({
+      ...state.assignments[0],
+      id: 'second-assignment',
+      agentId: manager.id,
+      companyId: 'second',
+    });
+    const before = structuredClone(state);
+    const options = agentContextOptions(state, [state.agents[0], manager]);
+    expect(options.map((row) => row.id)).toEqual(['agent-0', 'second-manager']);
+    expect(options[0].label).toContain('Product Studio (STUDIO)');
+    expect(options[1].label).toContain('Product Studio (STUDIO-2)');
+    expect(options[1].label).toContain('Department 0');
+    expect(new Set(options.map((row) => row.label)).size).toBe(2);
+    expect(state).toEqual(before);
+  });
+
+  it('keeps exact identities distinguishable even when name, role, company and department all match', () => {
+    const state = companyOf100();
+    const duplicate = { ...state.agents[0], id: 'agent-0-duplicate' };
+    state.agents.push(duplicate);
+    state.assignments.push({
+      ...state.assignments[0],
+      id: 'duplicate-assignment',
+      agentId: duplicate.id,
+    });
+    const options = agentContextOptions(state, [state.agents[0], duplicate]);
+    expect(new Set(options.map((row) => row.label)).size).toBe(2);
+    expect(options[0].label).toContain('ID agent-0');
+    expect(options[1].label).toContain('ID agent-0-duplicate');
+    expect(options.map((row) => row.id)).toEqual(['agent-0', 'agent-0-duplicate']);
+  });
+
+  it('finds a manager among 100 agents by role, company and department while retaining an unmatched current selection', () => {
+    const state = companyOf100();
+    state.agents[99].name = 'Zoë Müller';
+    const options = agentContextOptions(state, state.agents);
+    expect(options).toHaveLength(100);
+    expect(filterAgentOptions(options, 'release department 9 EX').map((row) => row.id)).toEqual([
+      'agent-99',
+    ]);
+    expect(filterAgentOptions(options, 'zoe muller').map((row) => row.id)).toEqual(['agent-99']);
+    expect(filterAgentOptions(options, 'missing query')).toEqual([]);
+    expect(filterAgentOptions(options, 'missing query', 'agent-2').map((row) => row.id)).toEqual([
+      'agent-2',
+    ]);
+    expect(filterAgentOptions(options, '')).toEqual(options);
+  });
+
+  it('shows selected company placement and truthful external reporting context without duplicating instructions', () => {
+    const state = companyOf100();
+    state.companies.push({
+      ...state.companies[0],
+      id: 'second',
+      name: 'Second Company',
+      shortCode: 'SECOND',
+    });
+    state.assignments.push({
+      ...state.assignments[99],
+      id: 'shared-assignment',
+      companyId: 'second',
+      isPrimary: false,
+    });
+    state.agents[99].instructions = 'A long operational document that belongs below placement.';
+    const html = renderToStaticMarkup(
+      createElement(AgentPlacement, {
+        state,
+        agent: state.agents[99],
+        companyId: 'second',
+        onAssignments: () => {},
+      }),
+    );
+    expect(html).toContain('Second Company (SECOND)');
+    expect(html).toContain('Department 9');
+    expect(html).toContain('Example Studio (EX)');
+    expect(html).toContain('Agent 90');
+    expect(html).toContain('Reports outside this corporation.');
+    expect(html).toContain('Also assigned to');
+    expect(html).not.toContain(state.agents[99].instructions);
+  });
+
+  it('keeps 100 real manager options and a search input in Create agent without making company-local restrictions', () => {
+    const html = renderToStaticMarkup(
+      createElement(EntityEditor, {
+        state: companyOf100(),
+        target: { kind: 'agent', companyId: 'company' },
+        busy: false,
+        error: null,
+        onClose: () => {},
+        onSubmit: async () => {},
+      }),
+    );
+    expect(html).toContain('Find a manager');
+    expect(html).toContain('Name, role, company or department');
+    expect(html).toContain('Example Studio (EX)');
+    expect(html.match(/<option value="agent-/g) ?? []).toHaveLength(100);
+    expect(html).toContain('The reporting line applies across this agent’s company assignments.');
+  });
+
+  it('edits valid 1- and 24-character company codes using a browser-valid pattern', () => {
+    for (const shortCode of ['X', 'X'.repeat(24)]) {
+      const state = companyOf100();
+      state.companies[0].shortCode = shortCode;
+      const html = renderToStaticMarkup(
+        createElement(EntityEditor, {
+          state,
+          target: { kind: 'company', id: 'company' },
+          busy: false,
+          error: null,
+          onClose: () => {},
+          onSubmit: async () => {},
+        }),
+      );
+      expect(html).toContain('minLength="1"');
+      expect(html).toContain('maxLength="24"');
+      const pattern = html.match(/pattern="([^"]+)"/)![1];
+      expect(new RegExp(`^(?:${pattern})$`, 'v').test(shortCode)).toBe(true);
+      expect(new RegExp(`^(?:${pattern})$`, 'v').test('X'.repeat(25))).toBe(false);
+      expect(new RegExp(`^(?:${pattern})$`, 'v').test('A-B_2')).toBe(true);
+    }
   });
 });

@@ -31,6 +31,7 @@ import { brand } from './identity';
 import type {
   Agent,
   ChangePreview,
+  CompanyDefinition,
   DomainCommand,
   TemplateSummary,
   WorkspaceState,
@@ -51,6 +52,18 @@ import {
 } from './model';
 import { Dialog, EntityEditor, PreviewDialog, type EditorTarget } from './Dialogs';
 import { CompanyMap } from './CompanyMap';
+import { CorporationWorkspace } from './CorporationWorkspace';
+import { CorporationSetup } from './CorporationSetup';
+import { AgentPlacement } from './AgentPlacement';
+import {
+  applyRecovery,
+  prepareRecoverableChange,
+  readPendingApply,
+  PENDING_APPLY_KEY,
+  type ApplyRecovery,
+  type PendingChange,
+} from './change-recovery';
+import type { TimeSnapshot } from '../time/contracts';
 import { TextDisclosure, textExcerpt } from './TextDisclosure';
 import { BrandMark } from './BrandMark';
 import { createWorkViewModel, getRunTargetCompany, workAgentDestination } from './work-view-model';
@@ -66,10 +79,19 @@ import {
   type RunInfo,
 } from './Work';
 
-type Area = 'home' | 'organization' | 'work' | 'time' | 'integrations' | 'activity' | 'settings';
+type Area =
+  | 'home'
+  | 'corporation'
+  | 'organization'
+  | 'work'
+  | 'time'
+  | 'integrations'
+  | 'activity'
+  | 'settings';
 type View = 'map' | 'reporting' | 'list';
 const AREA_NAMES: Record<Area, string> = {
-  home: 'Home',
+  home: 'Your corporations',
+  corporation: 'Company overview',
   organization: 'Organization',
   work: 'Work',
   time: 'Time Tracker',
@@ -78,27 +100,45 @@ const AREA_NAMES: Record<Area, string> = {
   settings: 'Settings',
 };
 const AREAS = [
-  { id: 'home', icon: House },
-  { id: 'organization', icon: Building2 },
-  { id: 'work', icon: Activity },
+  { id: 'home', icon: Building2 },
+  { id: 'corporation', icon: House },
+  { id: 'organization', icon: GitBranch },
   { id: 'time', icon: Clock3 },
+  { id: 'work', icon: Activity },
   { id: 'integrations', icon: PlugZap },
 ] as const;
-type PendingChange =
-  | { kind: 'commands'; commands: DomainCommand[]; summary: string }
-  | { kind: 'template'; id: string };
 const message = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Please try again.';
 
 export function App() {
+  const [resumingApply] = useState(() => readPendingApply(sessionStorage));
+  const [saveRecovery, setSaveRecovery] = useState<ApplyRecovery | null>(
+    resumingApply ? 'retry' : null,
+  );
   const [state, setState] = useState<WorkspaceState | null>(null);
   const [templates, setTemplates] = useState<TemplateSummary[]>([]);
   const [status, setStatus] = useState<IntegrationStatus | null>(null);
   const [runs, setRuns] = useState<RunInfo[]>([]);
   const [jobs, setJobs] = useState<JobInfo[]>([]);
-  const [area, setArea] = useState<Area>('home');
+  const [area, setArea] = useState<Area>(() => {
+    const saved = new URLSearchParams(location.search).get('area');
+    return saved && Object.hasOwn(AREA_NAMES, saved) ? (saved as Area) : 'home';
+  });
+  const [timeSnapshot, setTimeSnapshot] = useState<TimeSnapshot | null>(null);
+  const [timeError, setTimeError] = useState<string | null>(null);
+  const [corporationSetupOpen, setCorporationSetupOpen] = useState(false);
+  const previewCompanyIds = useRef<Set<string>>(new Set(resumingApply?.companyIds ?? []));
+  const [bookingRequest, setBookingRequest] = useState<{
+    id: number;
+    companyId: string;
+    agentId: string | null;
+  } | null>(null);
+  const bookingSequence = useRef(0);
   useEffect(() => {
-    document.getElementById('main')?.focus();
+    const workspace = document.getElementById('main');
+    workspace?.focus({ preventScroll: true });
+    workspace?.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [area]);
   const [workScope, setWorkScope] = useState<'company' | 'all'>('company');
   const [workMode, setWorkMode] = useState<'jobs' | 'tasks'>('jobs');
@@ -113,15 +153,19 @@ export function App() {
   const [editor, setEditor] = useState<EditorTarget | null>(null);
   const [templatesOpen, setTemplatesOpen] = useState(false);
   const [advanced, setAdvanced] = useState<AdvancedTarget | null>(null);
-  const [preview, setPreview] = useState<ChangePreview | null>(null);
+  const [preview, setPreview] = useState<ChangePreview | null>(resumingApply?.preview ?? null);
   const [undoPreview, setUndoPreview] = useState<UndoPreview | null>(null);
-  const [pending, setPending] = useState<PendingChange | null>(null);
+  const [pending, setPending] = useState<PendingChange | null>(resumingApply?.change ?? null);
   const [runAgent, setRunAgent] = useState<Agent | null>(null);
   const [initialRunId, setInitialRunId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [modalError, setModalError] = useState<string | null>(null);
+  const [modalError, setModalError] = useState<string | null>(
+    resumingApply
+      ? 'A previous save still needs confirmation. Retry the same save to recover its result.'
+      : null,
+  );
   const [toast, setToast] = useState<string | null>(null);
   const [navOpen, setNavOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
@@ -134,6 +178,17 @@ export function App() {
     } else if (drawerUsed.current) menuButton.current?.focus();
   }, [navOpen]);
   const [showInspector, setShowInspector] = useState(false);
+  const inspector = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (
+      area !== 'organization' ||
+      !showInspector ||
+      !window.matchMedia('(max-width: 920px)').matches
+    )
+      return;
+    inspector.current?.focus({ preventScroll: true });
+    inspector.current?.scrollIntoView({ block: 'start', behavior: 'instant' });
+  }, [area, showInspector, selection?.kind, selection?.id]);
   const [historicalIdentity, setHistoricalIdentity] = useState<{
     agentId?: string;
     companyId: string;
@@ -147,6 +202,7 @@ export function App() {
       request<IntegrationStatus>('/api/integrations'),
       request<RunInfo[]>('/api/runs'),
       request<JobInfo[]>('/api/jobs'),
+      request<TimeSnapshot>('/api/time'),
     ]);
     if (results[0].status === 'fulfilled') {
       setState(results[0].value);
@@ -156,6 +212,12 @@ export function App() {
     if (results[2].status === 'fulfilled') setStatus(results[2].value);
     if (results[3].status === 'fulfilled') setRuns(results[3].value);
     if (results[4].status === 'fulfilled') setJobs(results[4].value);
+    if (results[5].status === 'fulfilled') {
+      setTimeSnapshot(results[5].value);
+      setTimeError(null);
+    } else {
+      setTimeError(message(results[5].reason));
+    }
     setLoading(false);
   }, []);
   useEffect(() => {
@@ -174,10 +236,12 @@ export function App() {
   }, [toast]);
   useEffect(() => {
     const url = new URL(location.href);
+    if (area === 'home') url.searchParams.delete('area');
+    else url.searchParams.set('area', area);
     if (selection) url.searchParams.set('selected', selectionKey(selection));
     else url.searchParams.delete('selected');
     history.replaceState(null, '', url);
-  }, [selection]);
+  }, [selection, area]);
   useEffect(() => {
     if (!state) return;
     const valid =
@@ -224,68 +288,104 @@ export function App() {
     setModalError(null);
     setAdvanced(target);
   };
+  const createCorporation = () => {
+    setModalError(null);
+    setSetupAction(null);
+    setCorporationSetupOpen(true);
+    setNavOpen(false);
+  };
   const openEditor = (target: EditorTarget) => {
     setModalError(null);
     setEditor(target);
   };
   const announce = (text: string) => setToast(text);
-  const prepare = async (change: PendingChange, revision?: number) => {
-    if (!state) return;
+  const clearSaveReceipt = () => {
+    try {
+      sessionStorage.removeItem(PENDING_APPLY_KEY);
+    } catch {
+      /* In-memory recovery remains available. */
+    }
+  };
+  const prepare = async (change: PendingChange, baseState = state) => {
+    if (!baseState || saveRecovery === 'retry') return;
     setBusy(true);
     setModalError(null);
     setPending(change);
     try {
-      const next =
-        change.kind === 'template'
-          ? await client.template(change.id, revision ?? state.revision)
-          : await client.preview(change.commands, revision ?? state.revision, change.summary);
-      setPreview(next);
+      const prepared = await prepareRecoverableChange(change, baseState, setState);
+      previewCompanyIds.current = new Set(prepared.baseState.companies.map((row) => row.id));
+      setPreview(prepared.preview);
+      setSaveRecovery(null);
       setEditor(null);
       setTemplatesOpen(false);
       setAdvanced(null);
     } catch (cause) {
       setModalError(message(cause));
-      if (!editor && !preview && !templatesOpen && !advanced) setError(message(cause));
+      if (!editor && !preview && !templatesOpen && !advanced && !corporationSetupOpen)
+        setError(message(cause));
     } finally {
       setBusy(false);
     }
   };
   const refreshPreview = async () => {
-    if (!pending) return;
+    if (!pending || saveRecovery === 'retry') return;
+    setBusy(true);
     try {
       const fresh = await client.state();
       setState(fresh);
-      await prepare(pending, fresh.revision);
+      await prepare(pending, fresh);
     } catch (cause) {
       setModalError(message(cause));
+    } finally {
+      setBusy(false);
     }
   };
   const apply = async () => {
-    if (!preview) return;
+    if (!preview || busy || saveRecovery === 'refresh') return;
     setBusy(true);
     setModalError(null);
+    // A reload must keep the same idempotent preview receipt after an interrupted response.
+    try {
+      sessionStorage.setItem(
+        PENDING_APPLY_KEY,
+        JSON.stringify({
+          preview,
+          companyIds: [...previewCompanyIds.current],
+          change: pending,
+          corporationSetup: corporationSetupOpen,
+        }),
+      );
+    } catch {
+      /* The mounted dialog still retains the same receipt if storage is unavailable. */
+    }
     try {
       const result = await client.apply(preview.id);
+      clearSaveReceipt();
       setState(result.state);
-      if (setupAction || (pending?.kind === 'template' && pending.id === 'product-studio')) {
-        const created = result.state.companies.find(
-          (company) => !state?.companies.some((previous) => previous.id === company.id),
-        );
-        if (created) setSelection({ kind: 'company', id: created.id });
+      const created = result.state.companies.find(
+        (row) => row.status === 'active' && result.createdCompanyIds.includes(row.id),
+      );
+      if (created) {
+        setSelection({ kind: 'company', id: created.id });
+        setShowInspector(false);
         setWorkScope('company');
-        setWorkMode('jobs');
-        setArea(setupAction === 'time' ? 'time' : 'work');
-        if (setupAction === 'task' && created) setStartRequested(true);
+        setArea('corporation');
       }
+      setSaveRecovery(null);
+      setStartRequested(false);
+      setCorporationSetupOpen(false);
       setSetupAction(null);
       setPreview(null);
       setPending(null);
       announce(
         result.replayed
-          ? 'This change was already applied.'
+          ? 'Your previous save is confirmed. No duplicate change was created.'
           : 'Changes saved. Your company is up to date.',
       );
     } catch (cause) {
+      const recovery = applyRecovery(cause);
+      setSaveRecovery(recovery);
+      if (recovery === 'refresh') clearSaveReceipt();
       setModalError(message(cause));
     } finally {
       setBusy(false);
@@ -338,6 +438,7 @@ export function App() {
         )),
   );
   const navigate = (value: Area) => {
+    setBookingRequest(null);
     setStartRequested(false);
     setSetupAction(null);
     setInitialRunId(null);
@@ -349,32 +450,28 @@ export function App() {
     setArea(value);
     setNavOpen(false);
   };
-  const startTask = () => {
+  const openCorporation = (id: string) => {
+    select({ kind: 'company', id });
+    navigate('corporation');
+  };
+  const logTime = () => {
     if (!companyId) {
-      setSetupAction('task');
-      setModalError(null);
-      setTemplatesOpen(true);
+      createCorporation();
       return;
     }
-    setInitialRunId(null);
-    setWorkScope('company');
-    setWorkMode('jobs');
-    setStartRequested(true);
-    setArea('work');
-    setNavOpen(false);
+    navigate('time');
+    setBookingRequest({
+      id: ++bookingSequence.current,
+      companyId,
+      agentId: selectedAgent?.id ?? null,
+    });
   };
-  const reviewResults = () => {
-    navigate('work');
-    setWorkMode(
-      companyJobs.some((job) => job.status === 'waiting_owner')
-        ? 'jobs'
-        : companyWork?.stats.reviewable
-          ? 'tasks'
-          : companyJobs.length || !runs.some((run) => run.companyId === companyId)
-            ? 'jobs'
-            : 'tasks',
-    );
-  };
+  const reviewCorporation = (definition: CompanyDefinition) =>
+    prepare({
+      kind: 'commands',
+      commands: [{ type: 'definition.import', definition }],
+      summary: `Create corporation: ${definition.name}`,
+    });
   const openAgentContext = (id: string, originCompanyId: string) => {
     if (!state) return;
     if (workAgentDestination(state, id, originCompanyId).kind === 'historical') {
@@ -396,7 +493,7 @@ export function App() {
 
   return (
     <div
-      className="gitflash vcm-workspace"
+      className="gitflash vcm-workspace corporation-app"
       style={{ '--brand-accent': brand.accent } as React.CSSProperties}
     >
       <a className="skip-link" href="#main">
@@ -446,38 +543,40 @@ export function App() {
         </button>
         <a className="brand" href="/" aria-label={`${brand.name} home`}>
           <span className="brand-copy">
-            <img className="brand-lockup" src="/vcm-wordmark.svg" width={112} height={40} alt="" />
+            <img className="brand-lockup" src="/vcm-lockup.svg" width={123} height={34} alt="" />
             <small>{brand.descriptor}</small>
           </span>
           <span className="local-badge">local</span>
         </a>
         <nav className="primary-nav" aria-label="Primary">
-          {AREAS.map(({ id, icon: Icon }) => (
-            <button
-              className={area === id ? 'active' : ''}
-              aria-current={area === id ? 'page' : undefined}
-              onClick={() => navigate(id)}
-              key={id}
-            >
-              <Icon size={17} />
-              {AREA_NAMES[id]}
-              {id === 'work' && companyReviewCount > 0 && (
-                <span
-                  className="activity-count"
-                  aria-label={`${companyReviewCount} results need your review in ${company?.name ?? 'this company'}`}
-                >
-                  {companyReviewCount}
-                </span>
-              )}
-            </button>
-          ))}
+          {AREAS.filter(({ id }) => companyId || !['corporation', 'organization'].includes(id)).map(
+            ({ id, icon: Icon }) => (
+              <button
+                className={`${area === id ? 'active' : ''}${id === 'work' ? ' secondary-nav-start' : ''}`}
+                aria-current={area === id ? 'page' : undefined}
+                onClick={() => navigate(id)}
+                key={id}
+              >
+                <Icon size={17} />
+                {AREA_NAMES[id]}
+                {id === 'work' && companyReviewCount > 0 && (
+                  <span
+                    className="activity-count"
+                    aria-label={`${companyReviewCount} results need your review in ${company?.name ?? 'this company'}`}
+                  >
+                    {companyReviewCount}
+                  </span>
+                )}
+              </button>
+            ),
+          )}
         </nav>
         <div className="sidebar-label">
           <span>YOUR COMPANIES</span>
           <button
             className="icon-button"
-            aria-label="Create company"
-            onClick={() => openEditor({ kind: 'company' })}
+            aria-label="Set up a corporation"
+            onClick={createCorporation}
           >
             <Plus size={16} />
           </button>
@@ -509,7 +608,7 @@ export function App() {
                 const next = parseSelection(key);
                 if (next) {
                   select(next);
-                  setArea('organization');
+                  navigate(next.kind === 'company' ? 'corporation' : 'organization');
                 }
               }}
             />
@@ -559,19 +658,19 @@ export function App() {
           </span>
           <div className="breadcrumb">
             <span>{AREA_NAMES[area]}</span>
-            {company && area === 'organization' && (
+            {company && ['corporation', 'organization', 'time', 'work'].includes(area) && (
               <>
                 <ChevronRight size={14} />
                 <button onClick={() => select({ kind: 'company', id: company.id })}>
                   {company.name}
                 </button>
-                {selectedDepartment && (
+                {area === 'organization' && selectedDepartment && (
                   <>
                     <ChevronRight size={14} />
                     <span>{selectedDepartment.name}</span>
                   </>
                 )}
-                {selectedAgent && (
+                {area === 'organization' && selectedAgent && (
                   <>
                     <ChevronRight size={14} />
                     <span>{selectedAgent.name}</span>
@@ -628,85 +727,40 @@ export function App() {
             </div>
           ) : (
             <>
-              {area === 'home' && (
-                <section className="task-home" aria-label="Workspace actions">
-                  <div className="task-home-intro">
-                    <span className="eyebrow">{brand.descriptor}</span>
-                    <h1>What do you want to get done?</h1>
-                    <p>Run a task, review the result, or keep track of delivery hours.</p>
-                  </div>
-                  <div className="task-actions">
-                    {[
-                      {
-                        label: 'Run a task',
-                        description: 'Choose a company task and review the brief.',
-                        icon: Play,
-                        action: startTask,
-                      },
-                      {
-                        label: 'Review results',
-                        description: 'Open the files, check the evidence, and decide.',
-                        icon: CheckCircle2,
-                        action: reviewResults,
-                      },
-                      {
-                        label: 'Track delivery hours',
-                        description: 'Book hours and review your delivery history.',
-                        icon: Clock3,
-                        action: () => navigate('time'),
-                      },
-                      {
-                        label: 'Set up a company',
-                        description: 'Create a company and organize its team.',
-                        icon: Building2,
-                        action: () => openEditor({ kind: 'company' }),
-                      },
-                    ].map(({ label, description, icon: Icon, action }) => (
-                      <button className="task-action" key={label} onClick={action}>
-                        <span className="task-action-icon">
-                          <Icon size={25} />
-                        </span>
-                        <span className="task-action-copy">
-                          <strong>{label}</strong>
-                          <span>{description}</span>
-                        </span>
-                        <ArrowUpRight size={18} aria-hidden="true" />
-                      </button>
-                    ))}
-                  </div>
-                  <div className="task-home-context">
-                    {activeCompanies.length ? (
-                      <>
-                        <label htmlFor="home-company">Working in</label>
-                        <select
-                          id="home-company"
-                          value={companyId ?? ''}
-                          onChange={(event) => select({ kind: 'company', id: event.target.value })}
-                        >
-                          {activeCompanies.map((item) => (
-                            <option key={item.id} value={item.id}>
-                              {item.name}
-                            </option>
-                          ))}
-                        </select>
-                        <button className="text-button" onClick={() => navigate('organization')}>
-                          View organization <ArrowRight size={14} />
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <p>Start with a company. You can review its setup before saving.</p>
-                        <button className="text-button" onClick={() => setTemplatesOpen(true)}>
-                          Browse company templates <ArrowRight size={14} />
-                        </button>
-                      </>
-                    )}
-                  </div>
-                  <p className="task-home-note">
-                    <ShieldCheck size={15} /> Saved on your computer. Starting work always requires
-                    your confirmation.
-                  </p>
-                </section>
+              {(area === 'home' || area === 'corporation') && (
+                <CorporationWorkspace
+                  mode={area === 'home' ? 'index' : 'company'}
+                  state={state}
+                  companyId={companyId}
+                  time={timeSnapshot}
+                  timeError={timeError}
+                  onRefresh={() => void refresh()}
+                  onCreate={createCorporation}
+                  onBrowseTemplates={() => {
+                    setModalError(null);
+                    setSetupAction(null);
+                    setTemplatesOpen(true);
+                  }}
+                  onImport={() => openAdvanced({ kind: 'import' })}
+                  onOpenCompany={openCorporation}
+                  onEditCompany={() => companyId && openEditor({ kind: 'company', id: companyId })}
+                  onAddAgent={() => companyId && openEditor({ kind: 'agent', companyId })}
+                  onAddDepartment={() => companyId && openEditor({ kind: 'department', companyId })}
+                  onManageOrganization={() => {
+                    setView('reporting');
+                    navigate('organization');
+                  }}
+                  onOpenAgent={(id) => {
+                    if (companyId) {
+                      select({ kind: 'agent', id, companyId });
+                      setView('reporting');
+                      navigate('organization');
+                      setShowInspector(true);
+                    }
+                  }}
+                  onLogTime={logTime}
+                  onViewTime={() => navigate('time')}
+                />
               )}
               {area === 'organization' && (
                 <>
@@ -716,10 +770,7 @@ export function App() {
                       <h1>Set up your company</h1>
                       <p>Create a company, then add its team or start from a template.</p>
                       <div className="welcome-actions">
-                        <button
-                          className="button primary"
-                          onClick={() => openEditor({ kind: 'company' })}
-                        >
+                        <button className="button primary" onClick={createCorporation}>
                           Set up a company <ArrowRight size={16} />
                         </button>
                         <button className="button" onClick={() => setTemplatesOpen(true)}>
@@ -740,7 +791,7 @@ export function App() {
                             <h1>{company?.name ?? 'Your organization'}</h1>
                             <p>
                               {textExcerpt(company?.description ?? '', 140) ||
-                                'A company structure. Work starts with a task.'}
+                                'Define the team, reporting lines and responsibilities behind your corporation.'}
                             </p>
                           </div>
                         </div>
@@ -887,7 +938,12 @@ export function App() {
                           )}
                         </div>
                         {showInspector && company && selection && (
-                          <aside className="inspector" aria-label="Inspector">
+                          <aside
+                            className="inspector"
+                            aria-label="Inspector"
+                            ref={inspector}
+                            tabIndex={-1}
+                          >
                             <div className="inspector-top">
                               <span>{selection.kind} details</span>
                               <button
@@ -928,6 +984,9 @@ export function App() {
                                 <Pencil size={12} />
                                 Edit details
                               </button>
+                              <button className="button small-button" onClick={logTime}>
+                                <Plus size={13} /> Log time
+                              </button>
                               <button
                                 className="button small-button"
                                 onClick={() => navigate('time')}
@@ -937,6 +996,14 @@ export function App() {
                             </div>
                             {selectedAgent ? (
                               <>
+                                <AgentPlacement
+                                  state={state}
+                                  agent={selectedAgent}
+                                  companyId={companyId}
+                                  onAssignments={() =>
+                                    openAdvanced({ kind: 'assignments', agentId: selectedAgent.id })
+                                  }
+                                />
                                 <section className="inspector-section">
                                   <h3>Responsibilities</h3>
                                   {selectedAgent.responsibilities.length ? (
@@ -955,38 +1022,6 @@ export function App() {
                                     {selectedAgent.instructions ||
                                       'Add working context and constraints to guide this agent.'}
                                   </p>
-                                </section>
-                                <section className="inspector-section">
-                                  <div className="section-title">
-                                    <h3>Organization</h3>
-                                    <button
-                                      className="text-button"
-                                      onClick={() =>
-                                        openAdvanced({
-                                          kind: 'assignments',
-                                          agentId: selectedAgent.id,
-                                        })
-                                      }
-                                    >
-                                      Assignments
-                                    </button>
-                                  </div>
-                                  <dl className="details-list">
-                                    <dt>Department</dt>
-                                    <dd>
-                                      {state.departments.find(
-                                        (row) => row.id === selectedAgent.departmentId,
-                                      )?.name ?? 'Company level'}
-                                    </dd>
-                                    <dt>Reports to</dt>
-                                    <dd>
-                                      {state.agents.find(
-                                        (row) => row.id === selectedAgent.managerId,
-                                      )?.name ?? 'No manager'}
-                                    </dd>
-                                    <dt>Type</dt>
-                                    <dd>{selectedAgent.kind === 'agent' ? 'AI agent' : 'Human'}</dd>
-                                  </dl>
                                 </section>
                                 <section className="inspector-section run-cta">
                                   <h3>Put this agent to work</h3>
@@ -1233,9 +1268,7 @@ export function App() {
                         <button
                           className="button"
                           onClick={() => {
-                            setSetupAction('time');
-                            setModalError(null);
-                            setTemplatesOpen(true);
+                            createCorporation();
                           }}
                         >
                           Set up a company
@@ -1250,6 +1283,12 @@ export function App() {
                     onChanged={refresh}
                     onOpenAgent={openAgentContext}
                     onOpenCompany={openCompanyContext}
+                    bookingRequest={bookingRequest}
+                    onBookingRequestConsumed={() => setBookingRequest(null)}
+                    onAddAgent={(id) => {
+                      select({ kind: 'company', id });
+                      openEditor({ kind: 'agent', companyId: id });
+                    }}
                   />
                 </>
               )}
@@ -1464,6 +1503,21 @@ export function App() {
           </button>
         </div>
       )}
+      {corporationSetupOpen && (
+        <CorporationSetup
+          busy={busy}
+          error={modalError}
+          reviewing={Boolean(preview)}
+          onReview={reviewCorporation}
+          onClose={() => {
+            if (!busy) {
+              setCorporationSetupOpen(false);
+              setModalError(null);
+              setPending(null);
+            }
+          }}
+        />
+      )}
       {advanced && state && (
         <AdvancedDialog
           target={advanced}
@@ -1497,9 +1551,13 @@ export function App() {
           preview={preview}
           busy={busy}
           error={modalError}
+          recovery={saveRecovery}
           onClose={() => {
-            if (!busy) {
+            if (!busy && saveRecovery !== 'retry') {
               setPreview(null);
+              setSaveRecovery(null);
+              clearSaveReceipt();
+              setCorporationSetupOpen(false);
               setPending(null);
               setModalError(null);
               setSetupAction(null);

@@ -1,12 +1,14 @@
-# Product Studio support triage
+# VCM support triage
 
-Before starting, fill **Acceptance owner** with the person or responsible role who will review the result. No account or legal name is required. Expand **Review the brief, criteria and sample data** to read the exact source materials. The named owner and start authority are captured with the job; final acceptance remains a separate decision.
+This guide covers corporation setup, organization, delivery-hours and optional Product Studio reports. The [first-company guide](first-company.md) begins at **Your corporations → Set up a corporation**, followed by reviewed creation and the real company overview. Record the source/archive identity as well as the `gitflash --version` output; older archives may share the current candidate's version number.
 
-This guide covers the native PS-001 workflow described in [FIRST-COMPANY.md](first-company.md). Its entry point is **Work → Company jobs → Set up first job → Start job** for the selected Product Studio; candidate files are created by the workflow and delivered through its artifact bundle. The final installed package and button sequence still require verification.
+For the native PS-001 workflow, the separate entry is **Work → Company jobs → Set up first job → Start job** for a Product Studio with the required roles. The acceptance owner and start authority are captured with the job; final acceptance remains a separate decision. Candidate files are created by that workflow and delivered through its artifact bundle. **Preparation status, 5 September 2026:** exact installed-package and rendered successor acceptance remains tracked separately; see [acceptance](acceptance.md).
+
+A stale initial setup review must retain the entered definition. An uncertain Apply outcome must retain and retry the same preview receipt; do not recommend a fresh import until the original save has been confirmed or definitely rejected. For hours reports, identify the selected company/member, entry, date, basis and correction/void history separately from any runtime record.
 
 ## Intake and responsibility
 
-Use [GitFlash Issues](https://github.com/strobl/gitflash/issues) for appropriate public reports and [private vulnerability reporting](https://github.com/strobl/gitflash/security/advisories/new) for suspected vulnerabilities. The included [support guide](support.md) defines the minimal redacted report. Public replies require an authorized maintainer.
+Use [VCM Issues](https://github.com/strobl/virtual-corporation-manager/issues) for appropriate public reports and [private vulnerability reporting](https://github.com/strobl/virtual-corporation-manager/security/advisories/new) for suspected vulnerabilities. The included [support guide](support.md) defines the minimal redacted report. Public replies require an authorized maintainer.
 
 The repository's administrative maintainer is `strobl`. A named operational receiving person and backup/escalation arrangement for this release have not been confirmed. The functions below describe responsibility; they are not claims of actual GitHub assignment, staffed capacity or an on-call commitment. PMO must confirm the receiver and backup with the maintainer before claiming operational coverage. No paid-support SLA or response deadline is promised.
 
@@ -33,7 +35,7 @@ For ordinary defects, follow the actual job authorization and the narrower permi
 
 Use existing labels when applicable: `question` for clarification or missing evidence, `documentation` for a guide correction, `bug` for a triaged product defect or suspected defect, and `accessibility` for an accessibility barrier. A label does not prove reproduction or assignment. The current bug template has no default label or assignee. Private security reporting must not be replaced by a public label. No additional label is required by this guide.
 
-Give potential exposure/data loss first attention, then reproducible installation/first-output/saved-work blockers, then wording and nonblocking usability. PMO owns final priority and participant impact. This ordering creates no response-time promise.
+Give potential exposure/data loss first attention, then reproducible installation/setup/time-entry/first-output/saved-work blockers, then wording and nonblocking usability. PMO owns final priority and participant impact. This ordering creates no response-time promise.
 
 Record the category, version, evidence, next responsible function, authorized next action, request/repair counts and current state. Any acknowledgment should state the known next action and remaining evidence; do not invent a recipient acknowledgment or ETA.
 

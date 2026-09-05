@@ -1,6 +1,6 @@
 # Product Studio workflow
 
-**Local release candidate 0.1.0-alpha.3, prepared 5 September 2026,** includes a bounded software job, **PS-001: stock alert export**. At preparation, alpha.3 is **UNPUBLISHED** and public alpha.2 remains unchanged; alpha.2 does not include this company workflow. Open **Home → Run a task**; in an empty workspace, choose and review **Product Studio (5 seats)** or **100-agent Product Studio** before continuing to the job form. Review its inputs and execution permission, then explicitly choose **Start job**. The same form remains available under **Work → Company jobs → Set up first job**. The 100-agent template contains five operational workflow seats; it does not launch 100 concurrent agents. The 20-agent template remains a lightweight configuration template.
+**Unpublished corporation-first candidate 0.1.0-alpha.4-local.1, prepared 5 September 2026,** retains the bounded software job **PS-001: stock alert export**. Public alpha.2 does not include this workflow. Start with **Your corporations → Browse company templates** and review **Product Studio (5 seats)** or **100-agent Product Studio**. Applying the template opens its company overview without starting any job. Then open **Work → Company jobs → Set up first job**, review the inputs and execution permission, name the acceptance owner and explicitly choose **Start job**. The 100-agent template contains five operational workflow seats; it does not launch 100 concurrent agents. The 20-agent template remains a lightweight configuration template.
 
 ## What Start authorizes
 

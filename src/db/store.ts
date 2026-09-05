@@ -681,8 +681,23 @@ export function createWorkspaceStore(dataDir: string): WorkspaceStore {
         const preview = db.prepare('SELECT * FROM previews WHERE id=?').get(previewId);
         check(preview, 'NOT_FOUND', 'Preview not found. Create a new preview.');
         const before = readSnapshot(db);
-        if (preview.appliedChangeId)
-          return { state: before, changeId: String(preview.appliedChangeId), replayed: true };
+        if (preview.appliedChangeId) {
+          const change = db
+            .prepare('SELECT beforeJson,afterJson FROM changes WHERE id=?')
+            .get(String(preview.appliedChangeId));
+          check(change, 'INVALID_STATE', 'The saved change receipt could not be found.');
+          const originalBefore = JSON.parse(String(change.beforeJson)) as WorkspaceState;
+          const originalAfter = JSON.parse(String(change.afterJson)) as WorkspaceState;
+          const existingIds = new Set(originalBefore.companies.map((company) => company.id));
+          return {
+            state: before,
+            changeId: String(preview.appliedChangeId),
+            replayed: true,
+            createdCompanyIds: originalAfter.companies
+              .filter((company) => !existingIds.has(company.id))
+              .map((company) => company.id),
+          };
+        }
         assertRevision(Number(preview.baseRevision), before);
         const after = JSON.parse(String(preview.afterJson)) as WorkspaceState;
         after.revision = before.revision + 1;
@@ -703,7 +718,15 @@ export function createWorkspaceStore(dataDir: string): WorkspaceStore {
           changesWork ? 0 : 1,
         );
         db.prepare('UPDATE previews SET appliedChangeId=? WHERE id=?').run(changeId, previewId);
-        return { state: readSnapshot(db), changeId, replayed: false };
+        const existingIds = new Set(before.companies.map((company) => company.id));
+        return {
+          state: readSnapshot(db),
+          changeId,
+          replayed: false,
+          createdCompanyIds: after.companies
+            .filter((company) => !existingIds.has(company.id))
+            .map((company) => company.id),
+        };
       });
     },
     previewUndo(changeId: string, baseRevision: number): UndoPreview {

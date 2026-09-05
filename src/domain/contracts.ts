@@ -163,6 +163,8 @@ export interface ApplyResult {
   state: WorkspaceState;
   changeId: string;
   replayed: boolean;
+  /** Identities created by this committed change, even if a replay returns newer state. */
+  createdCompanyIds: string[];
 }
 export interface TemplateSummary {
   id: string;

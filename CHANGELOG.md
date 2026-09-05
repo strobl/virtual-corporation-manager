@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.0-alpha.4-local.1 — corporation-first review candidate, unpublished
+
+- Open on Your corporations, with a reviewed identity/structure setup and direct access to existing company templates. Saving opens the created corporation.
+- Show real agent/reporting structure and recorded weekly hours, with direct agent management and time logging. Keep optional Work secondary.
+- Apply the shared original VCM corporation-frame identity; align repository links with strobl/virtual-corporation-manager while retaining package, CLI and data compatibility.
+- Preserve drafts after stale previews and retry the same apply receipt after an uncertain response, including tab reload, to avoid duplicate corporations.
+- Make shared reporting identities searchable and unambiguous, show placement before long instructions, use neutral reporting levels and improve narrow-screen time forms/navigation.
+- This candidate receives its own source and archive verification. The alpha.3 entries below remain historical; their evidence does not identify these new UI bytes.
+
 ## 0.1.0-alpha.3 — local release candidate, prepared 5 September 2026
 
 At preparation on 5 September 2026, alpha.3 is unpublished and public alpha.2 and its assets remain unchanged. This dated preparation status does not establish later availability; the release page and verified public download do. Final source, archive SHA-256, installed checks and publication status are recorded in [acceptance evidence](docs/acceptance.md).

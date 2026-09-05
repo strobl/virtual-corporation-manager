@@ -1,8 +1,16 @@
-# Product Studio support
+# VCM support
 
-Before starting, fill **Acceptance owner** with the person or responsible role who will review the result. No account or legal name is required. Expand **Review the brief, criteria and sample data** to read the exact source materials. The named owner and start authority are captured with the job; final acceptance remains a separate decision.
+Use this guide for corporation setup, organization, delivery-hours and optional Product Studio problems. Follow the [first-company instructions](first-company.md) for the local setup journey. **Preparation status, 5 September 2026:** the corporation-first successor remains unpublished; exact installed-package and browser acceptance is recorded separately in [acceptance](acceptance.md). Earlier package evidence is not a pass for this interface.
 
-Use this guide with the included native PS-001 workflow and [first-company instructions](first-company.md). Release verification status: the final installed package and button sequence have not yet been tested.
+## Corporation and hours recovery
+
+Open **Your corporations** to choose the intended company before editing its team or recording hours. **Set up a corporation** captures identity and structure, then **Review changes → Apply changes** opens its saved overview. If an initial review is stale, the entered definition is retained while its revision refreshes. If a save response is interrupted, use **Retry save** to confirm the same receipt; do not create a second import to compensate for an unknown outcome.
+
+Use **Log time** from the company or agent context, or open **Time Tracker**. Empty companies need an assigned member; **Add agent** opens that setup. For unexpected hours, preserve the entry reference, date, company/member and visible basis, and inspect its correction/void history. Runtime duration and accepting a job do not create delivery hours. Keep the full ledger and backup private.
+
+## Optional Product Studio workflow
+
+Before starting a job, fill **Acceptance owner** with the person or responsible role who will review the result. No account or legal name is required. Expand **Review the brief, criteria and sample data** to read the exact source materials. The named owner and start authority are captured with the job; final acceptance remains a separate decision.
 
 ## Start and inspect the included job
 
@@ -27,13 +35,13 @@ An actual **Start job** action for PS-001 authorizes the workflow described in i
 
 ## Report a problem safely
 
-Sign in and open [GitFlash Issues](https://github.com/strobl/gitflash/issues/new/choose), then choose **Bug report**. Include:
+Sign in and open [VCM Issues](https://github.com/strobl/virtual-corporation-manager/issues/new/choose), then choose **Bug report**. Include:
 
-- GitFlash and Node versions, operating system/architecture, and relevant Codex/Python versions.
+- The VCM package version (`gitflash --version`) and Node version, operating system/architecture, and relevant Codex/Python versions.
 - The failing guide step, expected behavior and actual behavior.
 - The smallest synthetic reproduction or redacted discrepancy, plus the job/run reference and candidate identifier if safe to share.
 - Current work state, missing artifact names, and any recovery already attempted. State when a reproduction or check has not been run.
 
 Keep full originals private. Remove personal identifiers, usernames/home paths, hostnames, customer content and credentials from excerpts. Do not attach workspace databases/backups, provider login files, `.env` files, full private outputs or private screenshots. Do not start an extra model run just to complete a report.
 
-Use [GitHub private vulnerability reporting](https://github.com/strobl/gitflash/security/advisories/new) for suspected vulnerabilities. If issue-form access is unavailable, retain the draft for an already agreed facilitator contact; no new contact or successful posting access is implied here. No paid-support SLA or response deadline is promised. Internal handling follows the included [triage guide](triage.md).
+Use [GitHub private vulnerability reporting](https://github.com/strobl/virtual-corporation-manager/security/advisories/new) for suspected vulnerabilities. If issue-form access is unavailable, retain the draft for an already agreed facilitator contact; no new contact or successful posting access is implied here. No paid-support SLA or response deadline is promised. Internal handling follows the included [triage guide](triage.md).

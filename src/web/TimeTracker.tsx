@@ -122,6 +122,9 @@ export function TimeTracker({
   onChanged,
   onOpenAgent,
   onOpenCompany,
+  bookingRequest,
+  onBookingRequestConsumed,
+  onAddAgent,
 }: {
   state: WorkspaceState;
   selectedCompanyId: string | null;
@@ -129,6 +132,9 @@ export function TimeTracker({
   onChanged: () => Promise<void>;
   onOpenAgent: (id: string, companyId: string) => void;
   onOpenCompany: (id: string) => void;
+  bookingRequest?: { id: number; companyId: string; agentId: string | null } | null;
+  onBookingRequestConsumed?: () => void;
+  onAddAgent?: (companyId: string) => void;
 }) {
   const { snapshot, loading, error, refresh, mutate } = useTimeData(state.revision, onChanged);
   const [tab, setTab] = useState<'week' | 'catalog' | 'analytics'>('week');
@@ -138,6 +144,7 @@ export function TimeTracker({
   const [query, setQuery] = useState('');
   const [modal, setModal] = useState<Modal | null>(null);
   const [notice, setNotice] = useState('');
+  const consumedBooking = useRef<number | null>(null);
   useEffect(() => {
     setCompanyId(selectedCompanyId ?? '');
     setMemberId(selectedAgentId ?? '');
@@ -153,6 +160,28 @@ export function TimeTracker({
     () => (snapshot && companyId ? timeIdentities(state, snapshot, companyId) : []),
     [state, snapshot, companyId],
   );
+  useEffect(() => {
+    if (!bookingRequest || !snapshot || consumedBooking.current === bookingRequest.id) return;
+    consumedBooking.current = bookingRequest.id;
+    const target = bookingRequest.companyId;
+    const agentId =
+      bookingRequest.agentId ??
+      timeIdentities(state, snapshot, target).find((row) => canBookTime(state, target, row.id))?.id;
+    setCompanyId(target);
+    setMemberId(bookingRequest.agentId ?? '');
+    setTab('week');
+    if (agentId && canBookTime(state, target, agentId)) {
+      setNotice('');
+      setModal({ type: 'new', day: { companyId: target, agentId, date: snapshot.today } });
+    } else {
+      setNotice(
+        bookingRequest.agentId
+          ? 'This member cannot record a new entry for this corporation. Choose an eligible member in the Time Tracker.'
+          : 'Add an agent to this corporation before recording delivery hours.',
+      );
+    }
+    onBookingRequestConsumed?.();
+  }, [bookingRequest, snapshot, state, onBookingRequestConsumed]);
   const filteredMembers = members.filter(
     (row) =>
       (!memberId || row.id === memberId) &&
@@ -310,6 +339,23 @@ export function TimeTracker({
               <Plus size={14} /> Book entry
             </button>
           </div>
+          {!members.some((member) => canBookTime(state, companyId, member.id)) &&
+            state.companies.some((row) => row.id === companyId && row.status === 'active') && (
+              <div className="time-company-guidance">
+                <div>
+                  <strong>Add a member to start recording delivery hours</strong>
+                  <p>
+                    Create an agent with a role in this corporation, then log its work in the weekly
+                    ledger.
+                  </p>
+                </div>
+                {onAddAgent && (
+                  <button className="button" onClick={() => onAddAgent(companyId)}>
+                    <Plus size={14} /> Add agent
+                  </button>
+                )}
+              </div>
+            )}
           <div className="time-week-controls">
             <div className="button-row">
               <button
@@ -775,7 +821,7 @@ function TimeEntryEditor({
           assignments allow retroactive booking.{' '}
           {entry && 'Company and member identity stay fixed; corrections retain history.'}
         </p>
-        <div className="form-row">
+        <div className="form-row time-entry-identity">
           <label>
             Company
             <select
