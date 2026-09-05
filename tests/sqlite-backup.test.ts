@@ -11,7 +11,11 @@ it('finishes repeated native backups in a quiet process and releases its wakeup 
     ],
     {
       encoding: 'utf8',
-      timeout: 5000,
+      // Fifty durable file copies took 2.9s on the Windows CI control and
+      // exceeded 5s on a runner where the full SQLite suite was twice as slow.
+      // This remains a parent-only deadline: no child callback can mask the
+      // native wakeup regression, and all 50 integrity/error/exit checks remain.
+      timeout: process.platform === 'win32' ? 10_000 : 5000,
       // A parent preload could add a timer and conceal this runtime regression.
       env: { ...process.env, NODE_OPTIONS: '' },
     },
