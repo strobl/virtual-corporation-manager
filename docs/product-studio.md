@@ -1,6 +1,6 @@
 # Product Studio workflow
 
-Review candidate **0.1.0-alpha.3-local.3** ships a bounded software job, **PS-001: stock alert export**. Create **Product Studio (5 seats)** or **100-agent Product Studio**, then open **Work → Company jobs → Set up first job → Start job**. The 100-agent template contains five operational workflow seats; it does not launch 100 concurrent agents. The 20-agent template remains a lightweight configuration template.
+Review candidate **0.1.0-alpha.3-local.4** ships a bounded software job, **PS-001: stock alert export**. Create **Product Studio (5 seats)** or **100-agent Product Studio**, then open **Work → Company jobs → Set up first job → Start job**. The 100-agent template contains five operational workflow seats; it does not launch 100 concurrent agents. The 20-agent template remains a lightweight configuration template.
 
 ## What Start authorizes
 

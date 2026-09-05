@@ -1,3 +1,4 @@
+import { inspectSandboxBoundary } from './helpers/sandbox-boundary.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   access,
@@ -256,35 +257,27 @@ describe.runIf(process.platform === 'darwin' || process.platform === 'linux')(
       async () => {
         vi.mocked(findExecutable).mockImplementation(actual.findExecutable);
         vi.mocked(executeProcess).mockImplementation(actual.executeProcess);
-        const fixture = `
-import errno,json,pathlib,socket
-pathlib.Path('actual-marker.txt').write_text('local sandbox check')
-result={}
-try:
- pathlib.Path(${JSON.stringify(`${directory}-outside.txt`)}).write_text('must be blocked')
- result['outside']='allowed'
-except OSError as error: result['outside']=errno.errorcode[error.errno]
-connection=socket.socket()
-try:
- connection.connect(('127.0.0.1',9))
- result['network']='allowed'
-except OSError as error: result['network']=errno.errorcode[error.errno]
-finally: connection.close()
-print(json.dumps(result))
-`;
-        const result = await executeWorkflowCheck(
-          { directory, command: python, args: ['-B', '-c', fixture] },
-          process.env,
+        const boundary = await inspectSandboxBoundary(directory, (source) =>
+          executeWorkflowCheck(
+            { directory, command: python, args: ['-B', '-c', source] },
+            process.env,
+          ),
         );
-        expect(result, JSON.stringify(result)).toMatchObject({ status: 'completed', exitCode: 0 });
-        expect(JSON.parse(result.output.split('\n')[0])).toEqual({
-          outside: 'EPERM',
-          network: 'EPERM',
-        });
-        expect(await readFile(join(directory, 'actual-marker.txt'), 'utf8')).toBe(
-          'local sandbox check',
-        );
-        await expect(access(`${directory}-outside.txt`)).rejects.toMatchObject({ code: 'ENOENT' });
+        expect(boundary.result).toMatchObject({ status: 'completed', exitCode: 0 });
+        expect(Object.values(boundary.host).every(Boolean)).toBe(true);
+        expect(['EPERM', 'EACCES', 'EROFS']).toContain(boundary.observed.readonly_open);
+        expect(['EPERM', 'EACCES']).toContain(boundary.observed.network);
+        if (
+          boundary.observed.existing_write === 'allowed' ||
+          boundary.observed.new_write === 'allowed'
+        ) {
+          expect(process.platform).toBe('linux');
+          expect(boundary.observed.root_mounts).toEqual(['tmpfs']);
+          expect(boundary.observed.existing_before).toBe('ENOENT');
+        } else {
+          expect(['EPERM', 'EACCES', 'EROFS']).toContain(boundary.observed.existing_write);
+          expect(['EPERM', 'EACCES', 'EROFS']).toContain(boundary.observed.new_write);
+        }
       },
     );
   },

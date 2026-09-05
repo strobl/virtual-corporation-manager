@@ -9,6 +9,7 @@ if (!source || !/^[a-f0-9]{64}$/.test(expectedManifestHash ?? ''))
     'Usage: node scripts/import-ops-content.mjs <reviewed launch-finish directory> <manifest SHA256>',
   );
 const root = resolve(source);
+const releaseVersion = JSON.parse(await readFile('package.json', 'utf8')).version;
 const digest = (b) => createHash('sha256').update(b).digest('hex');
 const manifestBytes = await readFile(join(root, 'product-studio.integration.json'));
 if (digest(manifestBytes) !== expectedManifestHash)
@@ -117,9 +118,14 @@ for (const name of ['FIRST-COMPANY.md', 'SUPPORT.md', 'TRIAGE.md']) {
     .replaceAll('(REHEARSAL-RECORD.md)', '(agent-operations/help/REHEARSAL-RECORD.md)');
   const note =
     'Before starting, fill **Acceptance owner** with the person or responsible role who will review the result. No account or legal name is required. Expand **Review the brief, criteria and sample data** to read the exact source materials. The named owner and start authority are captured with the job; final acceptance remains a separate decision.\n\n';
-  if (name === 'FIRST-COMPANY.md')
+  if (name === 'FIRST-COMPANY.md') {
     text = text.replace('The installed job supplies', note + 'The installed job supplies');
-  else text = text.replace(/\n\n/, '\n\n' + note);
+    const guideVersion = text.match(
+      /This guide accompanies candidate \*\*([0-9A-Za-z.+-]+)\*\*/,
+    )?.[1];
+    if (!guideVersion) throw new Error('First-company guide has no explicit candidate version.');
+    text = text.replaceAll(guideVersion, releaseVersion);
+  } else text = text.replace(/\n\n/, '\n\n' + note);
   text = await format(text, { parser: 'markdown', printWidth: 100 });
   const destination = 'docs/' + name.toLowerCase();
   await writeFile(destination, text);
@@ -129,7 +135,11 @@ for (const name of ['FIRST-COMPANY.md', 'SUPPORT.md', 'TRIAGE.md']) {
     destination,
     destinationSha256: digest(text),
     adaptation:
-      'Local links, explicit acceptance owner and full pre-start brief viewer; no role, rubric or oracle changes.',
+      'Local links, explicit acceptance owner and full pre-start brief viewer' +
+      (name === 'FIRST-COMPANY.md'
+        ? `; candidate install/version commands adapted to ${releaseVersion}`
+        : '') +
+      '; no role, rubric or oracle changes.',
   });
 }
 await writeFile(

@@ -43,8 +43,8 @@
       "source": "help/FIRST-COMPANY.md",
       "sourceSha256": "82a16df494e73bead67c8c5061deb79368fe45e174b42be4d683a59c9c7db633",
       "destination": "docs/first-company.md",
-      "destinationSha256": "3d39ae9f4817895b0a0ae7ef56afcc7684d0eb4c4e9abe9171e227331122832f",
-      "adaptation": "Local links, explicit acceptance owner and full pre-start brief viewer; no role, rubric or oracle changes."
+      "destinationSha256": "23b36b24743092e32e4e5de8f758328ef729648fc0e42c97ce2dab1fa5428760",
+      "adaptation": "Local links, explicit acceptance owner and full pre-start brief viewer; candidate install/version commands adapted to 0.1.0-alpha.3-local.4; no role, rubric or oracle changes."
     },
     {
       "source": "support/release/SUPPORT.md",

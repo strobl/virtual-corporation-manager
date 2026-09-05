@@ -4,15 +4,15 @@ Create a small Product Studio and run its included stock-alert job. The job uses
 
 ## Install and check prerequisites
 
-This guide accompanies candidate **0.1.0-alpha.3-local.3**. Use Node.js **24.14 or newer in the 24.x line, or 26.x**. Check `node --version` before installing. Download the matching archive supplied with this candidate, then run these commands from the folder containing it:
+This guide accompanies candidate **0.1.0-alpha.3-local.4**. Use Node.js **24.14 or newer in the 24.x line, or 26.x**. Check `node --version` before installing. Download the matching archive supplied with this candidate, then run these commands from the folder containing it:
 
 ```sh
-npm install --offline --ignore-scripts --prefix ./gitflash-preview ./gitflash-0.1.0-alpha.3-local.3.tgz
+npm install --offline --ignore-scripts --prefix ./gitflash-preview ./gitflash-0.1.0-alpha.3-local.4.tgz
 node ./gitflash-preview/node_modules/gitflash/dist/cli.js --version
 node ./gitflash-preview/node_modules/gitflash/dist/cli.js --data-dir ./gitflash-first-company --no-open
 ```
 
-The version must print `0.1.0-alpha.3-local.3`. Keep it for any support report. Use a new data directory for this first exercise; open the local URL printed in the terminal. If its port is occupied, add `--port 4311` to the start command. Keep that process running while the job works. This candidate archive is separate from the older public alpha.2 download.
+The version must print `0.1.0-alpha.3-local.4`. Keep it for any support report. Use a new data directory for this first exercise; open the local URL printed in the terminal. If its port is occupied, add `--port 4311` to the start command. Keep that process running while the job works. This candidate archive is separate from the older public alpha.2 download.
 
 Company setup needs no GitFlash account. The PS-001 workflow requires **macOS or Linux**, the local Codex sandbox, a supported Codex CLI with a saved login, and **Python 3.8 or newer**. Native Windows supports the local core and Time Tracker, but this workflow's sandbox checker does not support it yet. In a terminal, check `codex login status` and `python3 --version`. If login is missing, run `codex login` and complete its sign-in. Use **Integrations → Check connections** to confirm readiness. Model execution uses your provider allowance; free GitFlash software does not mean free model usage.
 

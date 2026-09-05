@@ -30,9 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Keep latest Linux as a compatibility probe; test an explicitly named
-        # runner too, without changing any host namespace or AppArmor policy.
-        os: [ubuntu-latest, ubuntu-22.04, macos-latest]
+        os: [ubuntu-22.04, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -49,3 +47,33 @@ jobs:
           GITFLASH_CODEX_PATH: ${{ runner.temp }}/gitflash-codex/node_modules/.bin/codex
           GITFLASH_PYTHON_PATH: /usr/bin/python3
           GITFLASH_LIVE_SANDBOX: '1'
+          GITFLASH_EVIDENCE_DIR: acceptance-evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sandbox-${{ matrix.os }}
+          path: acceptance-evidence/
+  ubuntu24-expected-sandbox-refusal:
+    name: Ubuntu 24.04 expected sandbox refusal (no provider dispatch)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Install the pinned optional CLI without an account
+        run: npm install --prefix "$RUNNER_TEMP/gitflash-codex" --ignore-scripts --no-audit --no-fund @openai/codex@0.138.0
+      - name: Verify stock host policy refuses sandbox startup before provider dispatch
+        run: node node_modules/vitest/vitest.mjs run tests/workflow-sandbox-compat.test.ts
+        env:
+          GITFLASH_CODEX_PATH: ${{ runner.temp }}/gitflash-codex/node_modules/.bin/codex
+          GITFLASH_PYTHON_PATH: /usr/bin/python3
+          GITFLASH_UBUNTU24_REFUSAL: '1'
+          GITFLASH_EVIDENCE_DIR: acceptance-evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ubuntu24-expected-sandbox-refusal
+          path: acceptance-evidence/

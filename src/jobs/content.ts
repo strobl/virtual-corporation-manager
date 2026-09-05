@@ -1,6 +1,7 @@
 import data from './content.generated.json';
 import type { StageId, WorkflowInfo } from './contracts.js';
 import type { Files } from './files.js';
+declare const __GITFLASH_VERSION__: string;
 
 export interface StudioContent {
   version: string;
@@ -15,6 +16,15 @@ export interface StudioContent {
 }
 export const studioContent: StudioContent = data;
 export function workflowInfo(content = studioContent): WorkflowInfo {
+  // Keep the frozen Ops source intact; only the displayed installation guide
+  // names this build's archive, matching the adapted first-company document.
+  const guideVersion = content.help.match(
+    /This guide accompanies candidate \*\*([0-9A-Za-z.+-]+)\*\*/,
+  )?.[1];
+  const help =
+    guideVersion && typeof __GITFLASH_VERSION__ === 'string'
+      ? content.help.replaceAll(guideVersion, __GITFLASH_VERSION__)
+      : content.help;
   return {
     id: 'PS-001',
     title: 'Build a stock alert utility',
@@ -36,7 +46,7 @@ export function workflowInfo(content = studioContent): WorkflowInfo {
     maxRepairCandidates: 2,
     permissionNotice:
       'Start permits five separate Codex sessions to create files and run local commands in isolated job directories, plus at most two repair candidates. Your Codex account allowance applies. Shell network, web and connected apps are disabled. The workspace sandbox restricts writes; it is not full read isolation. Use a dedicated OS account for sensitive machines. No publishing, messaging or automatic owner acceptance.',
-    help: content.help,
+    help,
     brief: content.files['brief.md'],
     criteria: content.files['requirements.md'],
     inputPreview: content.files['input.json'],
