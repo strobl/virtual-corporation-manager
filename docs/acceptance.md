@@ -18,6 +18,14 @@ This page concerns **0.1.0-alpha.3-local.4**, an unpublished review candidate wi
 
 Status is deliberately pending where final evidence has not yet been attached. Before publication, replace pending entries with exact revision/package evidence or preserve the limitation in the release notes. Do not infer acceptance from a configured role, model prose, a transport connection or a green check for another revision.
 
+## Candidate-4 platform follow-up
+
+[Candidate-4 CI at `ebf75a0`](https://github.com/strobl/gitflash/actions/runs/33963153103) passed all 12 packaged-core combinations on macOS, Linux and Windows, including Node 26.8.1 after the bounded backup-completion fix. Its macOS optional sandbox fixture also passed. The original archive remains immutable: SHA-256 `d2b7bc6ba3e8fbc761d5a67e0b6ff144683cff979bb71f44809065d1635cfe01`, 628,541 bytes, 64 files.
+
+[The Ubuntu 22.04 follow-up at `e3c56f8`](https://github.com/strobl/gitflash/actions/runs/33963586491) passed the actual Codex 0.138.0/Python 3.10 checker. It preserves existing host bytes and inode, creates no new host file, refuses opening an explicitly read-bound host file for writing (`EROFS`), and denies networking (`EPERM`). A process-visible sibling write goes to the private `tmpfs` root and is not a host-write escape. No adapter permission or host security setting changed to obtain this result.
+
+Stock Ubuntu 24.04 with its default AppArmor namespace restriction remains unsupported for optional workflow execution. CI names its separate expected-refusal check explicitly: Python must not start, no provider stage may dispatch, and company/time data must remain unchanged. A passing refusal check is not a Python execution PASS. Current first-company instructions and displayed help adapt the frozen Ops guide's archive version to local.4; canonical roles, prompts, brief, rubric and oracle remain unchanged. Final package identity and review are recorded separately from the immutable baseline.
+
 ## Observed iteration-3 results
 
 The installed iteration-3 archive was built from `5fa982445b7e698a14dd354c0a95c899bea85964`: 625,494 bytes, 64 files, SHA-256 `26595325f1913963e04ba51a5ebadd5adff75ce825d954560eceeb2ee0c55338`. On Node 24.19.0/macOS arm64, source checks passed 213 tests with two opt-in skips, type checking, production build and formatting. A separate fresh HTTPS clone and dependency installation reproduced the same archive and passed the documented contributor commands, company creation, corrected delivery-hours entry and restart persistence. Independent installed migration/recovery review also passed its 12 bounded check groups on Node 24.19.0; it contained no completed workflow artifacts. These are engineering fixtures, not human pilots.

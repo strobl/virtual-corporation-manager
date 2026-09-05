@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import {
   access,
+  lstat,
   mkdir,
   mkdtemp,
   readFile,
@@ -193,7 +194,24 @@ it.runIf(process.env.GITFLASH_UBUNTU24_REFUSAL === '1')(
       await expect(access(join(stage, 'python-started.txt'))).rejects.toMatchObject({
         code: 'ENOENT',
       });
-      expect(await readdir(stage)).toEqual([]);
+      // The pinned native launcher creates its mount-target registry before
+      // bwrap reaches the refused namespace operation. This is bootstrap
+      // bookkeeping, not evidence that Python or a provider stage executed.
+      const registryName = `codex-bwrap-synthetic-mount-targets-${process.geteuid!()}`;
+      expect(await readdir(stage)).toEqual([registryName]);
+      const registry = join(stage, registryName);
+      const registryStat = await lstat(registry);
+      expect(registryStat.isDirectory()).toBe(true);
+      expect(registryStat.isSymbolicLink()).toBe(false);
+      expect(await readdir(registry)).toEqual(['lock']);
+      const lock = await lstat(join(registry, 'lock'));
+      expect(lock.isFile()).toBe(true);
+      expect(lock.isSymbolicLink()).toBe(false);
+      expect(lock.size).toBe(0);
+      evidence.nativeBootstrapMetadata = {
+        registry: registryName,
+        files: [{ name: 'lock', bytes: 0 }],
+      };
       evidence.pythonStarted = false;
       evidence.outcome = 'expected_prerequisite_refusal';
     } finally {
