@@ -8,6 +8,20 @@ import type {
 } from '../time/contracts';
 import { roundReferenceTenths } from '../time/rules';
 
+/** Ledger navigation retains captured identities without making them editable companies. */
+export function timeCompanyContext(
+  state: WorkspaceState,
+  snapshot: Pick<TimeSnapshot, 'entries'> | null,
+  companyId: string | null,
+) {
+  if (!companyId) return null;
+  const company = state.companies.find((row) => row.id === companyId);
+  if (company)
+    return { id: company.id, name: company.name, historical: company.status === 'archived' };
+  const entry = snapshot?.entries.find((row) => row.companyId === companyId);
+  return entry ? { id: companyId, name: entry.companyName, historical: true } : null;
+}
+
 // Calendar arithmetic and the multi-entry week model adapt the original
 // org-manager-console timesheet. See THIRD_PARTY_NOTICES.md. No billing lifecycle.
 export function addTimeDays(date: string, count: number): string {

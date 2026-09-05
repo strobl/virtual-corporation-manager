@@ -68,6 +68,7 @@ import { TextDisclosure, textExcerpt } from './TextDisclosure';
 import { BrandMark } from './BrandMark';
 import { createWorkViewModel, getRunTargetCompany, workAgentDestination } from './work-view-model';
 import { TimeTracker, TimezoneSettings } from './TimeTracker';
+import { timeCompanyContext } from './time-view-model';
 import { JobsView } from './Jobs';
 import type { JobInfo } from '../jobs/contracts';
 import { AdvancedDialog, type AdvancedTarget } from './AdvancedDialogs';
@@ -247,7 +248,10 @@ export function App() {
     const valid =
       selection &&
       (selection.kind === 'company'
-        ? state.companies.some((row) => row.id === selection.id && row.status === 'active')
+        ? state.companies.some((row) => row.id === selection.id && row.status === 'active') ||
+          (area === 'time' &&
+            (timeSnapshot === null ||
+              Boolean(timeCompanyContext(state, timeSnapshot, selection.id))))
         : selection.kind === 'department'
           ? state.departments.some(
               (row) =>
@@ -264,9 +268,17 @@ export function App() {
     setExpanded((previous) => [
       ...new Set([...previous, ...state.companies.map((row) => `company:${row.id}`)]),
     ]);
-  }, [state]);
+  }, [state, area, timeSnapshot]);
   const companyId = state ? companyForSelection(state, selection) : null;
   const company = state?.companies.find((row) => row.id === companyId);
+  const breadcrumbCompany =
+    area === 'time' && state && companyId
+      ? (timeCompanyContext(state, timeSnapshot, companyId) ?? {
+          id: companyId,
+          name: 'Historical company',
+          historical: true,
+        })
+      : company;
   const companyWork = state ? createWorkViewModel(state, runs, companyId) : null;
   const companyJobs = jobs.filter((job) => job.companyId === companyId);
   const companyReviewCount =
@@ -658,26 +670,27 @@ export function App() {
           </span>
           <div className="breadcrumb">
             <span>{AREA_NAMES[area]}</span>
-            {company && ['corporation', 'organization', 'time', 'work'].includes(area) && (
-              <>
-                <ChevronRight size={14} />
-                <button onClick={() => select({ kind: 'company', id: company.id })}>
-                  {company.name}
-                </button>
-                {area === 'organization' && selectedDepartment && (
-                  <>
-                    <ChevronRight size={14} />
-                    <span>{selectedDepartment.name}</span>
-                  </>
-                )}
-                {area === 'organization' && selectedAgent && (
-                  <>
-                    <ChevronRight size={14} />
-                    <span>{selectedAgent.name}</span>
-                  </>
-                )}
-              </>
-            )}
+            {breadcrumbCompany &&
+              ['corporation', 'organization', 'time', 'work'].includes(area) && (
+                <>
+                  <ChevronRight size={14} />
+                  <button onClick={() => select({ kind: 'company', id: breadcrumbCompany.id })}>
+                    {breadcrumbCompany.name}
+                  </button>
+                  {area === 'organization' && selectedDepartment && (
+                    <>
+                      <ChevronRight size={14} />
+                      <span>{selectedDepartment.name}</span>
+                    </>
+                  )}
+                  {area === 'organization' && selectedAgent && (
+                    <>
+                      <ChevronRight size={14} />
+                      <span>{selectedAgent.name}</span>
+                    </>
+                  )}
+                </>
+              )}
           </div>
           <div className="topbar-actions">
             <span className="saved-status">
@@ -1283,6 +1296,7 @@ export function App() {
                     onChanged={refresh}
                     onOpenAgent={openAgentContext}
                     onOpenCompany={openCompanyContext}
+                    onSelectCompany={(id) => select({ kind: 'company', id })}
                     bookingRequest={bookingRequest}
                     onBookingRequestConsumed={() => setBookingRequest(null)}
                     onAddAgent={(id) => {

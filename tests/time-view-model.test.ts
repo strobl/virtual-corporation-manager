@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { WorkspaceState } from '../src/domain/contracts';
 import type { CatalogItem, TimeEntry, TimeSnapshot } from '../src/time/contracts';
+import { companyForSelection, parseSelection, selectionKey } from '../src/web/model';
 import {
   aggregateTime,
   canBookTime,
@@ -10,6 +11,7 @@ import {
   realTimeDate,
   resolveTimeEstimate,
   timeDates,
+  timeCompanyContext,
   timeIdentities,
   timeMonday,
   timeRange,
@@ -57,6 +59,69 @@ function entry(patch: Partial<TimeEntry> = {}): TimeEntry {
   };
 }
 describe('delivery hours frontend model', () => {
+  it('retains the explicitly chosen company through the shared URL without carrying a member filter', () => {
+    const state = {
+      companies: [
+        { id: 'orion', name: 'Orion', status: 'active' },
+        { id: 'kepler', name: 'Kepler', status: 'active' },
+      ],
+    } as WorkspaceState;
+    const snapshot = { entries: [entry({ companyId: 'kepler', tenths: 20 })] };
+    const context = timeCompanyContext(state, snapshot, 'kepler');
+    expect(context).toEqual({ id: 'kepler', name: 'Kepler', historical: false });
+    const url = new URL('http://localhost/?area=time&selected=company:orion/agent:orion-member');
+    url.searchParams.set('selected', selectionKey({ kind: 'company', id: context!.id }));
+    const restored = parseSelection(url.searchParams.get('selected')!);
+    expect(restored).toEqual({ kind: 'company', id: 'kepler' });
+    expect(url.searchParams.get('area')).toBe('time');
+    expect(companyForSelection(state, restored)).toBe('kepler');
+    expect(
+      aggregateTime(
+        snapshot.entries.filter((row) => row.companyId === companyForSelection(state, restored)),
+        '2026-08-31',
+        '2026-09-06',
+      ).tenths,
+    ).toBe(20);
+  });
+
+  it('resolves archived and removed ledger companies by ID without granting booking eligibility', () => {
+    const state = {
+      companies: [
+        { id: 'active', name: 'Shared name', status: 'active' },
+        { id: 'archived', name: 'Shared name', status: 'archived' },
+      ],
+      agents: [{ id: 'member', status: 'active' }],
+      assignments: [],
+    } as unknown as WorkspaceState;
+    const snapshot = {
+      entries: [
+        entry({ id: 'archived-entry', companyId: 'archived', companyName: 'Older name' }),
+        entry({ id: 'removed-entry', companyId: 'removed', companyName: 'Captured company' }),
+      ],
+    };
+    const before = structuredClone({ state, snapshot });
+    expect(timeCompanyContext(state, snapshot, 'archived')).toEqual({
+      id: 'archived',
+      name: 'Shared name',
+      historical: true,
+    });
+    expect(timeCompanyContext(state, snapshot, 'removed')).toEqual({
+      id: 'removed',
+      name: 'Captured company',
+      historical: true,
+    });
+    expect(timeCompanyContext(state, null, 'archived')?.id).toBe('archived');
+    expect(timeCompanyContext(state, null, 'removed')).toBeNull();
+    expect(timeCompanyContext(state, snapshot, 'unknown')).toBeNull();
+    for (const id of ['archived', 'removed']) {
+      const restored = parseSelection(selectionKey({ kind: 'company', id }));
+      expect(companyForSelection(state, restored)).toBe(id);
+      expect(canBookTime(state, id, 'member')).toBe(false);
+      expect(timeCompanyContext(state, snapshot, restored!.id)?.historical).toBe(true);
+    }
+    expect({ state, snapshot }).toEqual(before);
+  });
+
   it('preserves an unchanged saved date after a timezone rollback, but refuses a newly chosen future date', () => {
     const savedDate = '2026-09-05';
     const todayAfterTimezoneChange = '2026-09-04';

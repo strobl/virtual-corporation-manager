@@ -122,6 +122,7 @@ export function TimeTracker({
   onChanged,
   onOpenAgent,
   onOpenCompany,
+  onSelectCompany,
   bookingRequest,
   onBookingRequestConsumed,
   onAddAgent,
@@ -132,6 +133,7 @@ export function TimeTracker({
   onChanged: () => Promise<void>;
   onOpenAgent: (id: string, companyId: string) => void;
   onOpenCompany: (id: string) => void;
+  onSelectCompany: (id: string) => void;
   bookingRequest?: { id: number; companyId: string; agentId: string | null } | null;
   onBookingRequestConsumed?: () => void;
   onAddAgent?: (companyId: string) => void;
@@ -154,8 +156,12 @@ export function TimeTracker({
   }, [snapshot, week]);
   const companies = snapshot ? companyOptions(state, snapshot) : [];
   useEffect(() => {
-    if (snapshot && !companyId && companies.length) setCompanyId(companies[0].id);
-  }, [snapshot, companyId]);
+    if (snapshot && !companyId && !selectedCompanyId && companies.length) {
+      setCompanyId(companies[0].id);
+      setMemberId('');
+      onSelectCompany(companies[0].id);
+    }
+  }, [snapshot, companyId, selectedCompanyId, onSelectCompany]);
   const members = useMemo(
     () => (snapshot && companyId ? timeIdentities(state, snapshot, companyId) : []),
     [state, snapshot, companyId],
@@ -291,6 +297,7 @@ export function TimeTracker({
                 onChange={(event) => {
                   setCompanyId(event.target.value);
                   setMemberId('');
+                  onSelectCompany(event.target.value);
                 }}
               >
                 {companies.map((row) => (
