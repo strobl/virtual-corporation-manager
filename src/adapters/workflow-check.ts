@@ -235,11 +235,27 @@ export async function executeWorkflowCheck(
         maxBytes: 64_000,
       });
     const help = await probe(['sandbox', '--help']);
-    for (const flag of ['--permissions-profile', '--include-managed-config', '--cd', '--config']) {
-      if (help.code !== 0 || !help.stdout.includes(flag))
+    if (help.code !== 0)
+      return fail(
+        'sandbox-unavailable',
+        'Unable to inspect the Codex sandbox interface. Use a compatible Codex CLI with explicit named permissions profiles. No check was run.',
+      );
+    const sandboxFlags = new Set(help.stdout.match(/--[a-z][a-z0-9-]*/g) ?? []);
+    // Current Codex uses the singular spelling; retain the documented older
+    // interface without changing the fixed profile or falling back to defaults.
+    const permissionProfileFlag = ['--permission-profile', '--permissions-profile'].find((flag) =>
+      sandboxFlags.has(flag),
+    );
+    if (!permissionProfileFlag)
+      return fail(
+        'sandbox-unavailable',
+        'Your Codex CLI lacks an explicit sandbox permission-profile option. Use a compatible version supporting --permission-profile or --permissions-profile. No check was run.',
+      );
+    for (const flag of ['--include-managed-config', '--cd', '--config']) {
+      if (!sandboxFlags.has(flag))
         return fail(
           'sandbox-unavailable',
-          `Your Codex CLI lacks sandbox ${flag}. Upgrade it before running the fixed check.`,
+          `Your Codex CLI lacks sandbox ${flag}. Use a compatible version supporting this explicit sandbox interface. No check was run.`,
         );
     }
     const version = await probe(['--version']);
@@ -261,7 +277,7 @@ export async function executeWorkflowCheck(
       executable,
       [
         'sandbox',
-        '--permissions-profile',
+        permissionProfileFlag,
         'gitflash-check',
         '--include-managed-config',
         '--cd',

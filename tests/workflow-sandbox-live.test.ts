@@ -34,11 +34,31 @@ async function reportSandboxStartupFailure(python: string): Promise<void> {
     .map(([key, value]) => `${JSON.stringify(key)}=${JSON.stringify(value)}`)
     .join(',')}}`;
   try {
+    const help = await executeProcess(executable, ['sandbox', '--help'], {
+      env,
+      cwd: stage,
+      timeoutMs: 5000,
+      maxBytes: 64000,
+    });
+    const flags = new Set(help.stdout.match(/--[a-z][a-z0-9-]*/g) ?? []);
+    const permissionProfileFlag = ['--permission-profile', '--permissions-profile'].find((flag) =>
+      flags.has(flag),
+    );
+    if (
+      help.code !== 0 ||
+      !permissionProfileFlag ||
+      ['--include-managed-config', '--cd', '--config'].some((flag) => !flags.has(flag))
+    ) {
+      console.error(
+        'Fixed local sandbox startup diagnostic refused an unsupported explicit profile interface.',
+      );
+      return;
+    }
     const diagnostic = await executeProcess(
       executable,
       [
         'sandbox',
-        '--permissions-profile',
+        permissionProfileFlag,
         'gitflash-check',
         '--include-managed-config',
         '--cd',
@@ -102,6 +122,13 @@ it.runIf(enabled)(
   'runs fixed Python checks in the actual pinned network-off Codex sandbox',
   async () => {
     expect(['darwin', 'linux']).toContain(process.platform);
+    const expectedCodexVersion = process.env.GITFLASH_TEST_CODEX_VERSION ?? '0.138.0';
+    if (
+      expectedCodexVersion.length > 80 ||
+      expectedCodexVersion.trim() !== expectedCodexVersion ||
+      !/^\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?$/.test(expectedCodexVersion)
+    )
+      throw new Error('GITFLASH_TEST_CODEX_VERSION must be a bounded Codex semantic version.');
     const python = process.env.GITFLASH_PYTHON_PATH || '/usr/bin/python3';
     const version = await executeProcess(
       python,
@@ -125,7 +152,7 @@ it.runIf(enabled)(
     expect(passing, JSON.stringify(passing)).toMatchObject({
       status: 'completed',
       exitCode: 0,
-      runtimeVersion: 'codex-cli 0.138.0',
+      runtimeVersion: `codex-cli ${expectedCodexVersion}`,
     });
     expect(passing.output).toContain('PASS');
     expect(await readFile(join(directory, 'check-output.txt'), 'utf8')).toBe('actual local check');
@@ -145,6 +172,7 @@ it.runIf(enabled)(
             node: process.version,
             platform: process.platform,
             architecture: process.arch,
+            expectedCodexVersion,
             pythonVersion,
             passing,
             failing,

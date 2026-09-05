@@ -31,6 +31,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, macos-latest]
+        codex: ['0.138.0', '0.153.4']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -40,10 +41,11 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - name: Install the pinned optional CLI without an account
-        run: npm install --prefix "$RUNNER_TEMP/gitflash-codex" --ignore-scripts --no-audit --no-fund @openai/codex@0.138.0
+        run: npm install --prefix "$RUNNER_TEMP/gitflash-codex" --ignore-scripts --no-audit --no-fund @openai/codex@${{ matrix.codex }}
       - name: Verify local Python sandbox without a model request
         run: node node_modules/vitest/vitest.mjs run tests/workflow-sandbox-live.test.ts
         env:
+          GITFLASH_TEST_CODEX_VERSION: ${{ matrix.codex }}
           GITFLASH_CODEX_PATH: ${{ runner.temp }}/gitflash-codex/node_modules/.bin/codex
           GITFLASH_PYTHON_PATH: /usr/bin/python3
           GITFLASH_LIVE_SANDBOX: '1'
@@ -51,7 +53,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: sandbox-${{ matrix.os }}
+          name: sandbox-${{ matrix.os }}-codex-${{ matrix.codex }}
           path: acceptance-evidence/
   ubuntu24-expected-sandbox-refusal:
     name: Ubuntu 24.04 expected sandbox refusal (no provider dispatch)

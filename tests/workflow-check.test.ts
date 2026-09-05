@@ -11,7 +11,7 @@ import {
   writeFile,
 } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { executeProcess, findExecutable } from '../src/adapters/process.js';
 import {
   executeWorkflowCheck,
@@ -96,6 +96,82 @@ it.runIf(process.platform === 'darwin' || process.platform === 'linux')(
 describe.runIf(process.platform === 'darwin' || process.platform === 'linux')(
   'fixed local workflow checker',
   () => {
+    it.each([
+      ['--permission-profile', '--permission-profile', 'codex-cli 0.153.4'],
+      ['--permissions-profile', '--permissions-profile', 'codex-cli 0.138.0'],
+      ['--permissions-profile --permission-profile', '--permission-profile', 'codex-cli 0.153.4'],
+    ])(
+      'selects the advertised profile interface %s without changing its boundary',
+      async (flags, selected, version) => {
+        const implementation = vi.mocked(executeProcess).getMockImplementation()!;
+        vi.mocked(executeProcess).mockImplementation((executable, args, options) => {
+          if (args[0] === 'sandbox' && args[1] === '--help')
+            return Promise.resolve({
+              code: 0,
+              stdout: `${flags} --include-managed-config --cd --config`,
+              stderr: '',
+            });
+          if (args[0] === '--version')
+            return Promise.resolve({ code: 0, stdout: version, stderr: '' });
+          return implementation(executable, args, options);
+        });
+        expect(await run("print('compatible fixed check')")).toMatchObject({
+          status: 'completed',
+          exitCode: 0,
+          output: 'compatible fixed check\n',
+          runtimeVersion: version,
+        });
+        const [, args] = vi
+          .mocked(executeProcess)
+          .mock.calls.find(([, args]) => args.includes('--'))!;
+        expect(args.slice(0, 4)).toEqual([
+          'sandbox',
+          selected,
+          'gitflash-check',
+          '--include-managed-config',
+        ]);
+        expect(
+          args.filter((arg) => ['--permission-profile', '--permissions-profile'].includes(arg)),
+        ).toEqual([selected]);
+        expect(args[args.indexOf('-c') + 1]).toContain(
+          'permissions.gitflash-check={filesystem={":minimal"="read",":workspace_roots"="write",',
+        );
+        expect(args[args.indexOf('-c') + 1]).toContain('},network={enabled=false}}');
+        expect(args).toContain('-I');
+      },
+    );
+
+    it.each([
+      [0, '--include-managed-config --cd --config'],
+      [0, '--permission-profile-unsafe --include-managed-config --cd --config'],
+      [0, '--permission-profile --cd --config'],
+      [0, '--permissions-profile --include-managed-config --config'],
+      [0, '--permission-profile --include-managed-config --cd'],
+      [71, '--permission-profile --include-managed-config --cd --config'],
+    ])(
+      'refuses an unsupported or failed sandbox help contract (%s, %s) before dispatch',
+      async (code, stdout) => {
+        vi.mocked(executeProcess).mockResolvedValue({
+          code: Number(code),
+          stdout: String(stdout),
+          stderr: 'private diagnostics',
+        });
+        const result = await run("print('must not execute')");
+        expect(result).toMatchObject({
+          status: 'failed',
+          exitCode: null,
+          runtimeVersion: null,
+          error: { code: 'sandbox-unavailable' },
+        });
+        expect(result.error?.message).toContain('compatible');
+        expect(result.error?.message).not.toContain('Upgrade');
+        expect(JSON.stringify(result)).not.toContain('private diagnostics');
+        expect(vi.mocked(executeProcess).mock.calls.map(([, args]) => args)).toEqual([
+          ['sandbox', '--help'],
+        ]);
+      },
+    );
+
     it('records a real child exit 0 or 1 without interpreting assertions as startup failure', async () => {
       const passing = await run("import sys;sys.stdout.write('Ran 4 tests\\nOK')");
       expect(passing).toMatchObject({
@@ -257,12 +333,39 @@ describe.runIf(process.platform === 'darwin' || process.platform === 'linux')(
       async () => {
         vi.mocked(findExecutable).mockImplementation(actual.findExecutable);
         vi.mocked(executeProcess).mockImplementation(actual.executeProcess);
-        const boundary = await inspectSandboxBoundary(directory, (source) =>
+        const check = (source: string) =>
           executeWorkflowCheck(
             { directory, command: python, args: ['-B', '-c', source] },
             process.env,
-          ),
+          );
+        const passing = await check(
+          "import pathlib;pathlib.Path('inside.txt').write_text('local check');print('PASS')",
         );
+        expect(passing).toMatchObject({ status: 'completed', exitCode: 0 });
+        expect(await readFile(join(directory, 'inside.txt'), 'utf8')).toBe('local check');
+        const failing = await check("import sys;print('ordinary failed assertion');sys.exit(1)");
+        expect(failing).toMatchObject({ status: 'completed', exitCode: 1 });
+        const boundary = await inspectSandboxBoundary(directory, (source) => check(source));
+        if (process.env.GITFLASH_EVIDENCE_DIR) {
+          const destination = resolve(process.env.GITFLASH_EVIDENCE_DIR);
+          await mkdir(destination, { recursive: true });
+          await writeFile(
+            join(destination, 'current-sandbox-boundary.json'),
+            JSON.stringify(
+              {
+                node: process.version,
+                platform: process.platform,
+                architecture: process.arch,
+                python,
+                passing,
+                failing,
+                boundary,
+              },
+              null,
+              2,
+            ) + '\n',
+          );
+        }
         expect(boundary.result).toMatchObject({ status: 'completed', exitCode: 0 });
         expect(Object.values(boundary.host).every(Boolean)).toBe(true);
         expect(['EPERM', 'EACCES', 'EROFS']).toContain(boundary.observed.readonly_open);

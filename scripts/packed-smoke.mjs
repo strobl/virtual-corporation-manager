@@ -75,6 +75,7 @@ async function assertDefaultDirectory(binaries) {
 async function start(binary, dataDir) {
   return new Promise((resolve, reject) => {
     let output = '';
+    let diagnostics = '';
     const child = spawn(
       process.execPath,
       [binary.entry, '--data-dir', dataDir, '--port', '0', '--no-open'],
@@ -91,22 +92,23 @@ async function start(binary, dataDir) {
     children.add(child);
     const timeout = setTimeout(() => {
       child.kill();
-      reject(new Error('Packaged startup timed out: ' + output));
+      reject(new Error('Packaged startup timed out: ' + diagnostics));
     }, 15000);
     child.stdout.on('data', (c) => {
       output += c;
+      diagnostics += c;
       const match = output.match(/http:\/\/127\.0\.0\.1:\d+/);
       if (match) {
         clearTimeout(timeout);
         resolve({ child, url: match[0], output });
       }
     });
-    child.stderr.on('data', (c) => (output += c));
+    child.stderr.on('data', (c) => (diagnostics += c));
     child.on('error', reject);
     child.on('exit', (code) => {
       children.delete(child);
       clearTimeout(timeout);
-      if (code) reject(new Error(output));
+      if (code) reject(new Error(diagnostics));
     });
   });
 }

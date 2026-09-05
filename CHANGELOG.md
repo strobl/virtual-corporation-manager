@@ -8,6 +8,7 @@
 - Correct the Rubik notice to acknowledge the original font file and its included OFL license.
 - Show submitted and failed manual outputs in Work, with the existing explicit acceptance flow.
 - Enforce the three-job admission limit on Start and Retry atomically; bind owner decisions to an immutable, verified ZIP digest.
+- Accept the current and previous Codex sandbox permission-profile option names while preserving explicit filesystem and network restrictions.
 - Render Slack replies as bounded literal text, preserving complete local results; cover the Buzz CLI contract with subprocess fixtures.
 - Document the three-container system architecture and the MIT core with optional separately licensed future Enterprise components.
 

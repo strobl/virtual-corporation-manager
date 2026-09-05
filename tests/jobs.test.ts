@@ -264,10 +264,39 @@ function fixture(options: FixtureOptions = {}) {
 }
 
 async function settled(service: ReturnType<typeof createJobService>, id: string): Promise<JobInfo> {
-  await vi.waitFor(() => expect(['queued', 'running']).not.toContain(service.get(id).status), {
-    timeout: 5000,
-    interval: 5,
-  });
+  // The Windows CI cold start exceeded 5s while other durable-file suites ran.
+  // Match the bounded Windows backup fixture allowance; no job is restarted.
+  const timeout = process.platform === 'win32' ? 10_000 : 5000;
+  const started = performance.now();
+  let last = service.get(id);
+  try {
+    await vi.waitFor(
+      () => {
+        last = service.get(id);
+        expect(['queued', 'running']).not.toContain(last.status);
+      },
+      { timeout, interval: 25 },
+    );
+  } catch (cause) {
+    const diagnostic = {
+      id,
+      status: last.status,
+      error: last.error,
+      stages: last.stages.map(({ kind, attempt, status, startedAt, finishedAt, error }) => ({
+        kind,
+        attempt,
+        status,
+        startedAt,
+        finishedAt,
+        error,
+      })),
+      events: last.events.slice(-6),
+    };
+    throw new Error(
+      `Job did not settle within ${timeout}ms (${Math.round(performance.now() - started)}ms observed): ${JSON.stringify(diagnostic)}`,
+      { cause },
+    );
+  }
   return service.get(id);
 }
 
