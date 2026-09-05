@@ -1,7 +1,16 @@
 import { createHash } from 'node:crypto';
 import type { DatabaseSync } from 'node:sqlite';
 import { DomainError } from '../domain/errors.js';
-import type { JobArtifact, JobInfo } from './contracts.js';
+import {
+  completedJobStage,
+  JOB_REQUIRED_OUTPUTS,
+  JOB_STAGE_ORDER,
+  safeArtifactPath,
+  type JobArtifact,
+  type JobInfo,
+} from './contracts.js';
+import { filesZip } from './zip.js';
+export { safeArtifactPath } from './contracts.js';
 
 export const JOB_MIGRATION = `CREATE TABLE workflow_jobs (id TEXT PRIMARY KEY, request_id TEXT NOT NULL UNIQUE, info TEXT NOT NULL CHECK(json_valid(info)), context TEXT NOT NULL CHECK(json_valid(context)));
 CREATE TABLE workflow_artifacts (id TEXT PRIMARY KEY, job_id TEXT NOT NULL REFERENCES workflow_jobs(id), stage_id TEXT NOT NULL, path TEXT NOT NULL, sha256 TEXT NOT NULL, bytes INTEGER NOT NULL, source TEXT NOT NULL, content TEXT NOT NULL);
@@ -9,13 +18,35 @@ CREATE INDEX workflow_artifacts_job ON workflow_artifacts(job_id);
 CREATE TABLE workflow_requests (request_id TEXT PRIMARY KEY, job_id TEXT NOT NULL REFERENCES workflow_jobs(id), action TEXT NOT NULL);`;
 
 export const sha256 = (value: string | Buffer) => createHash('sha256').update(value).digest('hex');
-export function safeArtifactPath(path: string): boolean {
-  return (
-    path.length > 0 &&
-    path.length <= 240 &&
-    path.split('/').every((p) => /^[a-zA-Z0-9_][a-zA-Z0-9_.-]*$/.test(p)) &&
-    /\.(py|json|md|txt|csv)$/.test(path)
+/** Reconstruct the exact ZIP from captured bytes, never from disposable run directories. */
+export function workflowBundleBytes(
+  db: DatabaseSync,
+  job: JobInfo,
+  provenance = job.bundle?.provenance ?? JSON.stringify(job, null, 2),
+): Buffer {
+  const row = db.prepare('SELECT context FROM workflow_jobs WHERE id=?').get(job.id);
+  const pinned = JSON.parse(String(row?.context)).content.files;
+  const files: Record<string, string> = Object.fromEntries(
+    ['input.json', 'brief.md', 'requirements.md'].map((path) => [path, pinned[path]]),
   );
+  for (const kind of JOB_STAGE_ORDER) {
+    const stage = completedJobStage(job, kind);
+    if (!stage) throw new DomainError('INVALID_DATABASE', 'The reviewed stage is missing.');
+    const captured = Object.fromEntries(
+      db
+        .prepare(
+          'SELECT path,content FROM workflow_artifacts WHERE job_id=? AND stage_id=? ORDER BY rowid',
+        )
+        .all(job.id, stage.id)
+        .map((artifact) => [String(artifact.path), String(artifact.content)]),
+    );
+    for (const path of JOB_REQUIRED_OUTPUTS[kind]) files[path] = captured[path];
+    if (kind === 'qa') files['oracle-result.json'] = captured['oracle-result.json'];
+  }
+  files['PROVENANCE.json'] = provenance;
+  if (Object.values(files).some((value) => typeof value !== 'string'))
+    throw new DomainError('INVALID_DATABASE', 'A reviewed bundle file is missing.');
+  return filesZip(files);
 }
 /** Integrity includes ownership, exact content, captured context and both directions of references. */
 export function validateJobData(db: DatabaseSync): void {
@@ -63,14 +94,7 @@ export function validateJobData(db: DatabaseSync): void {
       )
         return fail();
       if (['waiting_owner', 'accepted', 'rejected'].includes(info.status)) {
-        const chain = ['intake', 'requirements', 'build', 'qa', 'handoff'].map((kind) =>
-          info.stages.findLast(
-            (s) =>
-              s.kind === kind &&
-              s.status === 'completed' &&
-              (kind === 'intake' || kind === 'requirements' || s.attempt === info.candidate),
-          ),
-        );
+        const chain = JOB_STAGE_ORDER.map((kind) => completedJobStage(info, kind));
         if (
           chain.some((s) => !s?.sessionId || !s.runtimeVersion) ||
           new Set(chain.map((s) => s!.sessionId)).size !== 5
@@ -168,6 +192,49 @@ export function validateJobData(db: DatabaseSync): void {
       references.delete(String(row.id));
     }
     if (references.size) return fail();
+    for (const job of jobs.values()) {
+      if (job.bundle !== undefined) {
+        const bundle = job.bundle;
+        if (
+          !bundle ||
+          bundle.version !== 1 ||
+          typeof bundle.provenance !== 'string' ||
+          !/^[a-f0-9]{64}$/.test(bundle.sha256) ||
+          !Number.isSafeInteger(bundle.bytes) ||
+          bundle.bytes <= 0 ||
+          !['waiting_owner', 'accepted', 'rejected'].includes(job.status)
+        )
+          return fail();
+        const captured = JSON.parse(bundle.provenance);
+        if (
+          captured.status !== 'waiting_owner' ||
+          captured.ownerReview !== null ||
+          captured.bundle !== undefined
+        )
+          return fail();
+        for (const key of [
+          'id',
+          'requestId',
+          'workflowId',
+          'title',
+          'companyId',
+          'companyName',
+          'acceptanceOwner',
+          'contentVersion',
+          'contentSha256',
+          'contextSha256',
+          'createdAt',
+          'candidate',
+          'maxRepairCandidates',
+          'retryCount',
+          'stages',
+        ] as const)
+          if (JSON.stringify(captured[key]) !== JSON.stringify(job[key])) return fail();
+        const bytes = workflowBundleBytes(db, job);
+        if (bytes.length !== bundle.bytes || sha256(bytes) !== bundle.sha256) return fail();
+        if (job.ownerReview && job.ownerReview.bundleSha256 !== bundle.sha256) return fail();
+      } else if (job.ownerReview?.bundleSha256 !== undefined) return fail();
+    }
     for (const row of db.prepare('SELECT job_id,action FROM workflow_requests').all())
       if (!jobs.has(String(row.job_id)) || row.action !== 'retry') return fail();
   } catch (error) {

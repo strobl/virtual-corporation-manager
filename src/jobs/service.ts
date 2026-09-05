@@ -9,10 +9,17 @@ import { executeWorkflowCodex, WORKFLOW_EXECUTION_FILE } from '../adapters/workf
 import { executeWorkflowCheck } from '../adapters/workflow-check.js';
 import { executeProcess, runtimeEnvironment } from '../adapters/process.js';
 import { studioContent, workflowInfo, type StudioContent } from './content.js';
-import type { JobArtifact, JobInfo, JobStage, StageId } from './contracts.js';
+import {
+  completedJobStage,
+  JOB_STAGE_ORDER as stageOrder,
+  JOB_REQUIRED_OUTPUTS as requiredOutputs,
+  type JobArtifact,
+  type JobInfo,
+  type JobStage,
+  type StageId,
+} from './contracts.js';
 import { assertUnchanged, captureFiles, hashes, materializeInputs, type Files } from './files.js';
-import { sha256 } from './store.js';
-import { filesZip } from './zip.js';
+import { sha256, workflowBundleBytes } from './store.js';
 import { isQaTestCommand } from './qa-command.js';
 
 export interface JobServiceOptions {
@@ -39,14 +46,6 @@ const requestId = (value: unknown): string => {
       'Provide a unique request ID of 8–200 letters, digits or . _ : -.',
     );
   return value;
-};
-const stageOrder: StageId[] = ['intake', 'requirements', 'build', 'qa', 'handoff'];
-const requiredOutputs: Record<StageId, string[]> = {
-  intake: ['INTAKE.md'],
-  requirements: ['SCOPE.md'],
-  build: ['stock_alert.py', 'test_stock_alert.py', 'expected.json', 'USAGE.md'],
-  qa: ['QA.json', 'QA.md'],
-  handoff: ['HANDOFF.md'],
 };
 function jsonReport(files: Files): {
   status: string;
@@ -123,6 +122,46 @@ export function createJobService(
     return row ? JSON.parse(String(row.info)) : undefined;
   };
   const need = (id: string): JobInfo => get(id) ?? fail('NOT_FOUND', 'Workflow job not found.');
+  const transaction = <T>(operation: () => T): T => {
+    db.exec('BEGIN IMMEDIATE');
+    try {
+      const result = operation();
+      db.exec('COMMIT');
+      return result;
+    } catch (error) {
+      db.exec('ROLLBACK');
+      throw error;
+    }
+  };
+  const requireQueueSlot = () => {
+    const pending = db
+      .prepare(
+        "SELECT COUNT(*) AS count FROM workflow_jobs WHERE json_extract(info,'$.status') IN ('running','queued')",
+      )
+      .get()!;
+    if (Number(pending.count) >= 3)
+      fail(
+        'WORKFLOW_BUSY',
+        'Three workflow jobs are already active or queued. Wait for one to finish.',
+      );
+  };
+  const checkedBundle = (job: JobInfo): Buffer => {
+    const bytes = workflowBundleBytes(db, job);
+    if (job.bundle && (bytes.length !== job.bundle.bytes || sha256(bytes) !== job.bundle.sha256))
+      fail(
+        'BUNDLE_CONFLICT',
+        'The captured bundle no longer matches its reviewed bytes. Preserve the workspace and restore a verified backup.',
+      );
+    return bytes;
+  };
+  const sealBundle = (job: JobInfo) => {
+    if (job.bundle) return checkedBundle(job);
+    // Freeze the exact pre-decision download, without putting its own hash inside the ZIP.
+    const provenance = JSON.stringify(job, null, 2);
+    const bytes = workflowBundleBytes(db, job, provenance);
+    job.bundle = { version: 1, provenance, sha256: sha256(bytes), bytes: bytes.length };
+    return bytes;
+  };
   const context = (id: string): Context =>
     JSON.parse(String(db.prepare('SELECT context FROM workflow_jobs WHERE id=?').get(id)!.context));
   const save = (job: JobInfo) => {
@@ -193,13 +232,7 @@ export function createJobService(
       throw error;
     }
   };
-  const completed = (job: JobInfo, kind: StageId) =>
-    job.stages.findLast(
-      (s) =>
-        s.kind === kind &&
-        s.status === 'completed' &&
-        (kind === 'intake' || kind === 'requirements' || s.attempt === job.candidate),
-    );
+  const completed = completedJobStage;
   const immutableBase = (ctx: Context): Files => {
     const { ['expected.json']: expected, ...inputs } = ctx.content.files;
     return {
@@ -684,6 +717,7 @@ export function createJobService(
           return fail('CANCELLED', 'Job cancelled before owner review.');
         job.status = 'waiting_owner';
         job.error = null;
+        sealBundle(job);
         event(
           job,
           'The inspected candidate passed its independent checks. Download the files and accept or reject explicitly.',
@@ -765,18 +799,7 @@ export function createJobService(
           'REVIEW_NOT_READY',
           'The deliverable bundle is available once the reviewed handoff is ready. Individual stage evidence remains available.',
         );
-      const pinned = context(id).content.files;
-      const files: Files = Object.fromEntries(
-        ['input.json', 'brief.md', 'requirements.md'].map((path) => [path, pinned[path]]),
-      );
-      for (const kind of stageOrder) {
-        const stage = completed(job, kind)!;
-        const captured = stageFiles(id, stage.id);
-        for (const path of requiredOutputs[kind]) files[path] = captured[path];
-        if (kind === 'qa') files['oracle-result.json'] = captured['oracle-result.json'];
-      }
-      files['PROVENANCE.json'] = JSON.stringify(job, null, 2);
-      return filesZip(files);
+      return checkedBundle(job);
     },
     start: (input: {
       companyId: string;
@@ -835,16 +858,6 @@ export function createJobService(
       }
       if (new Set(Object.values(agents).map((a) => a.id)).size !== 5)
         return fail('INDEPENDENT_ROLES_REQUIRED', 'Five distinct role identities are required.');
-      const pending = db
-        .prepare(
-          "SELECT COUNT(*) AS count FROM workflow_jobs WHERE json_extract(info,'$.status') IN ('running','queued')",
-        )
-        .get()!;
-      if (Number(pending.count) >= 3)
-        return fail(
-          'WORKFLOW_BUSY',
-          'Three workflow jobs are already active or queued. Wait for one to finish.',
-        );
       const capturedContext = JSON.stringify({
         agents,
         content,
@@ -881,12 +894,15 @@ export function createJobService(
           },
         ],
       };
-      db.prepare('INSERT INTO workflow_jobs VALUES (?,?,?,?)').run(
-        job.id,
-        rid,
-        JSON.stringify(job),
-        capturedContext,
-      );
+      transaction(() => {
+        requireQueueSlot();
+        db.prepare('INSERT INTO workflow_jobs VALUES (?,?,?,?)').run(
+          job.id,
+          rid,
+          JSON.stringify(job),
+          capturedContext,
+        );
+      });
       pump();
       return need(job.id);
     },
@@ -901,66 +917,72 @@ export function createJobService(
       return need(id);
     },
     retry: (id: string, value: unknown) => {
+      if (closed) return fail('WORKSPACE_BUSY', 'The local server is closing.');
       const rid = requestId(value);
-      const job = need(id);
-      const replay = db
-        .prepare('SELECT job_id,action FROM workflow_requests WHERE request_id=?')
-        .get(rid);
-      if (replay) {
-        if (replay.job_id !== id || replay.action !== 'retry')
-          return fail('REQUEST_CONFLICT', 'Retry request ID is already in use.');
-        return job;
-      }
-      if (!job.retryable)
-        return fail(
-          'RETRY_NOT_ALLOWED',
-          job.retryReason ??
-            'Only a failed workflow with remaining retry authority can be retried.',
-        );
-      job.retryCount++;
-      job.status = 'queued';
-      job.error = null;
-      db.exec('BEGIN IMMEDIATE');
-      try {
+      transaction(() => {
+        const job = need(id);
+        const replay = db
+          .prepare('SELECT job_id,action FROM workflow_requests WHERE request_id=?')
+          .get(rid);
+        if (replay) {
+          if (replay.job_id !== id || replay.action !== 'retry')
+            return fail('REQUEST_CONFLICT', 'Retry request ID is already in use.');
+          return;
+        }
+        if (!job.retryable)
+          return fail(
+            'RETRY_NOT_ALLOWED',
+            job.retryReason ??
+              'Only a failed workflow with remaining retry authority can be retried.',
+          );
+        requireQueueSlot();
+        job.retryCount++;
+        job.status = 'queued';
+        job.error = null;
         db.prepare('INSERT INTO workflow_requests VALUES (?,?,?)').run(rid, id, 'retry');
         event(job, `Owner requested runtime retry ${job.retryCount} of 2.`);
-        db.exec('COMMIT');
-      } catch (e) {
-        db.exec('ROLLBACK');
-        throw e;
-      }
+      });
       pump();
       return need(id);
     },
     review: (id: string, input: { decision: string; note: string }) => {
-      const job = need(id);
-      if (
-        !['accepted', 'rejected'].includes(input.decision) ||
-        typeof input.note !== 'string' ||
-        input.note.trim().length < 3 ||
-        input.note.length > 5000
-      )
-        return fail(
-          'INVALID_REVIEW',
-          'Choose accept or reject and add a review note of 3–5,000 characters.',
-        );
-      if (job.ownerReview) {
+      if (closed) return fail('WORKSPACE_BUSY', 'The local server is closing.');
+      return transaction(() => {
+        const job = need(id);
         if (
-          job.ownerReview.decision === input.decision &&
-          job.ownerReview.note === input.note.trim()
+          !['accepted', 'rejected'].includes(input.decision) ||
+          typeof input.note !== 'string' ||
+          input.note.trim().length < 3 ||
+          input.note.length > 5000
         )
-          return job;
-        return fail('REVIEW_CONFLICT', 'This candidate already has a recorded owner decision.');
-      }
-      if (job.status !== 'waiting_owner')
-        return fail(
-          'REVIEW_NOT_READY',
-          'Owner acceptance is available only after independent checks and handoff finish.',
-        );
-      job.status = input.decision as 'accepted' | 'rejected';
-      job.ownerReview = { decision: job.status, note: input.note.trim(), reviewedAt: now() };
-      event(job, `Owner ${job.status} this candidate: ${job.ownerReview.note}`);
-      return need(id);
+          return fail(
+            'INVALID_REVIEW',
+            'Choose accept or reject and add a review note of 3–5,000 characters.',
+          );
+        if (job.ownerReview) {
+          if (
+            job.ownerReview.decision === input.decision &&
+            job.ownerReview.note === input.note.trim()
+          )
+            return job;
+          return fail('REVIEW_CONFLICT', 'This candidate already has a recorded owner decision.');
+        }
+        if (job.status !== 'waiting_owner')
+          return fail(
+            'REVIEW_NOT_READY',
+            'Owner acceptance is available only after independent checks and handoff finish.',
+          );
+        sealBundle(job);
+        job.status = input.decision as 'accepted' | 'rejected';
+        job.ownerReview = {
+          decision: job.status,
+          note: input.note.trim(),
+          reviewedAt: now(),
+          bundleSha256: job.bundle!.sha256,
+        };
+        event(job, `Owner ${job.status} this candidate: ${job.ownerReview.note}`);
+        return need(id);
+      });
     },
     close: async () => {
       closed = true;

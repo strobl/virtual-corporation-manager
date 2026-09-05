@@ -90,6 +90,13 @@ export function createWorkViewModel(
   const reviewableRuns = scopedRuns.filter((run) => runDisplayState(run, work).reviewable);
   const reviewableIds = new Set(reviewableRuns.map((run) => run.id));
   const acceptedRecords = work.filter((record) => record.status === 'accepted');
+  const manualRecords = work.filter(
+    (record) =>
+      record.provenance === 'manual' && record.runId === null && record.status !== 'accepted',
+  );
+  const reviewableManualRecords = manualRecords.filter(
+    (record) => record.status === 'submitted' && record.output.trim().length > 0,
+  );
   return {
     scopeName:
       companyId === null
@@ -98,6 +105,8 @@ export function createWorkViewModel(
     runs: [...reviewableRuns, ...scopedRuns.filter((run) => !reviewableIds.has(run.id))],
     work,
     acceptedRecords,
+    manualRecords,
+    reviewableManualRecords,
     reviewableRuns,
     stats: {
       tasks: scopedRuns.length,
@@ -105,7 +114,7 @@ export function createWorkViewModel(
       queued: scopedRuns.filter((run) => run.status === 'queued').length,
       completed: scopedRuns.filter((run) => run.status === 'completed').length,
       accepted: acceptedRecords.length,
-      reviewable: reviewableRuns.length,
+      reviewable: reviewableRuns.length + reviewableManualRecords.length,
     },
   };
 }

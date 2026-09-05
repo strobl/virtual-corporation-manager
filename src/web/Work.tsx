@@ -215,6 +215,7 @@ export function WorkView({
   const requestedRun = initialRunForScope(runs, companyId, initialRunId);
   const [selectedRun, setSelectedRun] = useState<string | null>(() => requestedRun?.id ?? null);
   const openedRequest = useRef<string | null>(null);
+  const firstManualReview = useRef<HTMLDetailsElement>(null);
   useEffect(() => {
     if (!initialRunId) {
       openedRequest.current = null;
@@ -265,7 +266,7 @@ export function WorkView({
           Refresh
         </button>
       </div>
-      {view.reviewableRuns.length > 0 && (
+      {view.stats.reviewable > 0 && (
         <section className="work-review-banner" aria-label="Work ready for review">
           <span className="work-review-count">{view.stats.reviewable}</span>
           <div className="work-review-copy">
@@ -279,7 +280,14 @@ export function WorkView({
           </div>
           <button
             className="button primary work-review-action"
-            onClick={() => setSelectedRun(view.reviewableRuns[0]!.id)}
+            onClick={() => {
+              const firstRun = view.reviewableRuns[0];
+              if (firstRun) setSelectedRun(firstRun.id);
+              else if (firstManualReview.current) {
+                firstManualReview.current.open = true;
+                firstManualReview.current.querySelector('pre')?.focus();
+              }
+            }}
           >
             Review work <ArrowUpRight size={16} />
           </button>
@@ -303,7 +311,7 @@ export function WorkView({
           <span>Accepted records</span>
         </div>
       </div>
-      {!view.runs.length && !view.acceptedRecords.length && (
+      {!view.runs.length && !view.acceptedRecords.length && !view.manualRecords.length && (
         <div className="empty-state">
           <span className="empty-icon">
             <Terminal size={25} />
@@ -360,6 +368,64 @@ export function WorkView({
           );
         })}
       </div>
+      {view.manualRecords.length > 0 && (
+        <section className="record-section" aria-label="Manual work records">
+          <h3>Manual work</h3>
+          <p className="muted small">
+            These records were supplied manually; they are not runtime executions.
+          </p>
+          {view.manualRecords.map((record) => {
+            const reviewable = view.reviewableManualRecords.includes(record);
+            return (
+              <article className="work-record" key={record.id}>
+                <h4>{record.title}</h4>
+                <span
+                  className={`status-pill ${record.status} work-status-${reviewable ? 'review' : record.status}`}
+                >
+                  {record.status === 'failed'
+                    ? 'Failed'
+                    : reviewable
+                      ? 'Needs your review'
+                      : 'Submitted'}
+                </span>
+                <p className="muted small">
+                  {state.agents.find((agent) => agent.id === record.agentId)?.name ?? 'Agent'} ·{' '}
+                  {state.companies.find((company) => company.id === record.companyId)?.name ??
+                    'Company'}{' '}
+                  · {record.provenance} · {date(record.createdAt)}
+                </p>
+                <details
+                  className="text-disclosure"
+                  ref={
+                    record.id === view.reviewableManualRecords[0]?.id
+                      ? firstManualReview
+                      : undefined
+                  }
+                >
+                  <summary>Read manual output</summary>
+                  <pre
+                    className="full-text work-record-output"
+                    tabIndex={0}
+                    role="region"
+                    aria-label="Manual output"
+                  >
+                    {record.output}
+                  </pre>
+                  {reviewable && (
+                    <button
+                      className="button primary"
+                      onClick={() => onAccept(record.id, record.title)}
+                    >
+                      <CheckCircle2 size={15} />
+                      Review acceptance
+                    </button>
+                  )}
+                </details>
+              </article>
+            );
+          })}
+        </section>
+      )}
       {view.acceptedRecords.length > 0 && (
         <section className="record-section">
           <h3>Accepted work</h3>

@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "name": "Patchwork Studio: three-agent example",
+  "description": "Fictional learning fixture. Three peer roles, no reporting hierarchy, no work or time records. Importing creates fresh identities.",
+  "companies": [
+    {
+      "id": "example-patchwork",
+      "name": "Patchwork Studio (example)",
+      "shortCode": "PATCH",
+      "description": "Fictional three-agent organization for a release-notes tool. Configuration only; no work has been executed or hours booked.",
+      "color": "#0e7490",
+      "status": "active",
+      "version": 1,
+      "createdAt": "2026-09-05T00:00:00.000Z",
+      "updatedAt": "2026-09-05T00:00:00.000Z"
+    }
+  ],
+  "departments": [
+    {
+      "id": "example-product",
+      "companyId": "example-patchwork",
+      "name": "Product",
+      "description": "Maintain the example release-notes tool.",
+      "managerId": null
+    }
+  ],
+  "agents": [
+    {
+      "id": "example-builder",
+      "name": "Builder",
+      "role": "Software builder",
+      "kind": "agent",
+      "instructions": "Implement only the agreed release-notes change. Read the supplied issue and relevant code. Return the patch, commands run and unresolved assumptions. Do not publish a release or modify production data.",
+      "responsibilities": ["Implement the scoped change", "Record test commands and results"],
+      "departmentId": "example-product",
+      "managerId": null,
+      "status": "active",
+      "version": 1,
+      "createdAt": "2026-09-05T00:00:00.000Z",
+      "updatedAt": "2026-09-05T00:00:00.000Z"
+    },
+    {
+      "id": "example-reviewer",
+      "name": "Reviewer",
+      "role": "Code reviewer",
+      "kind": "agent",
+      "instructions": "Review the supplied candidate diff and its evidence. Identify defects with reproduction steps. Return a review note and open questions. A review note is not permission to merge or a record that work was executed.",
+      "responsibilities": [
+        "Check behavior against the issue",
+        "Report concrete defects and coverage gaps"
+      ],
+      "departmentId": "example-product",
+      "managerId": null,
+      "status": "active",
+      "version": 1,
+      "createdAt": "2026-09-05T00:00:00.000Z",
+      "updatedAt": "2026-09-05T00:00:00.000Z"
+    },
+    {
+      "id": "example-researcher",
+      "name": "Researcher",
+      "role": "Requirements researcher",
+      "kind": "agent",
+      "instructions": "Use the supplied sources to clarify the next release-notes requirement. Return source links, requirements and uncertainties. Do not invent customer feedback or claim access to private systems.",
+      "responsibilities": [
+        "Trace requirements to supplied sources",
+        "Separate evidence from assumptions"
+      ],
+      "departmentId": "example-product",
+      "managerId": null,
+      "status": "active",
+      "version": 1,
+      "createdAt": "2026-09-05T00:00:00.000Z",
+      "updatedAt": "2026-09-05T00:00:00.000Z"
+    }
+  ],
+  "assignments": [
+    {
+      "id": "example-assignment-builder",
+      "agentId": "example-builder",
+      "companyId": "example-patchwork",
+      "isPrimary": true,
+      "startedAt": "2026-09-05T00:00:00.000Z",
+      "endedAt": null
+    },
+    {
+      "id": "example-assignment-reviewer",
+      "agentId": "example-reviewer",
+      "companyId": "example-patchwork",
+      "isPrimary": true,
+      "startedAt": "2026-09-05T00:00:00.000Z",
+      "endedAt": null
+    },
+    {
+      "id": "example-assignment-researcher",
+      "agentId": "example-researcher",
+      "companyId": "example-patchwork",
+      "isPrimary": true,
+      "startedAt": "2026-09-05T00:00:00.000Z",
+      "endedAt": null
+    }
+  ],
+  "relationships": []
+}

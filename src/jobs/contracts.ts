@@ -9,6 +9,22 @@ export type JobStatus =
   | 'failed'
   | 'cancelled';
 export type StageId = 'intake' | 'requirements' | 'build' | 'qa' | 'handoff';
+export const JOB_STAGE_ORDER: StageId[] = ['intake', 'requirements', 'build', 'qa', 'handoff'];
+export const JOB_REQUIRED_OUTPUTS: Record<StageId, string[]> = {
+  intake: ['INTAKE.md'],
+  requirements: ['SCOPE.md'],
+  build: ['stock_alert.py', 'test_stock_alert.py', 'expected.json', 'USAGE.md'],
+  qa: ['QA.json', 'QA.md'],
+  handoff: ['HANDOFF.md'],
+};
+export function safeArtifactPath(path: string): boolean {
+  return (
+    path.length > 0 &&
+    path.length <= 240 &&
+    path.split('/').every((p) => /^[a-zA-Z0-9_][a-zA-Z0-9_.-]*$/.test(p)) &&
+    /\.(py|json|md|txt|csv)$/.test(path)
+  );
+}
 export interface JobArtifact {
   id: string;
   stageId: string;
@@ -66,9 +82,23 @@ export interface JobInfo {
   retryCount: number;
   stages: JobStage[];
   error: string | null;
-  ownerReview: { decision: 'accepted' | 'rejected'; note: string; reviewedAt: string } | null;
+  /** Absent on historical jobs; never backfill a historical owner's decision. */
+  bundle?: { version: 1; provenance: string; sha256: string; bytes: number };
+  ownerReview: {
+    decision: 'accepted' | 'rejected';
+    note: string;
+    reviewedAt: string;
+    bundleSha256?: string;
+  } | null;
   events: { at: string; message: string }[];
 }
+export const completedJobStage = (job: JobInfo, kind: StageId) =>
+  job.stages.findLast(
+    (s) =>
+      s.kind === kind &&
+      s.status === 'completed' &&
+      (kind === 'intake' || kind === 'requirements' || s.attempt === job.candidate),
+  );
 export interface WorkflowInfo {
   id: 'PS-001';
   title: string;

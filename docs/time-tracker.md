@@ -41,7 +41,7 @@ This Node.js example sends a local JSON file without printing the session token:
 import { readFile } from 'node:fs/promises';
 const base = 'http://127.0.0.1:4310'; // use the URL printed by your server
 const sessionResponse = await fetch(`${base}/api/session`);
-if (!sessionResponse.ok) throw new Error('Start the local GitFlash server first.');
+if (!sessionResponse.ok) throw new Error('Start the local VCM server first.');
 const { token } = await sessionResponse.json();
 const payload = JSON.parse(await readFile(process.argv[2], 'utf8'));
 const response = await fetch(`${base}/api/time/ingest`, {

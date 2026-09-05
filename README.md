@@ -6,7 +6,7 @@ VCM is an MIT-licensed local workspace for developers who manage agent roles acr
 
 If your roles currently live in a document, prompts or scripts, try representing one real project in VCM and compare the effort of maintaining it. VCM stores the context you enter; it does not synchronize arbitrary chats or make configured agents execute automatically.
 
-**Local review candidate: `0.1.0-alpha.5-local.1`, prepared 5 September 2026; unpublished.** The commands below require the supplied candidate archive or its reviewed checkout. Public alpha.2 is an earlier release and does not contain this interface, the Time Tracker or company file workflows. A version string alone is insufficient: use the candidate's source revision and archive SHA-256 from its handoff. Check the [release page](https://github.com/strobl/virtual-corporation-manager/releases) for actual public availability.
+**Release target: `0.1.0-alpha.5`.** At preparation on 5 September 2026, this successor is a release candidate; its final CI, tag and public-download checks are pending. The previously accepted `0.1.0-alpha.5-local.1` and public alpha.2 are distinct artifacts. Public alpha.2 does not contain this interface, the Time Tracker or company file workflows. Check the [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.5) and its source revision and SHA-256 before treating this candidate as publicly available.
 
 [Developer quickstart](docs/developer-quickstart.md) · [Three-agent example](docs/examples/README.md) · [Architecture and data](docs/developer-architecture.md) · [Contribute](CONTRIBUTING.md)
 
@@ -14,19 +14,21 @@ If your roles currently live in a document, prompts or scripts, try representing
 
 _Actual local candidate: Patchwork is a fictional three-agent example with no executed jobs or booked hours. Reporting relationships and execution are separate._
 
-## Install the local candidate
+## Install the reviewed archive
 
-Use **Node.js 24.14+ in the 24.x line, or Node 26.x**, with npm. The local core supports macOS, Linux and native Windows. No database compiler, provider account or Python installation is needed for corporation management, the Time Tracker or the example below.
+Use **Node.js 24.14+ in the 24.x line, or Node 26.x**, with npm. The declared local-core targets are macOS, Linux and native Windows; consult the exact release's [OS/Node acceptance](docs/acceptance.md) rather than inferring a passing matrix from these targets. No database compiler, provider account or Python installation is needed for corporation management, the Time Tracker or the example below.
 
-Run these commands in the directory containing the exact supplied archive. This installs into a separate folder and starts the candidate's `vcm` binary:
+The distribution artifact is [gitflash-0.1.0-alpha.5.tgz](https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.5/gitflash-0.1.0-alpha.5.tgz). That GitHub URL is the intended release asset, not an availability claim before publication. During candidate review, use the exact supplied archive and its matching manifest instead. Download and verify the archive before going offline; no npm registry namespace is required.
+
+Run these commands in the directory containing that verified archive. They install into a separate folder and start its `vcm` binary:
 
 ```sh
-npm install --offline --ignore-scripts --prefix ./vcm-preview ./gitflash-0.1.0-alpha.5-local.1.tgz
+npm install --offline --ignore-scripts --prefix ./vcm-preview ./gitflash-0.1.0-alpha.5.tgz
 npm exec --offline --prefix ./vcm-preview -- vcm --version
 npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company
 ```
 
-Expected version: `0.1.0-alpha.5-local.1`. Open the loopback URL printed by the command if the browser does not open. Use the same working directory and `--data-dir` when restarting. Add `--port 4311` if 4310 is occupied, or `--no-open` to open the URL yourself.
+Expected version: `0.1.0-alpha.5`. Open the loopback URL printed by the command if the browser does not open. Use the same working directory and `--data-dir` when restarting. Add `--port 4311` if 4310 is occupied, or `--no-open` to open the URL yourself.
 
 The package name and archive prefix remain `gitflash`; **`vcm` is the canonical command and `gitflash` is its compatibility alias**. Both use the same existing `~/.gitflash` default, `GITFLASH_DATA_DIR` setting and explicit `--data-dir`. There is no automatic move to a new data directory and no claim that the npm name `vcm` is available. Technical export and protocol identifiers retain their compatibility names. GitFlash's separate FDE website is unchanged.
 
@@ -87,3 +89,5 @@ Start with a small change you can demonstrate in an isolated workspace. [CONTRIB
 MIT for the application code. Useful organization, inspector and domain work was selectively adapted from the owner's prior prototype. Private history, hosted infrastructure and private/customer records were excluded. The Time Tracker bundles 124 owner-authorized Shared catalog definitions from the live prototype. Catalog provenance and complete upstream notices for bundled dependencies and adapted component patterns are in [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md).
 
 The retained Rubik Bold font and earlier vector assets keep their SIL OFL 1.1 attribution in `dist/web/fonts/Rubik-OFL-1.1.txt`. The VCM interface uses system fonts and native SVG assets.
+
+The complete current VCM core is MIT licensed, including commercial use, hosting and forks subject to the MIT notice requirement. Optional, newly developed Enterprise components may be offered separately under their own license. No Enterprise fee or company-size limit applies to the MIT core. See the [licensing model](docs/licensing.md) for the component, service and contribution boundaries.

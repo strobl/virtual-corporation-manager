@@ -1,4 +1,4 @@
-import { safeArtifactPath } from './store.js';
+import { safeArtifactPath } from './contracts.js';
 import type { Files } from './files.js';
 
 /** Small uncompressed ZIP: portable downloads without adding an archive dependency. */

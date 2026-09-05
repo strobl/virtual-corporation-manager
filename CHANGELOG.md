@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.0-alpha.5 — release preparation, 5 September 2026
+
+- Target the verified GitHub tarball distribution route for the developer-first VCM product, retaining the `gitflash` package and both `vcm` and `gitflash` commands.
+- Reconcile installation, first-company, recovery handoff and acceptance documentation with the actual schema-5 application and the separate optional execution boundary.
+- Preserve the accepted local alpha.5-local.1 evidence as the predecessor. This release version requires its own source, CI, package and public-download verification; earlier checks do not identify the new archive.
+- Correct the Rubik notice to acknowledge the original font file and its included OFL license.
+- Show submitted and failed manual outputs in Work, with the existing explicit acceptance flow.
+- Enforce the three-job admission limit on Start and Retry atomically; bind owner decisions to an immutable, verified ZIP digest.
+- Render Slack replies as bounded literal text, preserving complete local results; cover the Buzz CLI contract with subprocess fixtures.
+- Document the three-container system architecture and the MIT core with optional separately licensed future Enterprise components.
+
+At this preparation snapshot, the final CI matrix, immutable tag and fresh public install are pending. The published release record and verified asset determine later availability. No human pilot, live Buzz/Slack result or untested platform is claimed.
+
 ## 0.1.0-alpha.5-local.1 — developer-first review candidate, unpublished
 
 - Make `vcm` the visible CLI entry and keep `gitflash` as an alias in the existing `gitflash` package. Preserve default/custom data paths, legacy environment variables and machine-facing formats.

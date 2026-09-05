@@ -338,6 +338,21 @@ describe('workflow HTTP boundary and downloads', () => {
       const captured = body.artifacts.find((a: { path: string }) => a.path === name);
       expect(sha256(entries.get(name)!.toString())).toBe(captured.sha256);
     }
+    expect(job.bundle).toMatchObject({ version: 1, sha256: sha256(zip), bytes: zip.length });
+    expect(entries.get('PROVENANCE.json')?.toString()).toBe(job.bundle!.provenance);
+    const reviewed = await f.post(`/api/jobs/${job.id}/review`, {
+      decision: 'accepted',
+      note: 'Downloaded and inspected these exact HTTP fixture bytes.',
+    });
+    expect(reviewed.status).toBe(200);
+    expect(reviewed.body.ownerReview.bundleSha256).toBe(sha256(zip));
+    const decidedZip = Buffer.from(
+      await (await fetch(`${f.app.url}/api/jobs/${job.id}/deliverables`)).arrayBuffer(),
+    );
+    expect(decidedZip).toEqual(zip);
+    const decidedExport = await (await fetch(`${f.app.url}/api/jobs/${job.id}/export`)).json();
+    expect(decidedExport.job.ownerReview).toEqual(reviewed.body.ownerReview);
+    expect(decidedExport.job.bundle.sha256).toBe(sha256(zip));
     const second = await f.settle((await f.start(companyId)).body.id);
     expect(
       (await fetch(`${f.app.url}/api/jobs/${second.id}/artifacts/${artifact.id}`)).status,

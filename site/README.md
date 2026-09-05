@@ -1,27 +1,33 @@
-# VCM repository fallback page
+# VCM technical site
 
-Static HTML, CSS and native SVG. This directory is the repository fallback page source, separate from the CMO-owned Lovable draft. It has no build step, JavaScript, analytics, remote fonts, uploads or task execution. Relative assets support a repository subpath such as `/gitflash/`.
+Static technical landing page and documentation for **VCM — Virtual Corporation Manager**. The approved developer-first headline is **Your agent company. On your machine.** The primary action is **Install VCM**, with **Read the docs** beside it. GitFlash remains the separate FDE boutique and legal operator; it is not the acquisition brand.
 
-The public identity is **VCM — Virtual Corporation Manager** and the headline is **Run a task. Review the result.** Four distinct links explain the corresponding installed actions: **Run a task**, **Review results**, **Track delivery hours**, **Set up a company**. Each guide names the input, output and actual next action. The primary website setup action is **Set up locally**; the website does not impersonate a hosted tool.
+The site is plain HTML, CSS and a small progressive-enhancement script for clipboard feedback and image enlargement. No build, external font, analytics, upload, inference or account is required. Images, identity SVGs and the example JSON are bundled locally. It is independent of the separately accepted Lovable project.
 
-## Candidate and release boundary
+## Serve and review
 
-This source describes **local release candidate `0.1.0-alpha.3`, prepared 5 September 2026**. At preparation it is **UNPUBLISHED**. Its installation commands require the supplied `gitflash-0.1.0-alpha.3.tgz` archive and matching handoff SHA-256. There is no public alpha.3 download link until release publication is verified. At preparation, the existing public `v0.1.0-alpha.2` remains unchanged; its link is explicitly historical and does not promise the VCM screen, Time Tracker or Product Studio company workflows. Technical repository, package, CLI and default data identifiers remain `gitflash`.
+Serve `site/` using any static HTTP server. Directory routes are `./`, `./docs/` and `./imprint/`; every local resource uses a relative URL. It also works below a repository prefix such as `/virtual-corporation-manager/` without a router fallback. The existing Pages workflow uploads this directory directly.
 
-`virtualcorporationmanager.com` is the selected target text. At preparation on 5 September 2026, registration, ownership, DNS, TLS and live deployment remain unverified. Do not add a canonical URL or claim this page is live until the actual destination is verified. GitFlash's existing FDE site and domains remain unchanged.
+Check the homepage and Docs install blocks, command-copy success/failure feedback, local example download, FAQ, responsive screenshots, image viewer Close/Escape/Tab/focus return, legal links and narrow-width overflow. Without JavaScript, all document and source links still work and product images open as ordinary image links. Clipboard failures give an honest manual-copy instruction.
 
-The VCM wordmark and favicon are byte-for-byte copies of `public/vcm-wordmark.svg` and `public/vcm-favicon.svg`. White surfaces, a blue action accent, system typography and visible keyboard focus match the product candidate. Retained older F-mark assets are not referenced by this page.
+## Alpha 5 candidate and release handoff
 
-## Review before publication
+This source is prepared for `0.1.0-alpha.5`. It remains an **Alpha 5 release candidate** until Engineering verifies the published release and downloadable archive. The exact future target is:
 
-Serve this directory through a static server for local review. Check desktop and mobile layouts, keyboard navigation, true 200% zoom, relative assets under a repository subpath, every local anchor and the exact supplied install commands. These are required review checks, not claims of completed visual acceptance.
+`https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.5/gitflash-0.1.0-alpha.5.tgz`
 
-Preparing, serving or reviewing these files does not publish them. Keep the existing release, public `main`, Pages configuration, repository About/Homepage fields and domains unchanged during candidate review.
+The displayed command installs into `./vcm-preview` without lifecycle scripts, checks `vcm --version`, and starts with explicit `./my-company` data. Requires Node.js `>=24.14.0 <25 || >=26.0.0 <27` and npm. The download needs network access; installed local core operation does not. The package name remains `gitflash`; `vcm` is canonical and `gitflash` a compatibility alias. No public npm namespace is assumed.
 
-At an explicitly authorized release, the owner should:
+Before deployment, the release owner must verify the exact source, tag, archive digest and download; execute the displayed commands against that archive; then reconcile the candidate label, download-availability text and version FAQ in `index.html` and `docs/index.html` with the actual result. Source preparation and local browser checks do not establish release publication. The CMO does not publish or commit this assignment.
 
-1. Verify the final source revision, release tag, archive checksum and actual downloadable asset. Update candidate copy and installation links to that exact release; recheck runtime requirements and task routes.
-2. Coordinate the final page owner and destination with CMO and PMO. Do not deploy this fallback page over the separate Lovable project or the GitFlash FDE site.
-3. Review repository About text for the VCM descriptor. Set the Homepage field only after the actual VCM destination has been verified; the technical repository name need not change.
-4. Inspect the current Pages workflow, allowed branch and environment before dispatch. If this fallback remains the chosen deployment, deploy the approved revision and verify the completed job plus live HTML, CSS, SVGs and task/setup links.
-5. Verify domain ownership, DNS, TLS and target content separately. Keep unrelated existing domains intact. Record the live URL and evidence before calling the VCM site published.
+## Product evidence and limits
+
+The four original JPEGs are unchanged captures from the separately accepted local `0.1.0-alpha.5-local.1` product, source `bc3e6b1b5c0954f3d01764d18ea9dedfb3075733`, archive `c2d239f6168a61c0c6ea849d14aaf32db528e4867e72799ca57e3dea1410be9e`. They are not new captures of the alpha.5 release. `assets/PROVENANCE.json` binds the bytes and version. Patchwork is a fictional three-peer-agent configuration with no jobs or booked hours. Northstar shows illustrative recorded effort: desktop company week8.0h and mobile Alex filter2.5h. The captions preserve these distinctions.
+
+A single local operator configures organizations. Configuration and reporting do not execute or delegate work automatically. Delivery hours are attributed human-equivalent effort, separate from runtime, savings, invoices and accepted output. Definition export reuses configuration with fresh identities on import; SQLite backup/restore preserves the whole workspace. Provider tools, credentials, sandbox requirements and platform restrictions remain separate from the local core.
+
+No custom-domain ownership, DNS, TLS, adoption, outside contribution, pilot outcome, enterprise edition or guaranteed support is asserted. The header and footer use the reviewed vector identity, not the obsolete checkmark. Old unreferenced assets remain historical files only.
+
+## Adopted licensing model
+
+The 6 September 2026 Founder decision keeps the complete existing core under MIT, including commercial use, hosting and forks without a company-size threshold. Optional new Enterprise modules may be separately commercially licensed; inspectable proprietary code is not open source. Existing Time Tracker, export/recovery and core fixes remain MIT. The homepage FAQ and `docs/#licensing` explain this boundary; no current Enterprise availability, prices or support guarantee are asserted. The public source licensing document is integrated by the release owner alongside this site.

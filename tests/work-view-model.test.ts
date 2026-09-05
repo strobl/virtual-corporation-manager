@@ -144,6 +144,137 @@ function workspace(work: WorkRecord[] = []): WorkspaceState {
 }
 
 describe('company work presentation', () => {
+  it('keeps pending and failed manual records visible in their recorded company without counting executions', () => {
+    const runtime = run('runtime');
+    const pending = record(runtime, { id: 'manual-pending', runId: null, provenance: 'manual' });
+    const failed = { ...pending, id: 'manual-failed', status: 'failed' as const };
+    const accepted = { ...pending, id: 'manual-accepted', status: 'accepted' as const };
+    const otherCompany = { ...pending, id: 'manual-other', companyId: 'b' };
+    const state = workspace([record(runtime), pending, failed, accepted, otherCompany]);
+    const before = JSON.stringify(state);
+    const view = createWorkViewModel(state, [runtime], 'a');
+    expect(view.manualRecords).toEqual([pending, failed]);
+    expect(view.reviewableManualRecords).toEqual([pending]);
+    expect(view.acceptedRecords).toEqual([accepted]);
+    expect(view.stats).toEqual({
+      tasks: 1,
+      running: 0,
+      queued: 0,
+      completed: 1,
+      accepted: 1,
+      reviewable: 2,
+    });
+    expect(createWorkViewModel(state, [], 'a').stats.tasks).toBe(0);
+    expect(createWorkViewModel(state, [runtime], 'b').manualRecords).toEqual([otherCompany]);
+    expect(createWorkViewModel(state, [runtime]).manualRecords).toEqual([
+      pending,
+      failed,
+      otherCompany,
+    ]);
+    expect(JSON.stringify(state)).toBe(before);
+  });
+
+  it.each([
+    ['submitted', '\n  Exact manual <output> & details.  \n', true],
+    ['failed', '\n  Exact failed manual <output> & details.  \n', false],
+    ['submitted', ' \n\t', false],
+  ] as const)(
+    'renders %s manual output and offers acceptance only for a nonempty submitted record',
+    (status, output, reviewable) => {
+      const value = record(run('unused'), {
+        id: 'manual-record',
+        title: 'Manual evidence',
+        runId: null,
+        provenance: 'manual',
+        status,
+        output,
+      });
+      const other = {
+        ...value,
+        id: 'other-manual',
+        companyId: 'b',
+        title: 'OTHER COMPANY PRIVATE TITLE',
+        output: 'OTHER COMPANY PRIVATE OUTPUT',
+      };
+      const state = workspace([value, other]);
+      const onAccept = vi.fn();
+      const html = renderToStaticMarkup(
+        createElement(WorkView, {
+          state,
+          runs: [],
+          companyId: 'a',
+          onSelectAgent: () => {},
+          onRefresh: () => {},
+          onAccept,
+        }),
+      );
+      expect(html).toContain('aria-label="Manual work records"');
+      expect(html).toContain('Manual evidence');
+      expect(html).toContain('manual ·');
+      expect(html).not.toContain('Your first useful result starts here');
+      expect(html).not.toContain('OTHER COMPANY PRIVATE');
+      const details = html.match(
+        /<details\b[^>]*><summary>Read manual output<\/summary>([\s\S]*?)<\/details>/,
+      )?.[1];
+      expect(details).toBeDefined();
+      const escaped = output
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;');
+      const serializedOutput = details?.match(/aria-label="Manual output">([\s\S]*?)<\/pre>/)?.[1];
+      // HTML strips the first newline after <pre>; React emits an extra newline
+      // when the original value starts with one so the browser preserves it.
+      const parsedOutput = serializedOutput?.startsWith('\n')
+        ? serializedOutput.slice(1)
+        : serializedOutput;
+      expect(parsedOutput).toBe(escaped);
+      expect(details).toContain('tabindex="0" role="region"');
+      if (reviewable) {
+        expect(details).toContain('Review acceptance');
+        expect(details!.indexOf('Manual output')).toBeLessThan(
+          details!.indexOf('Review acceptance'),
+        );
+        expect(html).toContain('Work ready for review');
+      } else {
+        expect(html).not.toContain('Review acceptance');
+        expect(html).not.toContain('Work ready for review');
+      }
+      expect(onAccept).not.toHaveBeenCalled();
+      expect(state.work[0]).toEqual(value);
+    },
+  );
+
+  it('moves accepted manual work out of the review list without hiding or duplicating its output', () => {
+    const pending = record(run('unused'), {
+      id: 'manual-transition',
+      runId: null,
+      provenance: 'manual',
+      title: 'Manual transition',
+      output: 'Unique manual output',
+    });
+    expect(createWorkViewModel(workspace([pending]), [], 'a').stats.reviewable).toBe(1);
+    const accepted = { ...pending, status: 'accepted' as const };
+    const state = workspace([accepted]);
+    const view = createWorkViewModel(state, [], 'a');
+    expect(view.manualRecords).toEqual([]);
+    expect(view.acceptedRecords).toEqual([accepted]);
+    expect(view.stats).toMatchObject({ tasks: 0, completed: 0, reviewable: 0, accepted: 1 });
+    const html = renderToStaticMarkup(
+      createElement(WorkView, {
+        state,
+        runs: [],
+        companyId: 'a',
+        onSelectAgent: () => {},
+        onRefresh: () => {},
+        onAccept: () => {},
+      }),
+    );
+    expect(html).not.toContain('Review acceptance');
+    expect(html).not.toContain('aria-label="Manual work records"');
+    expect(html).toContain('Read accepted output');
+    expect(html.match(/Unique manual output/g)).toHaveLength(1);
+  });
+
   it('uses persisted company provenance after an agent moves, including accepted manual work', () => {
     const a = run('historical-a');
     const b = run('current-b', { companyId: 'b', status: 'running' });

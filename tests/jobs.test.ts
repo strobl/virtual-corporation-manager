@@ -370,11 +370,25 @@ describe('Product Studio job orchestration', () => {
       exitCode: 0,
       oracleSha256: sha256(content.oracle),
     });
+    const reviewedBytes = f.service.download(job.id);
+    expect(job.bundle).toMatchObject({
+      version: 1,
+      sha256: sha256(reviewedBytes),
+      bytes: reviewedBytes.length,
+    });
+    expect(JSON.parse(job.bundle!.provenance)).toMatchObject({
+      status: 'waiting_owner',
+      ownerReview: null,
+      stages: job.stages,
+    });
+    expect(JSON.parse(job.bundle!.provenance)).not.toHaveProperty('bundle');
     const accepted = f.service.review(job.id, {
       decision: 'accepted',
       note: 'Inspected downloaded files.',
     });
     expect(accepted.status).toBe('accepted');
+    expect(accepted.ownerReview!.bundleSha256).toBe(sha256(reviewedBytes));
+    expect(f.service.download(job.id)).toEqual(reviewedBytes);
     expect(
       f.service.review(job.id, { decision: 'accepted', note: 'Inspected downloaded files.' }),
     ).toEqual(accepted);
@@ -760,6 +774,116 @@ describe('Product Studio job orchestration', () => {
     ).toBe(job.id);
   });
 
+  it('keeps retry admission within three total jobs without consuming refused requests or replay authority', async () => {
+    let holding = false;
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const f = fixture({
+      execute: async (call, result) => {
+        if (holding) await gate;
+        else if (call.kind === 'build')
+          return {
+            ...result,
+            status: 'failed',
+            error: { code: 'runtime', message: 'Synthetic retryable interruption.' },
+          };
+        return result;
+      },
+    });
+    try {
+      const failed = await settled(f.service, f.start().id);
+      holding = true;
+      const active = f.start('capacity-active');
+      const queued = [f.start('capacity-queued-one'), f.start('capacity-queued-two')];
+      const pending = () =>
+        f.service.list().filter((j) => ['queued', 'running'].includes(j.status));
+      expect(pending()).toHaveLength(3);
+      const before = f.service.export(failed.id);
+      const db = new DatabaseSync(join(f.dir, 'workspace.sqlite'), { readOnly: true });
+      try {
+        const row = db.prepare('SELECT * FROM workflow_jobs WHERE id=?').get(failed.id);
+        expect(() => f.service.retry(failed.id, 'capacity-retry')).toThrow(
+          expect.objectContaining({ code: 'WORKFLOW_BUSY' }),
+        );
+        expect(f.service.export(failed.id)).toEqual(before);
+        expect(db.prepare('SELECT * FROM workflow_jobs WHERE id=?').get(failed.id)).toEqual(row);
+        expect(
+          db.prepare('SELECT * FROM workflow_requests WHERE request_id=?').get('capacity-retry'),
+        ).toBeUndefined();
+      } finally {
+        db.close();
+      }
+      expect(() => f.start('capacity-overflow')).toThrow(
+        expect.objectContaining({ code: 'WORKFLOW_BUSY' }),
+      );
+      expect(f.start('capacity-active').id).toBe(active.id);
+      f.service.cancel(queued[0]!.id);
+      const admitted = f.service.retry(failed.id, 'capacity-retry');
+      expect(admitted.retryCount).toBe(1);
+      expect(pending()).toHaveLength(3);
+      expect(f.service.retry(failed.id, 'capacity-retry')).toEqual(admitted);
+      expect(() => f.service.retry(queued[0]!.id, 'capacity-retry')).toThrow(
+        expect.objectContaining({ code: 'REQUEST_CONFLICT' }),
+      );
+      expect(pending()).toHaveLength(3);
+      release();
+      expect((await settled(f.service, failed.id)).status).toBe('waiting_owner');
+      expect((await settled(f.service, active.id)).status).toBe('waiting_owner');
+      await settled(f.service, queued[1]!.id);
+    } finally {
+      release();
+    }
+  });
+
+  it('admits only one of concurrent retries competing for the final queue slot', async () => {
+    let holding = false;
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const f = fixture({
+      execute: async (call, result) => {
+        if (holding) await gate;
+        else if (call.kind === 'build')
+          return {
+            ...result,
+            status: 'failed',
+            error: { code: 'runtime', message: 'Synthetic retryable interruption.' },
+          };
+        return result;
+      },
+    });
+    try {
+      const failed = [
+        await settled(f.service, f.start().id),
+        await settled(f.service, f.start().id),
+      ];
+      holding = true;
+      f.start();
+      f.start();
+      const results = await Promise.allSettled(
+        failed.map((job, index) =>
+          Promise.resolve().then(() => f.service.retry(job.id, `competing-retry-${index}`)),
+        ),
+      );
+      expect(results.filter((result) => result.status === 'fulfilled')).toHaveLength(1);
+      expect(results.find((result) => result.status === 'rejected')).toMatchObject({
+        reason: { code: 'WORKFLOW_BUSY' },
+      });
+      expect(
+        f.service.list().filter((job) => ['queued', 'running'].includes(job.status)),
+      ).toHaveLength(3);
+      const loser = failed[results.findIndex((result) => result.status === 'rejected')]!;
+      expect(f.service.get(loser.id)).toEqual(loser);
+      release();
+      for (const job of f.service.list()) await settled(f.service, job.id);
+    } finally {
+      release();
+    }
+  });
+
   it('retries a failed handoff without replaying QA or inheriting another stage execution receipt', async () => {
     let handoffs = 0;
     const f = fixture({
@@ -889,6 +1013,95 @@ describe('Product Studio job orchestration', () => {
 });
 
 describe('durable workflow recovery', () => {
+  it.each(['waiting_owner', 'accepted', 'rejected'] as const)(
+    'preserves historical %s evidence without inventing an earlier bundle attestation',
+    async (status) => {
+      const f = fixture();
+      const ready = await settled(f.service, f.start().id);
+      const note = 'Historical synthetic owner decision.';
+      if (status !== 'waiting_owner') f.service.review(ready.id, { decision: status, note });
+      const job = f.service.get(ready.id);
+      await f.close();
+      delete job.bundle;
+      if (job.ownerReview) delete job.ownerReview.bundleSha256;
+      const db = new DatabaseSync(join(f.dir, 'workspace.sqlite'));
+      db.prepare('UPDATE workflow_jobs SET info=? WHERE id=?').run(JSON.stringify(job), job.id);
+      db.close();
+      const store = createWorkspaceStore(f.dir);
+      cleanups.push(() => store.close());
+      const execute = vi.fn(async () => {
+        throw new Error('Legacy read must not dispatch.');
+      });
+      const service = createJobService(store, f.dir, { content, execute });
+      cleanups.push(() => service.close());
+      const bytes = service.download(job.id);
+      expect(service.get(job.id)).toEqual(job);
+      const reviewed = service.review(job.id, {
+        decision: status === 'waiting_owner' ? 'accepted' : status,
+        note,
+      });
+      if (status === 'waiting_owner') {
+        expect(reviewed.bundle!.sha256).toBe(sha256(bytes));
+        expect(reviewed.ownerReview!.bundleSha256).toBe(sha256(bytes));
+      } else {
+        expect(reviewed).toEqual(job);
+        expect(reviewed.bundle).toBeUndefined();
+        expect(reviewed.ownerReview!.bundleSha256).toBeUndefined();
+      }
+      expect(service.download(job.id)).toEqual(bytes);
+      expect(execute).not.toHaveBeenCalled();
+    },
+  );
+
+  it('rejects a changed ready bundle without recording an owner decision', async () => {
+    const f = fixture();
+    const job = await settled(f.service, f.start().id);
+    const db = new DatabaseSync(join(f.dir, 'workspace.sqlite'));
+    job.bundle!.sha256 = '0'.repeat(64);
+    db.prepare('UPDATE workflow_jobs SET info=? WHERE id=?').run(JSON.stringify(job), job.id);
+    db.close();
+    expect(() => f.service.download(job.id)).toThrow(
+      expect.objectContaining({ code: 'BUNDLE_CONFLICT' }),
+    );
+    expect(() =>
+      f.service.review(job.id, { decision: 'accepted', note: 'Inspected synthetic bytes.' }),
+    ).toThrow(expect.objectContaining({ code: 'BUNDLE_CONFLICT' }));
+    expect(f.service.get(job.id)).toEqual(job);
+    expect(f.service.get(job.id).ownerReview).toBeNull();
+  });
+
+  it.each(['hash', 'size', 'provenance', 'owner-hash', 'missing-bundle'])(
+    'rejects %s corruption in owner bundle evidence during open and restore',
+    async (tamper) => {
+      const f = fixture();
+      const ready = await settled(f.service, f.start().id);
+      const job = f.service.review(ready.id, {
+        decision: 'accepted',
+        note: 'Synthetic exact bytes inspected.',
+      });
+      const backup = join(f.dir, `bundle-${tamper}.sqlite`);
+      await f.store.backup(backup);
+      const db = new DatabaseSync(backup);
+      if (tamper === 'hash') job.bundle!.sha256 = '0'.repeat(64);
+      if (tamper === 'size') job.bundle!.bytes++;
+      if (tamper === 'provenance') job.bundle!.provenance += '\n';
+      if (tamper === 'owner-hash') job.ownerReview!.bundleSha256 = '0'.repeat(64);
+      if (tamper === 'missing-bundle') delete job.bundle;
+      db.prepare('UPDATE workflow_jobs SET info=? WHERE id=?').run(JSON.stringify(job), job.id);
+      db.close();
+      const corruptDirectory = directory('gitflash-bundle-corrupt-open-');
+      copyFileSync(backup, join(corruptDirectory, 'workspace.sqlite'));
+      expect(() => createWorkspaceStore(corruptDirectory)).toThrow(
+        expect.objectContaining({ code: 'INVALID_DATABASE' }),
+      );
+      await expect(
+        restoreWorkspaceBackup(directory('gitflash-bundle-corrupt-restore-'), backup),
+      ).rejects.toMatchObject({
+        code: 'INVALID_BACKUP',
+      });
+    },
+  );
+
   it('opens legacy saved jobs without inventing a review-owner name or replaying provider work', async () => {
     const f = fixture();
     const job = await settled(f.service, f.start().id);
@@ -899,6 +1112,7 @@ describe('durable workflow recovery', () => {
     const info = JSON.parse(String(row.info));
     const context = JSON.parse(String(row.context));
     delete info.acceptanceOwner;
+    delete info.bundle;
     delete context.acceptanceOwner;
     const captured = JSON.stringify(context);
     info.contextSha256 = sha256(captured);
@@ -926,11 +1140,14 @@ describe('durable workflow recovery', () => {
   it('restores all exact artifact bytes, owner decisions and request deduplication from SQLite alone', async () => {
     const f = fixture();
     const job = await settled(f.service, f.start('recoverable-job-request').id);
+    const reviewedBytes = f.service.download(job.id);
     f.service.review(job.id, {
       decision: 'rejected',
       note: 'Synthetic owner requested additional scope.',
     });
     const before = f.service.export(job.id);
+    expect(before.job.ownerReview!.bundleSha256).toBe(sha256(reviewedBytes));
+    expect(f.service.download(job.id)).toEqual(reviewedBytes);
     const backup = join(f.dir, 'workflow-backup.sqlite');
     await f.store.backup(backup);
     const restoredDirectory = directory('gitflash-job-restore-');
@@ -943,6 +1160,7 @@ describe('durable workflow recovery', () => {
     const service = createJobService(store, restoredDirectory, { content, execute });
     cleanups.push(() => service.close());
     expect(service.export(job.id)).toEqual(before);
+    expect(service.download(job.id)).toEqual(reviewedBytes);
     expect(
       service.start({
         companyId: f.company.id,

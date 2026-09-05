@@ -1,0 +1,48 @@
+{
+  "sourceVersion": "0.1.0-alpha.5-local.1",
+  "sourceCommit": "bc3e6b1b5c0954f3d01764d18ea9dedfb3075733",
+  "sourceArchiveSha256": "c2d239f6168a61c0c6ea849d14aaf32db528e4867e72799ca57e3dea1410be9e",
+  "description": "Original accepted local product captures, not fresh alpha.5 release screenshots. Fictional example and illustrative hours only.",
+  "files": [
+    {
+      "file": "northstar-hours-desktop.jpg",
+      "bytes": 78635,
+      "sha256": "e3d60c8ee3634d8cd1a4dd9d90aa5d4bbfa0382b0200636cf93a0d8a2bb38b20"
+    },
+    {
+      "file": "northstar-hours-mobile.jpg",
+      "bytes": 41031,
+      "sha256": "d2418233dc55c683042fd6356c408bda27d101eef25e5d9179f49c8948ae888d"
+    },
+    {
+      "file": "patchwork-agent-desktop.jpg",
+      "bytes": 85892,
+      "sha256": "69176b4fd02912ef5a9f418ab92a52697b4c203fc9039fe11c0fa96810ac8843"
+    },
+    {
+      "file": "patchwork-agent-mobile.jpg",
+      "bytes": 41681,
+      "sha256": "6683536dae97e0bb497253530b8591ffb61ba3ba07a54f801606229dbc5f4b89"
+    },
+    {
+      "file": "three-agent-studio.json",
+      "bytes": 3695,
+      "sha256": "ae1a202978e9b14d71edb62e5c55c9a5fec06aaf925e6b9712f02cc4e4fed9cf"
+    },
+    {
+      "file": "vcm-favicon.svg",
+      "bytes": 259,
+      "sha256": "64afa41ac7a74119eb1b4f8c2449972afbe2a669087b7aff8194554d88d31527"
+    },
+    {
+      "file": "vcm-glyph.svg",
+      "bytes": 355,
+      "sha256": "a15b3eced932f638d0bfac26dbafe6bd8aaf24ec91047e86fa3c382cefaad2b9"
+    },
+    {
+      "file": "vcm-lockup.svg",
+      "bytes": 702,
+      "sha256": "d657ae61de1ebe8d8b7152c3a18350cf039151053bb5cf3a68ce7d90ff953dde"
+    }
+  ]
+}
