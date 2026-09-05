@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="VCM — Virtual Corporation Manager. Run a task, review the result, and track delivery hours in a local open-source workspace. Unpublished preview."
+      content="VCM — Virtual Corporation Manager. Run a task, review the result, and track delivery hours in a local open-source workspace. Local release preview prepared 5 September 2026."
     />
     <meta name="theme-color" content="#FFFFFF" />
     <title>VCM — Virtual Corporation Manager</title>
@@ -28,7 +28,7 @@
       </header>
       <main id="main" tabindex="-1">
         <section class="hero" aria-labelledby="hero-title">
-          <p class="eyebrow">Local app · Open source · Unpublished preview</p>
+          <p class="eyebrow">Local app · Open source · Preview prepared 5 September 2026</p>
           <h1 id="hero-title">Run a task.<br />Review the result.</h1>
           <p class="intro">
             Choose the work, inspect the output, and keep track of delivery hours.
@@ -85,12 +85,14 @@
             <p class="eyebrow">Local setup</p>
             <h2 id="install-title">Open VCM on your computer.</h2>
             <p>
-              This page describes review candidate <code>0.1.0-alpha.3-local.4</code>. It has not
-              been published as a downloadable VCM release.
+              Preparation status, 5 September 2026: UNPUBLISHED local release candidate
+              <code>0.1.0-alpha.3</code>. At preparation, public alpha.2 remains unchanged. Alpha.3
+              is not yet available as a downloadable VCM release.
             </p>
             <p>
               If you received the candidate archive for review, verify its matching handoff checksum
-              and use the commands below. The local version alone does not identify a candidate.
+              and use the commands below. The version alone does not identify the reviewed archive
+              bytes.
             </p>
           </div>
           <div class="install-panel">
@@ -100,7 +102,7 @@
             <pre
               tabindex="0"
               aria-label="Install the supplied candidate archive and start the local workspace"
-            ><code>npm install --offline --ignore-scripts --prefix ./gitflash-preview ./gitflash-0.1.0-alpha.3-local.4.tgz
+            ><code>npm install --offline --ignore-scripts --prefix ./gitflash-preview ./gitflash-0.1.0-alpha.3.tgz
 node ./gitflash-preview/node_modules/gitflash/dist/cli.js --data-dir ./my-company</code></pre>
             <p>
               Open the loopback URL printed by the CLI. The technical package and command remain
@@ -112,6 +114,13 @@ node ./gitflash-preview/node_modules/gitflash/dist/cli.js --data-dir ./my-compan
             Obtaining the archive requires a connection. The supplied archive installs offline, and
             company setup and time tracking work locally. Executing the Product Studio job uses your
             separately installed Codex CLI, Python and runtime access.
+          </p>
+          <p class="setup-boundary">
+            The local core and Time Tracker support macOS, Linux and Windows. The optional company
+            job requires a compatible macOS or Linux sandbox; its fixed checker is unavailable on
+            native Windows. Stock Ubuntu 24.04 with its AppArmor namespace restriction refuses this
+            workflow before provider execution. The application does not change host security
+            policy.
           </p>
           <details class="legacy-release">
             <summary>Looking for the existing public release?</summary>

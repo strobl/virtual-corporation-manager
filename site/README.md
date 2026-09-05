@@ -6,9 +6,9 @@ The public identity is **VCM — Virtual Corporation Manager** and the headline 
 
 ## Candidate and release boundary
 
-This source describes unpublished review candidate `0.1.0-alpha.3-local.4`. Its installation commands require the supplied archive and matching handoff checksum. There is no invented candidate download URL. The existing `v0.1.0-alpha.2` link is explicitly historical and does not promise the VCM screen, Time Tracker or Product Studio company workflows. Technical repository, package, CLI and default data identifiers remain `gitflash`.
+This source describes **local release candidate `0.1.0-alpha.3`, prepared 5 September 2026**. At preparation it is **UNPUBLISHED**. Its installation commands require the supplied `gitflash-0.1.0-alpha.3.tgz` archive and matching handoff SHA-256. There is no public alpha.3 download link until release publication is verified. At preparation, the existing public `v0.1.0-alpha.2` remains unchanged; its link is explicitly historical and does not promise the VCM screen, Time Tracker or Product Studio company workflows. Technical repository, package, CLI and default data identifiers remain `gitflash`.
 
-`virtualcorporationmanager.com` is the selected target text. Registration, ownership, DNS, TLS and live deployment remain unverified. Do not add a canonical URL or claim this page is live until the actual destination is verified. GitFlash's existing FDE site and domains remain unchanged.
+`virtualcorporationmanager.com` is the selected target text. At preparation on 5 September 2026, registration, ownership, DNS, TLS and live deployment remain unverified. Do not add a canonical URL or claim this page is live until the actual destination is verified. GitFlash's existing FDE site and domains remain unchanged.
 
 The VCM wordmark and favicon are byte-for-byte copies of `public/vcm-wordmark.svg` and `public/vcm-favicon.svg`. White surfaces, a blue action accent, system typography and visible keyboard focus match the product candidate. Retained older F-mark assets are not referenced by this page.
 

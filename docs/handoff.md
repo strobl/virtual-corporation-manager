@@ -1,6 +1,6 @@
-# Review candidate handoff and known limits
+# VCM alpha.3 release handoff and known limits
 
-This checkout is unpublished review candidate **0.1.0-alpha.3-local.4**, using SQLite schema **5**. It includes the delivery-hours Time Tracker, bounded Product Studio file workflows and the Little Powerhouse identity. The public alpha.2 release is a separate older artifact. Candidate source, package, platform checks and installed workflow evidence must be identified independently; see [acceptance status](acceptance.md).
+**Preparation status, 5 September 2026:** This checkout is the **unpublished local release candidate 0.1.0-alpha.3**, using SQLite schema **5**. It includes the accepted VCM task-first interface, delivery-hours Time Tracker and bounded Product Studio file workflows. The technical repository, package, command and default workspace directory retain their `gitflash` identifiers. The public alpha.2 release is a separate older artifact. Candidate source, package, platform checks and installed workflow evidence must be identified independently; see [acceptance status](acceptance.md).
 
 The maintainer is [strobl](https://github.com/strobl). Source, issues, pull requests, CI and release artifacts live in [this repository](https://github.com/strobl/gitflash). Publication is a separate review decision. A candidate branch, green unit suite or working local preview does not by itself update the public release or landing page.
 
@@ -10,9 +10,13 @@ Platform/data owns database migrations and recovery. Domain owns company invaria
 
 Use one issue or linked work order for each change. Describe the observed trigger and expected outcome, add relevant regression coverage, run the commands in [CONTRIBUTING](../CONTRIBUTING.md), then review the PR and exact-revision OS matrix. Never commit a real workspace, provider token, login store or private company output.
 
-## Candidate acceptance still needs exact evidence
+## Accepted evidence and remaining release checks
 
-The final source revision, tarball hash, independent fresh-checkout contributor run, installed browser/Time Tracker journey and actual five-stage runtime result belong together. Their pending/completed state is recorded in [acceptance](acceptance.md); historical alpha.2 evidence does not close these gates. The configured Node 24.x/26.x platform matrix must run on the final candidate. Linux workflow-sandbox proof is separate from local-core CI, and native Windows workflow checking is unavailable.
+The accompanying alpha.3 release manifest binds the local source commit, tarball hash, file comparison and installed-package receipt. [Acceptance](acceptance.md) attributes the accepted VCM browser/data review, prior actual five-stage runtime results, independent contributor run and 15-job platform matrix to their exact earlier revisions. The alpha.3 preparation changes release metadata and documentation; its rebuilt runtime/CLI must differ only in exact version literals, while browser assets and canonical Ops content remain identical. No provider run is repeated or implied by packaging.
+
+Exact-release-revision CI remains pending because this local candidate is not pushed. Once publication is authorized, the existing PR must receive the reviewed successor, pass the required matrix, and bind the eventual tag and public artifact to the verified source. The public asset must then be downloaded and installed independently. A planned URL is not current availability. Publication of a release and deployment or domain activation of a website are separate actions.
+
+Public alpha.2 uses schema 3; upgrading to alpha.3 uses the already tested migration to schema 5. Stop the old workspace and make a verified backup before upgrade. Do not open an upgraded database with the older binary; follow [recovery and rollback](recovery.md). Linux workflow-sandbox proof remains separate from local-core CI, and native Windows workflow checking is unavailable.
 
 An independent agent can execute the contributor guide and report its actual commands/results. This is an engineering contribution check, not an external human pilot or a customer's assessment of usefulness. A synthetic owner-review decision must be labelled as such.
 

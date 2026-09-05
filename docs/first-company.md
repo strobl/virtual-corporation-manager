@@ -4,27 +4,27 @@ Create a small Product Studio and run its included stock-alert job. The job uses
 
 ## Install and check prerequisites
 
-This guide accompanies candidate **0.1.0-alpha.3-local.4**. Use Node.js **24.14 or newer in the 24.x line, or 26.x**. Check `node --version` before installing. Download the matching archive supplied with this candidate, then run these commands from the folder containing it:
+This guide accompanies **local release candidate 0.1.0-alpha.3, prepared 5 September 2026**. At preparation, alpha.3 is **UNPUBLISHED** and public alpha.2 remains unchanged; alpha.2 does not include this company workflow. Use Node.js **24.14 or newer in the 24.x line, or 26.x**. Check `node --version` before installing. Obtain the archive supplied for review, verify its matching handoff SHA-256, then run these commands from the folder containing it:
 
 ```sh
-npm install --offline --ignore-scripts --prefix ./gitflash-preview ./gitflash-0.1.0-alpha.3-local.4.tgz
+npm install --offline --ignore-scripts --prefix ./gitflash-preview ./gitflash-0.1.0-alpha.3.tgz
 node ./gitflash-preview/node_modules/gitflash/dist/cli.js --version
 node ./gitflash-preview/node_modules/gitflash/dist/cli.js --data-dir ./gitflash-first-company --no-open
 ```
 
-The version must print `0.1.0-alpha.3-local.4`. Keep it for any support report. Use a new data directory for this first exercise; open the local URL printed in the terminal. If its port is occupied, add `--port 4311` to the start command. Keep that process running while the job works. This candidate archive is separate from the older public alpha.2 download.
+The version must print `0.1.0-alpha.3`. Keep it with the archive checksum for any support report. Use a new data directory for this first exercise; open the local URL printed in the terminal. If its port is occupied, add `--port 4311` to the start command. Keep that process running while the job works. These commands install the supplied archive; they are not public-download commands. Check the release page and verified download for any later publication status.
 
-Company setup needs no GitFlash account. The PS-001 workflow requires **macOS or Linux**, the local Codex sandbox, a supported Codex CLI with a saved login, and **Python 3.8 or newer**. Native Windows supports the local core and Time Tracker, but this workflow's sandbox checker does not support it yet. In a terminal, check `codex login status` and `python3 --version`. If login is missing, run `codex login` and complete its sign-in. Use **Integrations → Check connections** to confirm readiness. Model execution uses your provider allowance; free GitFlash software does not mean free model usage.
+Company setup needs no VCM account. The PS-001 workflow requires **macOS or compatible Linux**, the local Codex sandbox, a supported Codex CLI with a saved login, and **Python 3.8 or newer**. Native Windows supports the local core and Time Tracker, but this workflow's sandbox checker does not support it yet. Stock Ubuntu 24.04 with its AppArmor namespace restriction is unsupported for the optional workflow; the prerequisite check refuses execution before any provider stage. VCM does not weaken host policy to make it run. In a terminal, check `codex login status` and `python3 --version`. If login is missing, run `codex login` and complete its sign-in. Use **Integrations → Check connections** to confirm readiness. Model execution uses your provider allowance; free local software does not mean free model usage. See [workflow prerequisites and platform evidence](product-studio.md).
 
 ## Create the team
 
-Open **Templates** (or **Explore templates** on the empty workspace), choose **Product Studio (5 seats)**, review the company, responsibilities and reporting lines, then choose **Apply changes**. This configures five seats: delivery manager, requirements analyst, builder, independent quality reviewer and handoff editor. Creating them starts no model work.
+On **Home**, choose **Run a task**. In an empty workspace this opens company templates: choose **Product Studio (5 seats)**, review the company, responsibilities and reporting lines, then choose **Apply changes** to continue to the task brief. You can also open templates from **Organization → Templates**. This configures five seats: delivery manager, requirements analyst, builder, independent quality reviewer and handoff editor. Creating them starts no model work.
 
 Select this company before starting its job. If a required role is missing or duplicated, resolve the displayed role mapping instead of assigning an arbitrary agent. Additional 20/100-role organizations remain separate configurations.
 
 ## Start the included job
 
-Open **Work → Company jobs**, select your Product Studio, then choose **Set up first job**. The **Start a Product Studio job** dialog identifies PS-001, the stock-alert exercise and all five assigned roles. Expand **Prerequisites and included files** and review the listed deliverables, platform requirements and resource notice. Enter the **Acceptance owner**: the person or clearly responsible role who will make the final decision, such as your company owner. Naming that responsibility does not record approval or acceptance. Choose **Start job** when ready. The action authorizes the listed local workflow and at most two corrective candidates after the initial candidate. It does not authorize external messages, purchases, deployment or changing the acceptance rules.
+With your Product Studio selected, open **Home → Run a task**. The same preparation is available through **Work → Company jobs → Set up first job**. The **Start a Product Studio job** dialog identifies PS-001, the stock-alert exercise and all five assigned roles. Expand **Prerequisites and included files** and review the listed deliverables, platform requirements and resource notice. Enter the **Acceptance owner**: the person or clearly responsible role who will make the final decision, such as your company owner. Naming that responsibility does not record approval or acceptance. Choose **Start job** when ready. The action authorizes the listed local workflow and at most two corrective candidates after the initial candidate. It does not authorize external messages, purchases, deployment or changing the acceptance rules.
 
 Before starting, fill **Acceptance owner** with the person or responsible role who will review the result. No account or legal name is required. Expand **Review the brief, criteria and sample data** to read the exact source materials. The named owner and start authority are captured with the job; final acceptance remains a separate decision.
 
@@ -34,7 +34,7 @@ Allow the job to finish or report a specific blocker. Do not repeatedly start th
 
 ## Inspect the result and decide
 
-Open the completed job's artifacts and QA record. The usable result must include:
+Open **Home → Review results**, select the completed job, and inspect its artifacts and QA record. The usable result must include:
 
 - `stock_alert.py`, exporting `reorder_items(products)`.
 - `test_stock_alert.py`, runnable standard-library tests.
@@ -51,7 +51,7 @@ QA success leaves the result awaiting your decision. Use the job's owner-review 
 
 ## Keep time and outcome separate
 
-Time Tracker records booked human-equivalent delivery hours, with explicit, catalog or fallback-estimate basis. Starting or accepting this job must not silently create or change those bookings. Runtime duration is a separate technical measurement. No time, money or labor saving is inferred from this example.
+Open **Home → Track delivery hours** for the Time Tracker. It records booked human-equivalent delivery hours, with explicit, catalog or fallback-estimate basis. Starting or accepting this job must not silently create or change those bookings. Runtime duration is a separate technical measurement. No time, money or labor saving is inferred from this example.
 
 ## Get help
 

@@ -1,10 +1,10 @@
 # Product Studio workflow
 
-Review candidate **0.1.0-alpha.3-local.4** ships a bounded software job, **PS-001: stock alert export**. Create **Product Studio (5 seats)** or **100-agent Product Studio**, then open **Work → Company jobs → Set up first job → Start job**. The 100-agent template contains five operational workflow seats; it does not launch 100 concurrent agents. The 20-agent template remains a lightweight configuration template.
+**Local release candidate 0.1.0-alpha.3, prepared 5 September 2026,** includes a bounded software job, **PS-001: stock alert export**. At preparation, alpha.3 is **UNPUBLISHED** and public alpha.2 remains unchanged; alpha.2 does not include this company workflow. Open **Home → Run a task**; in an empty workspace, choose and review **Product Studio (5 seats)** or **100-agent Product Studio** before continuing to the job form. Review its inputs and execution permission, then explicitly choose **Start job**. The same form remains available under **Work → Company jobs → Set up first job**. The 100-agent template contains five operational workflow seats; it does not launch 100 concurrent agents. The 20-agent template remains a lightweight configuration template.
 
 ## What Start authorizes
 
-Starting PS-001 permits local file production and checks for the synthetic inventory brief, followed by independent review and a handoff. The optional Codex CLI uses your signed-in account and allowance. GitFlash itself has no account, billing or mandatory hosted inference.
+Starting PS-001 permits local file production and checks for the synthetic inventory brief, followed by independent review and a handoff. The optional Codex CLI uses your signed-in account and allowance. VCM itself has no account, billing or mandatory hosted inference.
 
 Each stage runs in a new isolated directory and a new observed Codex session. The runtime may write there and execute local commands. Shell network, web, apps and other connected tools are disabled. The workspace sandbox restricts writes; it is not complete read isolation. Do not place confidential files beside experimental jobs; use a dedicated OS account when stronger isolation is needed. No publishing, messaging, spending, deployment or automatic owner decision is granted.
 

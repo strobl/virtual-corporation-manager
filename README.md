@@ -4,7 +4,7 @@
 
 VCM is a free, open-source local workspace. Run a task, inspect its files and evidence, track delivery hours, and manage the company behind the work. Your company, reviewed changes and actual results live in SQLite on your computer.
 
-**Unpublished review candidate `0.1.0-alpha.3-local.4`.** This source adds the VCM task entry screen to the accepted delivery-hours Time Tracker and Product Studio workflows. The public alpha.2 release is a separate older version; it does not contain this interface, the Time Tracker or the company file workflows. Candidate implementation and release acceptance are separate; see [acceptance evidence](docs/acceptance.md).
+**Preparation status, 5 September 2026: UNPUBLISHED local release candidate `0.1.0-alpha.3`.** This candidate packages the VCM task entry screen, delivery-hours Time Tracker and Product Studio workflows for alpha.3. The current public alpha.2 release remains unchanged; it does not contain this interface, the Time Tracker or the company file workflows. At preparation, this version is not yet available as a public release. The release page and verified public download determine any later publication status. See [release notes](CHANGELOG.md) and [acceptance evidence](docs/acceptance.md) for scope and exact candidate checks.
 
 This is a **technical alpha**. The first company job is an included synthetic Product Studio exercise that produces `stock_alert.py`, exporting `reorder_items(products)`, plus tests and review evidence. It uses fictional inventory in `input.json`; it does not connect to inventory systems or place orders. Optional Codex execution requires your own runtime access. Buzz native team import has been exercised; Buzz task dispatch and Slack round trips remain experimental. No customer or human-pilot validation is claimed.
 
@@ -14,14 +14,16 @@ The selected public destination is `virtualcorporationmanager.com`; domain activ
 
 Use **Node.js 24.14+ in the 24.x line, or 26.x**. The configured acceptance matrix targets macOS, Linux and Windows on both supported release lines; see [acceptance evidence](docs/acceptance.md) for the exact source and observed results. Optional agent execution has its own [runtime prerequisites](docs/integrations.md).
 
+The local core and Time Tracker support macOS, Linux and native Windows. The optional PS-001 company workflow requires a working macOS or Linux sandbox; its fixed checker is unavailable on native Windows. Stock Ubuntu 24.04 with its AppArmor namespace restriction is unsupported for this optional workflow and stops before provider execution. Earlier macOS and Ubuntu 22.04 sandbox evidence belongs to its recorded source; final release-candidate evidence is recorded separately.
+
 These commands require the exact candidate archive supplied for review. They do not download a published VCM release:
 
 ```sh
-npm install --offline --ignore-scripts --prefix ./gitflash-preview ./gitflash-0.1.0-alpha.3-local.4.tgz
+npm install --offline --ignore-scripts --prefix ./gitflash-preview ./gitflash-0.1.0-alpha.3.tgz
 node ./gitflash-preview/node_modules/gitflash/dist/cli.js --data-dir ./my-company
 ```
 
-Use the exact supplied archive above and its matching handoff checksum, or build it from the reviewed candidate checkout with `npm ci --ignore-scripts`, `npm run check` and `npm pack`. Multiple review candidates can share this local version string; the archive checksum identifies the actual candidate. The isolated install does not change a global installation. For maintenance examples using `gitflash`, substitute `node ./gitflash-preview/node_modules/gitflash/dist/cli.js` if you used this isolated install.
+Use the exact supplied archive above and its matching handoff checksum, or build it from the reviewed candidate checkout with `npm ci --ignore-scripts`, `npm run check` and `npm pack`. Record the source revision and archive SHA-256: the version string alone does not identify the bytes reviewed. The isolated install does not change a global installation. For maintenance examples using `gitflash`, substitute `node ./gitflash-preview/node_modules/gitflash/dist/cli.js` if you used this isolated install.
 
 The CLI prints a loopback URL and opens VCM in your browser. If the browser does not open, visit the printed URL. Nothing needs to be deployed. The installed package includes its runtime JavaScript and browser assets; it has no npm runtime dependencies or database compiler step.
 

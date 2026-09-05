@@ -1,6 +1,8 @@
-# VCM task workspace — review candidate
+# VCM task workspace — alpha.3 release candidate
 
-VCM — Virtual Corporation Manager is the public product identity. This isolated UI successor starts from accepted source `53d97457ea2b7ec78f730c8c9466036d9f07870c`. It is a local review candidate, not a published release or a live website at the selected domain.
+VCM — Virtual Corporation Manager is the public product identity. **Local release candidate `0.1.0-alpha.3`, prepared 5 September 2026,** packages the task interface from accepted source `8638887434d3316238189b25bc236006cf56f3cf`, built on runtime baseline `53d97457ea2b7ec78f730c8c9466036d9f07870c`. At preparation, alpha.3 is **UNPUBLISHED** and the public alpha.2 release remains unchanged. Later publication requires a verified release page and public download. Preparing this release candidate does not publish a release or activate the selected VCM domain.
+
+Install only the supplied `gitflash-0.1.0-alpha.3.tgz` using the [README commands](../README.md), and compare the handoff's archive SHA-256. The earlier UI candidate used the local.4 development version; its acceptance does not by itself identify or verify the alpha.3 archive. Record exact release-source and package checks in [acceptance](acceptance.md).
 
 ## Four real entry actions
 
