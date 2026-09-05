@@ -440,8 +440,10 @@ function Header({
       ) : null}
       <h3 className="text-xs font-semibold text-foreground">{corporationName} — Reporting lines</h3>
       <span className="text-micro tabular-nums text-muted-foreground">
-        {pyramid.counts.humans} people · {pyramid.counts.agents} agents ·{' '}
-        {pyramid.counts.departments} teams · {pyramid.counts.depth} levels
+        {pyramid.counts.humans} {pyramid.counts.humans === 1 ? 'person' : 'people'} ·{' '}
+        {pyramid.counts.agents} {pyramid.counts.agents === 1 ? 'agent' : 'agents'} ·{' '}
+        {pyramid.counts.departments} {pyramid.counts.departments === 1 ? 'team' : 'teams'} ·{' '}
+        {pyramid.counts.depth} {pyramid.counts.depth === 1 ? 'level' : 'levels'}
       </span>
       <div
         role="tablist"

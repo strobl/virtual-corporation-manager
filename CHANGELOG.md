@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.5-local.1 — developer-first review candidate, unpublished
+
+- Make `vcm` the visible CLI entry and keep `gitflash` as an alias in the existing `gitflash` package. Preserve default/custom data paths, legacy environment variables and machine-facing formats.
+- Add a developer quickstart, an importable fictional three-agent peer organization and a verification script for actual import/export, saved edits, restart and SQLite recovery.
+- Explain the local operator model, optional hierarchy and execution, separate booked hours, and public-alpha-versus-local-candidate availability at the first install step.
+- Make public contribution context sufficient without private 8090 access, with bounded starter tasks and updated issue/PR templates.
+- This candidate requires its own exact source, installed-archive and UI receipts. Earlier acceptance below remains tied to its recorded version.
+
 ## 0.1.0-alpha.4-local.1 — corporation-first review candidate, unpublished
 
 - Open on Your corporations, with a reviewed identity/structure setup and direct access to existing company templates. Saving opens the created corporation.

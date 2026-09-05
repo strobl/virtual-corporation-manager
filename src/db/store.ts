@@ -96,7 +96,7 @@ function lockDirectory(dataDir: string): () => void {
       } catch {
         throw new DomainError(
           'WORKSPACE_BUSY',
-          'The workspace lock cannot be read. Confirm no GitFlash server is running before removing workspace.lock.',
+          'The workspace lock cannot be read. Confirm no VCM server is running before removing workspace.lock.',
         );
       }
       if (Number.isSafeInteger(existing.pid) && Number(existing.pid) > 0) {
@@ -115,7 +115,7 @@ function lockDirectory(dataDir: string): () => void {
       }
       throw new DomainError(
         'WORKSPACE_BUSY',
-        'This workspace is already open. Stop its GitFlash server before opening or restoring it.',
+        'This workspace is already open. Stop its VCM server before opening or restoring it.',
       );
     }
   }
@@ -149,7 +149,7 @@ function initialize(db: DatabaseSync, dataDir: string) {
   check(
     currentVersion <= SCHEMA_VERSION,
     'UPGRADE_REQUIRED',
-    `This workspace uses schema ${currentVersion}; this GitFlash supports up to ${SCHEMA_VERSION}. Upgrade GitFlash before opening it.`,
+    `This workspace uses schema ${currentVersion}; this VCM supports up to ${SCHEMA_VERSION}. Upgrade VCM before opening it.`,
   );
   if (currentVersion === 0) {
     const tables = db
@@ -158,7 +158,7 @@ function initialize(db: DatabaseSync, dataDir: string) {
     check(
       tables.length === 0,
       'INVALID_DATABASE',
-      'The selected database is not a recognized GitFlash workspace.',
+      'The selected database is not a recognized VCM workspace.',
     );
   } else {
     check(
@@ -173,7 +173,7 @@ function initialize(db: DatabaseSync, dataDir: string) {
       rows.length === currentVersion &&
         rows.every((r, i) => Number(r.version) === i + 1 && r.checksum === digest(MIGRATIONS[i]!)),
       'INVALID_DATABASE',
-      'Workspace migration journal does not match this release. Preserve the database and use its compatible GitFlash version.',
+      'Workspace migration journal does not match this release. Preserve the database and use its compatible VCM version.',
     );
     validateDatabaseContents(db, currentVersion);
     if (currentVersion < SCHEMA_VERSION) preUpgradeBackup(db, dataDir, currentVersion);
@@ -584,7 +584,7 @@ function verifyBackup(path: string): DatabaseSync {
     check(
       v >= 1 && v <= SCHEMA_VERSION,
       'INVALID_BACKUP',
-      'Backup schema is unsupported. Use the matching or newer GitFlash version.',
+      'Backup schema is unsupported. Use the matching or newer VCM version.',
     );
     const journal = db
       .prepare('SELECT version,checksum FROM schema_migrations ORDER BY version')
@@ -604,7 +604,7 @@ function verifyBackup(path: string): DatabaseSync {
     if (error instanceof DomainError && error.code === 'INVALID_BACKUP') throw error;
     throw new DomainError(
       'INVALID_BACKUP',
-      'The file is not a valid GitFlash workspace backup. Its entity or execution records could not be verified.',
+      'The file is not a valid VCM workspace backup. Its entity or execution records could not be verified.',
     );
   }
 }

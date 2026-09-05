@@ -25,6 +25,10 @@
   background: #faf9f6;
   border-bottom-color: var(--flash-border);
 }
+.corporation-app .mobile-brand {
+  flex-shrink: 0;
+  margin-right: 8px;
+}
 .corporation-app .primary-nav {
   gap: 3px;
 }
@@ -33,6 +37,10 @@
 }
 .corporation-app .primary-nav button.active {
   background: #eeeee7;
+  color: var(--flash-ink);
+}
+.corporation-app .sidebar-bottom > button.active {
+  background: var(--flash-selected);
   color: var(--flash-ink);
 }
 .corporation-app .button.primary {
@@ -69,7 +77,7 @@
   width: 100%;
   max-width: 1420px;
   margin: 0 auto;
-  padding: 38px 38px 44px;
+  padding: 24px 24px 32px;
   min-width: 0;
 }
 .corporation-empty {
@@ -140,19 +148,19 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 28px;
-  margin-bottom: 29px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 .corporation-page-heading > div {
   min-width: 0;
 }
 .corporation-page-heading h1 {
   font-family: var(--console-font-sans);
-  font-size: clamp(27px, 2.8vw, 37px);
+  font-size: 30px;
   line-height: 1.2;
   letter-spacing: -1px;
   font-weight: 600;
-  margin: 9px 0 11px;
+  margin: 6px 0 8px;
   overflow-wrap: anywhere;
 }
 .corporation-page-heading p {
@@ -166,7 +174,7 @@
 }
 .corporation-page-heading > .button {
   flex-shrink: 0;
-  margin-top: 25px;
+  margin-top: 8px;
 }
 .corporation-page-heading > div > .text-button {
   margin-top: 12px;
@@ -287,7 +295,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 .corporation-switcher label {
   display: inline-flex;
@@ -310,7 +318,7 @@
   display: grid;
   grid-template-columns: 1.5fr 1fr 1fr;
   border-block: 1px solid var(--flash-border);
-  margin: 16px 0 22px;
+  margin: 12px 0 16px;
 }
 .corporation-measures > div,
 .corporation-hours-measure {
@@ -319,7 +327,7 @@
   align-items: flex-start;
   text-align: left;
   gap: 6px;
-  padding: 14px 20px;
+  padding: 12px 16px;
   border: 0;
   border-right: 1px solid var(--flash-border);
   background: transparent;
@@ -336,7 +344,7 @@
   font-size: 12px;
 }
 .corporation-measures strong {
-  font-size: 35px;
+  font-size: 24px;
   line-height: 1;
   font-weight: 500;
   letter-spacing: -0.8px;
@@ -356,7 +364,7 @@
 .corporation-workspace-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 260px;
-  gap: 28px;
+  gap: 24px;
   align-items: start;
 }
 .corporation-structure {
@@ -367,7 +375,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 15px;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 .corporation-section-heading h2 {
   font-size: 18px;
@@ -516,7 +524,7 @@
 }
 
 .corporation-app .time-page {
-  padding: 34px 38px;
+  padding: 24px;
 }
 .corporation-app .time-page h1 {
   font-size: 29px;
@@ -524,7 +532,7 @@
   font-weight: 600;
 }
 .corporation-app .time-page .compact-intro {
-  margin-bottom: 26px;
+  margin-bottom: 16px;
 }
 .corporation-app .time-page .compact-intro p {
   font-size: 13px;
@@ -843,7 +851,7 @@
     margin: 0;
   }
   .corporation-page-heading h1 {
-    font-size: 29px;
+    font-size: 26px;
   }
   .corporation-page-heading p {
     font-size: 13px;
@@ -893,22 +901,33 @@
   }
   .corporation-measures {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-bottom: 26px;
+    margin-bottom: 16px;
   }
   .corporation-measures > .corporation-hours-measure {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    width: 100%;
     grid-column: 1 / -1;
-    padding: 19px 0;
+    padding: 12px 0;
     border-right: 0;
     border-bottom: 1px solid var(--flash-border);
   }
+  .corporation-hours-measure small {
+    grid-column: 1 / -1;
+  }
   .corporation-measures > div {
-    padding: 20px 0;
+    padding: 12px 0;
   }
   .corporation-measures > div:last-child {
     padding-left: 20px;
   }
   .corporation-measures strong {
-    font-size: 31px;
+    font-size: 24px;
+  }
+  .corporation-app .button,
+  .corporation-app .text-button {
+    min-height: 44px;
   }
   .corporation-section-heading {
     align-items: flex-start;

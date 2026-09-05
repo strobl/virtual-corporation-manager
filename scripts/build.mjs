@@ -38,7 +38,7 @@ const [major, minor] = process.versions.node.split('.').map(Number);
 if (process.argv.includes('--version')) {
   console.log(${JSON.stringify(version)});
 } else if (!((major === 24 && minor >= 14) || major === 26)) {
-  console.error('GitFlash requires Node.js 24.14+ (24.x) or 26.x. Current runtime: ' + process.version + '. Install a supported Node.js release and retry.');
+  console.error('VCM requires Node.js 24.14+ (24.x) or 26.x. Current runtime: ' + process.version + '. Install a supported Node.js release and retry.');
   process.exitCode = 1;
 } else {
   await import('./runtime.js');

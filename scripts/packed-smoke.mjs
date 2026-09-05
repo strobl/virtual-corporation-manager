@@ -1,7 +1,8 @@
 import { spawn, spawnSync } from 'node:child_process';
-import { mkdtemp, readFile, rm, mkdir, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, mkdir, writeFile, realpath, readdir } from 'node:fs/promises';
 import { tmpdir, cpus, platform, arch } from 'node:os';
 import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 const started = performance.now();
@@ -19,22 +20,64 @@ function command(args, cwd = process.cwd()) {
   if (p.status !== 0) throw new Error(p.stderr || p.stdout || `Command failed: ${args.join(' ')}`);
   return p.stdout;
 }
-async function cli(entry, args) {
-  return new Promise((resolve, reject) => {
-    let output = '';
-    const p = spawn(process.execPath, [entry, ...args], { env: process.env });
-    p.stdout.on('data', (c) => (output += c));
-    p.stderr.on('data', (c) => (output += c));
-    p.on('error', reject);
-    p.on('close', (code) => (code === 0 ? resolve(output) : reject(new Error(output))));
-  });
+function cli(binary, args, { env = {}, expectedExit = 0 } = {}) {
+  const p = spawnSync(
+    process.execPath,
+    [npm, 'exec', '--offline', '--prefix', binary.install, '--', binary.name, ...args],
+    {
+      cwd: binary.install,
+      encoding: 'utf8',
+      env: { ...process.env, ...env },
+      timeout: 15000,
+    },
+  );
+  assert.equal(p.status, expectedExit, p.error?.message || p.stderr || p.stdout);
+  return expectedExit === 0 ? p.stdout : p.stdout + p.stderr;
 }
-async function start(entry, dataDir) {
+async function installedBinary(install, name, entry) {
+  const shim = join(install, 'node_modules', '.bin', name);
+  if (process.platform === 'win32') {
+    // Short commands execute the real .cmd shim through npm exec. Long-running
+    // startup uses its verified target so SIGTERM reaches Node rather than cmd.exe.
+    const commandShim = await readFile(shim + '.cmd', 'utf8');
+    assert.match(commandShim, /gitflash[\\/]dist[\\/]cli\.js/);
+    return { name, install, entry };
+  }
+  assert.equal(await realpath(shim), await realpath(entry));
+  return { name, install, entry: shim };
+}
+async function assertDefaultDirectory(binaries) {
+  const isolatedHome = join(temp, 'default-home');
+  const preload = join(temp, 'isolated-homedir.mjs');
+  await mkdir(isolatedHome);
+  // Override only the child's OS-home provider, never the operator's real home
+  // or parent environment. This exercises the CLI's real default resolution.
+  await writeFile(
+    preload,
+    `import os from 'node:os';\nimport { syncBuiltinESMExports } from 'node:module';\nos.homedir = () => ${JSON.stringify(isolatedHome)};\nsyncBuiltinESMExports();\n`,
+  );
+  const env = {
+    GITFLASH_DATA_DIR: undefined,
+    NODE_OPTIONS: `--import=${pathToFileURL(preload).href}`,
+    npm_config_cache: join(temp, 'npm-cache'),
+  };
+  const doctors = binaries.map((binary) => JSON.parse(cli(binary, ['doctor'], { env })));
+  assert.equal(doctors[0].dataDir, join(isolatedHome, '.gitflash'));
+  assert.deepEqual(doctors[1], doctors[0]);
+  assert.deepEqual(await readdir(isolatedHome), ['.gitflash']);
+  return {
+    path: '~/.gitflash',
+    method: 'Child-process OS homedir override; real user home and environment unchanged',
+    aliasesShareDirectory: true,
+    extraWorkspaceCreated: false,
+  };
+}
+async function start(binary, dataDir) {
   return new Promise((resolve, reject) => {
     let output = '';
     const child = spawn(
       process.execPath,
-      [entry, '--data-dir', dataDir, '--port', '0', '--no-open'],
+      [binary.entry, '--data-dir', dataDir, '--port', '0', '--no-open'],
       {
         env: {
           ...process.env,
@@ -100,8 +143,39 @@ try {
     tarball,
   ]);
   const entry = join(install, 'node_modules', 'gitflash', 'dist', 'cli.js');
+  const manifest = JSON.parse(
+    await readFile(join(install, 'node_modules', 'gitflash', 'package.json'), 'utf8'),
+  );
+  assert.equal(manifest.name, 'gitflash');
+  assert.deepEqual(manifest.bin, { vcm: 'dist/cli.js', gitflash: 'dist/cli.js' });
+  const vcm = await installedBinary(install, 'vcm', entry);
+  const gitflash = await installedBinary(install, 'gitflash', entry);
+  const binaries = [vcm, gitflash];
+  const help = binaries.map((binary) => cli(binary, ['--help']));
+  assert.equal(help[0], help[1]);
+  assert.match(help[0], /^VCM .* — Virtual Corporation Manager/);
+  assert.match(help[0], /Usage: vcm \[start\|doctor\|backup\|restore\|export\|time-export\]/);
+  assert.match(help[0], /gitflash remains a compatibility alias/);
+  const versions = binaries.map((binary) => cli(binary, ['--version']).trim());
+  assert.deepEqual(versions, [manifest.version, manifest.version]);
+  const invalidCommands = binaries.map((binary) => cli(binary, ['init'], { expectedExit: 1 }));
+  const invalidDiagnostics = invalidCommands.map((output) =>
+    output.split('\n').find((line) => line.startsWith('VCM:')),
+  );
+  assert.deepEqual(invalidDiagnostics, [
+    'VCM: Unknown command: init. Use --help.',
+    'VCM: Unknown command: init. Use --help.',
+  ]);
+  const defaultDirectory = await assertDefaultDirectory(binaries);
   const data = join(temp, 'data');
-  let app = await start(entry, data);
+  let app = await start(vcm, data);
+  assert.match(app.output, new RegExp(`^VCM ${manifest.version.replaceAll('.', '\\.')}`));
+  assert.match(
+    cli(gitflash, ['start', '--data-dir', data, '--port', '0', '--no-open'], {
+      expectedExit: 1,
+    }),
+    /workspace is already open/,
+  );
   const html = await (await fetch(app.url)).text();
   assert.match(html, /VCM — Virtual Corporation Manager/);
   const assets = [...html.matchAll(/(?:src|href)="([^"#]+\.(?:js|css))"/g)].map((m) => m[1]);
@@ -206,7 +280,13 @@ try {
   assert.equal(savedTime.history.length, 2);
   assert.equal((await (await fetch(app.url + '/api/state')).json()).work.length, 0);
   await stop(app);
-  app = await start(entry, data);
+  app = await start(gitflash, data);
+  assert.match(
+    cli(vcm, ['start', '--data-dir', data, '--port', '0', '--no-open'], {
+      expectedExit: 1,
+    }),
+    /workspace is already open/,
+  );
   const reopened = await (await fetch(app.url + '/api/state')).json();
   assert.equal(reopened.agents.length, 101);
   assert(reopened.agents.some((a) => a.id === agentId));
@@ -215,18 +295,56 @@ try {
   assert.deepEqual(reopenedTime.entries, savedTime.entries);
   assert.deepEqual(reopenedTime.history, savedTime.history);
   await stop(app);
+  const envDoctors = binaries.map((binary) =>
+    JSON.parse(cli(binary, ['doctor'], { env: { GITFLASH_DATA_DIR: data } })),
+  );
+  assert.deepEqual(envDoctors[0], envDoctors[1]);
+  assert.equal(envDoctors[0].dataDir, data);
+  assert.equal(envDoctors[0].agents, 101);
+  const ignoredEnvPath = join(temp, 'ignored-env-path');
+  for (const binary of binaries) {
+    const doctor = JSON.parse(
+      cli(binary, ['doctor', '--data-dir', data], {
+        env: { GITFLASH_DATA_DIR: ignoredEnvPath },
+      }),
+    );
+    assert.deepEqual(doctor, envDoctors[0]);
+  }
+  assert(!(await readdir(temp)).includes('ignored-env-path'));
+  const definitions = [];
+  for (const binary of binaries) {
+    const destination = join(temp, `${binary.name}-definition.json`);
+    cli(binary, ['export', '--data-dir', data, '--output', destination]);
+    definitions.push(JSON.parse(await readFile(destination, 'utf8')));
+  }
+  assert.deepEqual(definitions[0], definitions[1]);
+  assert.deepEqual(definitions[0], exported);
   const timeExport = join(temp, 'delivery-hours.json');
-  await cli(entry, ['time-export', '--data-dir', data, '--output', timeExport]);
+  cli(vcm, ['time-export', '--data-dir', data, '--output', timeExport]);
   const exportedTime = JSON.parse(await readFile(timeExport, 'utf8'));
   assert.equal(exportedTime.format, 'gitflash-delivery-hours');
   assert.equal(exportedTime.version, 1);
   assert.deepEqual(exportedTime.entries, savedTime.entries);
+  const compatibilityTimeExport = join(temp, 'compatibility-delivery-hours.json');
+  cli(gitflash, ['time-export', '--data-dir', data, '--output', compatibilityTimeExport]);
+  assert.deepEqual(JSON.parse(await readFile(compatibilityTimeExport, 'utf8')), exportedTime);
   const backup = join(temp, 'backup.sqlite');
-  await cli(entry, ['backup', '--data-dir', data, '--output', backup]);
+  cli(vcm, ['backup', '--data-dir', data, '--output', backup]);
   const restored = join(temp, 'restored');
-  await cli(entry, ['restore', '--data-dir', restored, '--from', backup]);
-  app = await start(entry, restored);
+  cli(gitflash, ['restore', '--data-dir', restored, '--from', backup]);
+  const compatibilityBackup = join(temp, 'compatibility-backup.sqlite');
+  cli(gitflash, ['backup', '--data-dir', data, '--output', compatibilityBackup]);
+  const compatibilityRestored = join(temp, 'compatibility-restored');
+  cli(vcm, ['restore', '--data-dir', compatibilityRestored, '--from', compatibilityBackup]);
+  const restoredDoctors = [
+    JSON.parse(cli(vcm, ['doctor', '--data-dir', restored])),
+    JSON.parse(cli(gitflash, ['doctor', '--data-dir', compatibilityRestored])),
+  ];
+  for (const doctor of restoredDoctors)
+    assert.deepEqual({ ...doctor, dataDir: data }, envDoctors[0]);
+  app = await start(vcm, restored);
   const recovered = await (await fetch(app.url + '/api/state')).json();
+  assert.deepEqual(recovered.companies, reopened.companies);
   assert.deepEqual(recovered.agents, reopened.agents);
   assert.deepEqual(recovered.assignments, reopened.assignments);
   assert.deepEqual(recovered.history, reopened.history);
@@ -243,6 +361,12 @@ try {
   });
   assert.equal(replayResponse.status, 200);
   assert.deepEqual(await replayResponse.json(), firstBooking);
+  await stop(app);
+  app = await start(gitflash, compatibilityRestored);
+  assert.deepEqual(await (await fetch(app.url + '/api/state')).json(), recovered);
+  const compatibilityRecoveredTime = await (await fetch(app.url + '/api/time')).json();
+  assert.deepEqual(compatibilityRecoveredTime.entries, savedTime.entries);
+  assert.deepEqual(compatibilityRecoveredTime.history, savedTime.history);
   await stop(app);
   const dataBeforeUninstall = await readFile(join(data, 'workspace.sqlite'));
   command([
@@ -265,10 +389,24 @@ try {
     os: platform(),
     arch: arch(),
     cpu: cpus()[0]?.model,
+    packageName: manifest.name,
+    version: manifest.version,
+    installedBinaries: ['vcm', 'gitflash'],
+    commandInvocation: 'npm exec --offline --prefix <isolated-install> -- <vcm|gitflash>',
+    startupInvocation:
+      process.platform === 'win32'
+        ? 'Node executes the package entry verified in each installed .cmd shim'
+        : 'Node executes each installed named .bin symlink; both resolve to dist/cli.js',
+    defaultDirectory,
     template100PreviewAndApplyMs: Math.round(templateMs),
     totalMs: Math.round(performance.now() - started),
     checks: [
       'offline npm install of self-contained tarball',
+      'vcm and gitflash installed aliases expose identical help/version and invalid-command exit codes',
+      'both aliases retain ~/.gitflash default and GITFLASH_DATA_DIR; --data-dir takes precedence',
+      'both aliases start the same populated workspace and contend for the same live lock',
+      'both aliases run doctor/export/time-export with equivalent data and existing format identifiers',
+      'cross-alias SQLite backup/restore works in both directions without creating an empty company',
       'packaged CLI and all referenced assets',
       'company and agent creation through API',
       '100-agent template atomic apply',

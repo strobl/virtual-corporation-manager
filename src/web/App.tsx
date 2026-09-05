@@ -435,6 +435,9 @@ export function App() {
   const activeCompanies = state?.companies.filter((row) => row.status === 'active') ?? [];
   const activeAgents = state?.agents.filter((row) => row.status === 'active') ?? [];
   const agents = state && companyId ? companyAgents(state, companyId) : [];
+  const configuredAgentCount = agents.filter((row) => row.kind === 'agent').length;
+  const companyDepartmentCount =
+    state?.departments.filter((row) => row.companyId === companyId).length ?? 0;
   const selectedDepartment =
     selection?.kind === 'department'
       ? state?.departments.find((row) => row.id === selection.id)
@@ -732,7 +735,7 @@ export function App() {
             <div className="empty-state">
               <h2>The local server is unavailable</h2>
               <p>
-                Run <code>gitflash start</code> in your terminal, then retry.
+                Run <code>vcm start</code> in your terminal, then retry.
               </p>
               <button className="button primary" onClick={() => void refresh()}>
                 Try again
@@ -838,9 +841,9 @@ export function App() {
                         aria-label={`Activity for ${company?.name ?? 'this company'}`}
                       >
                         <span>
-                          {agents.filter((row) => row.kind === 'agent').length} configured roles ·{' '}
-                          {state.departments.filter((row) => row.companyId === companyId).length}{' '}
-                          departments
+                          {configuredAgentCount} configured{' '}
+                          {configuredAgentCount === 1 ? 'role' : 'roles'} · {companyDepartmentCount}{' '}
+                          {companyDepartmentCount === 1 ? 'department' : 'departments'}
                         </span>
                         <span>
                           {(companyWork?.stats.running ?? 0) +

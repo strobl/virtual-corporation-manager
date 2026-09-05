@@ -8,7 +8,7 @@ import { createWorkspaceStore, restoreWorkspaceBackup } from '../db/store';
 import { brand } from '../brand';
 declare const __GITFLASH_VERSION__: string;
 const version = typeof __GITFLASH_VERSION__ === 'undefined' ? 'development' : __GITFLASH_VERSION__;
-const help = `${brand.name} ${version} — Virtual Corporation Manager\n\nUsage: gitflash [start|doctor|backup|restore|export|time-export] [options]\n\n  --data-dir <path>   Workspace directory (default: ~/.gitflash)\n  --port <number>     Local port (default: 4310)\n  --no-open           Print the URL without opening a browser\n  --output <path>     Destination for backup or export\n  --from <path>       SQLite backup to restore; stop GitFlash first\n  --help, -h          Show help\n  --version          Show version\n\nexport saves company configuration; time-export saves the delivery-hours\nledger, catalog and history. Use backup/restore for full workspace recovery.\nStop the workspace before running these file commands.\n\nThe local core needs no account or network. Optional agent runtimes have\ntheir own installation, authentication and usage requirements.\n`;
+const help = `${brand.name} ${version} — ${brand.productName}\n\nUsage: vcm [start|doctor|backup|restore|export|time-export] [options]\n\n  --data-dir <path>   Workspace directory (default: ~/.gitflash)\n  --port <number>     Local port (default: 4310)\n  --no-open           Print the URL without opening a browser\n  --output <path>     Destination for backup or export\n  --from <path>       SQLite backup to restore; stop VCM first\n  --help, -h          Show help\n  --version          Show version\n\ngitflash remains a compatibility alias for the same commands and workspace.\nData directory: --data-dir, then GITFLASH_DATA_DIR, then ~/.gitflash.\nThe npm package remains gitflash. Both commands keep the existing data path.\n\nexport saves company configuration; time-export saves the delivery-hours\nledger, catalog and history. Use backup/restore for full workspace recovery.\nStop the workspace before running these file commands.\n\nThe local core needs no account or network. Optional agent runtimes have\ntheir own installation, authentication and usage requirements.\n`;
 function parse(args: string[]) {
   const values: Record<string, string | boolean> = {};
   let command = 'start';
@@ -52,7 +52,7 @@ async function main() {
   const [nodeMajor, nodeMinor] = process.versions.node.split('.').map(Number);
   if (!((nodeMajor === 24 && nodeMinor >= 14) || nodeMajor === 26))
     throw new Error(
-      'GitFlash requires Node.js 24.14+ (24.x) or 26.x. Install a supported Node.js release and retry.',
+      'VCM requires Node.js 24.14+ (24.x) or 26.x. Install a supported Node.js release and retry.',
     );
   const dataDir = resolve(
     String(
@@ -62,7 +62,7 @@ async function main() {
   if (command === 'restore') {
     if (!values['--from']) throw new Error('Use --from <backup.sqlite> to choose a backup.');
     await restoreWorkspaceBackup(dataDir, resolve(String(values['--from'])));
-    console.log(`Workspace restored in ${dataDir}. Start GitFlash to inspect it.`);
+    console.log(`Workspace restored in ${dataDir}. Start VCM with vcm to inspect it.`);
     return;
   }
   if (command === 'backup' || command === 'export' || command === 'time-export') {
@@ -156,7 +156,7 @@ main().catch((error) => {
   const e = error as NodeJS.ErrnoException;
   const message =
     e.code === 'EADDRINUSE'
-      ? 'The local port is already in use. Open the existing GitFlash session or choose --port <number>.'
+      ? 'The local port is already in use. Open the existing VCM session or choose --port <number>.'
       : e.message;
   console.error(`${brand.name}: ${message}`);
   process.exitCode = 1;

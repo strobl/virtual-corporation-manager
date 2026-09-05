@@ -109,14 +109,14 @@ export async function startServer(options: ServerOptions) {
     try {
       const allowedHosts = [`127.0.0.1:${port}`, `localhost:${port}`];
       if (!req.headers.host || !allowedHosts.includes(req.headers.host))
-        throw new HttpError('INVALID_HOST', 'Use the loopback URL printed by GitFlash.', 403);
+        throw new HttpError('INVALID_HOST', 'Use the loopback URL printed by VCM.', 403);
       if (
         req.headers.origin &&
         !allowedHosts.some((host) => req.headers.origin === `http://${host}`)
       )
         throw new HttpError(
           'INVALID_ORIGIN',
-          'This request did not originate from your local GitFlash console.',
+          'This request did not originate from your local VCM console.',
           403,
         );
       if (req.headers['sec-fetch-site'] === 'cross-site')
@@ -212,7 +212,7 @@ export async function startServer(options: ServerOptions) {
         )
           throw new HttpError(
             'INVALID_SESSION',
-            'Reload the console to reconnect to this GitFlash session.',
+            'Reload the console to reconnect to this VCM session.',
             403,
           );
         if (!req.headers['content-type']?.startsWith('application/json'))
@@ -383,7 +383,7 @@ export async function startServer(options: ServerOptions) {
             code: known ? code : 'INTERNAL_ERROR',
             message: known
               ? e.message
-              : 'GitFlash could not complete this request. Retry or restart the local server.',
+              : 'VCM could not complete this request. Retry or restart the local server.',
           },
         },
         status,
