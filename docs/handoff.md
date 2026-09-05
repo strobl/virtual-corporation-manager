@@ -1,6 +1,6 @@
 # Review candidate handoff and known limits
 
-This checkout is unpublished review candidate **0.1.0-alpha.3-local.3**, using SQLite schema **5**. It includes the delivery-hours Time Tracker, bounded Product Studio file workflows and the Little Powerhouse identity. The public alpha.2 release is a separate older artifact. Candidate source, package, platform checks and installed workflow evidence must be identified independently; see [acceptance status](acceptance.md).
+This checkout is unpublished review candidate **0.1.0-alpha.3-local.4**, using SQLite schema **5**. It includes the delivery-hours Time Tracker, bounded Product Studio file workflows and the Little Powerhouse identity. The public alpha.2 release is a separate older artifact. Candidate source, package, platform checks and installed workflow evidence must be identified independently; see [acceptance status](acceptance.md).
 
 The maintainer is [strobl](https://github.com/strobl). Source, issues, pull requests, CI and release artifacts live in [this repository](https://github.com/strobl/gitflash). Publication is a separate review decision. A candidate branch, green unit suite or working local preview does not by itself update the public release or landing page.
 

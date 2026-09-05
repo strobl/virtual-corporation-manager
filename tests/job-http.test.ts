@@ -78,16 +78,18 @@ async function setup() {
           );
         const timestamp = new Date().toISOString();
         const sessionId = randomUUID();
+        const identity = {
+          format: 'gitflash-observed-runtime-session' as const,
+          sessionId,
+          runtimeVersion: 'test',
+          observedAt: timestamp,
+        };
         await writeFile(
           join(input.directory, 'WORKFLOW-EXECUTION.json'),
-          JSON.stringify({
-            format: 'gitflash-observed-runtime-session',
-            sessionId,
-            runtimeVersion: 'test',
-            observedAt: timestamp,
-          }),
+          JSON.stringify(identity, null, 2) + '\n',
           { flag: 'wx' },
         );
+        input.onSession?.(identity);
         return {
           status: 'completed',
           sessionId,

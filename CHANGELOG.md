@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.0-alpha.3-local.4 — hardened workflow review candidate
+
+- Keep the completed delivery-hours Time Tracker and existing SQLite records through workflow integration.
+- Capture original execution receipts at session start and reject changed identities or bytes during execution and restore.
+- Clarify that intake assigns independent seats; actual session independence is checked when QA runs.
+- Complete native SQLite backups on Node 26 even when no other JavaScript callbacks are pending.
+- Fix the bundled CLI module-name collision and recognize Linux network denial at socket creation as well as connection.
+- Limit Linux checker reads to the selected Codex native runtime files. Hosts that deny the required namespaces still stop before model work; no host policy is changed.
+- This is an unpublished candidate. Exact package, cross-platform and new provider-run acceptance remain separate from source tests and earlier iteration-3 evidence.
+
 ## 0.1.0-alpha.3-local.3 — workflow review candidate
 
 - Ship complete reviewed Product Studio 1.2.2 role/job/input/help content and a five-seat starter; the 100-agent company includes the same operational seats.

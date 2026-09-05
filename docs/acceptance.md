@@ -1,6 +1,6 @@
 # Review candidate acceptance
 
-This page concerns **0.1.0-alpha.3-local.3**, an unpublished review candidate with SQLite schema **5**. It includes the delivery-hours Time Tracker, real Product Studio file workflows and the Little Powerhouse identity. The public alpha.2 release and its earlier checks are separate evidence. This is engineering acceptance, not customer validation, a human usability pilot or a security certification.
+This page concerns **0.1.0-alpha.3-local.4**, an unpublished review candidate with SQLite schema **5**. It includes the delivery-hours Time Tracker, real Product Studio file workflows and the Little Powerhouse identity. The public alpha.2 release and its earlier checks are separate evidence. This is engineering acceptance, not customer validation, a human usability pilot or a security certification.
 
 ## Current evidence boundaries
 
@@ -17,6 +17,14 @@ This page concerns **0.1.0-alpha.3-local.3**, an unpublished review candidate wi
 | Buzz and Slack              | Buzz configuration import has historical evidence; live Buzz task dispatch/output and Slack mention/reply round trips remain unverified. Neither blocks the supported local route.                                                                                                                              |
 
 Status is deliberately pending where final evidence has not yet been attached. Before publication, replace pending entries with exact revision/package evidence or preserve the limitation in the release notes. Do not infer acceptance from a configured role, model prose, a transport connection or a green check for another revision.
+
+## Observed iteration-3 results
+
+The installed iteration-3 archive was built from `5fa982445b7e698a14dd354c0a95c899bea85964`: 625,494 bytes, 64 files, SHA-256 `26595325f1913963e04ba51a5ebadd5adff75ce825d954560eceeb2ee0c55338`. On Node 24.19.0/macOS arm64, source checks passed 213 tests with two opt-in skips, type checking, production build and formatting. A separate fresh HTTPS clone and dependency installation reproduced the same archive and passed the documented contributor commands, company creation, corrected delivery-hours entry and restart persistence. Independent installed migration/recovery review also passed its 12 bounded check groups on Node 24.19.0; it contained no completed workflow artifacts. These are engineering fixtures, not human pilots.
+
+[The frozen source CI](https://github.com/strobl/gitflash/actions/runs/33957128090) passed 10 of 14 jobs. All nine core jobs on Node 24.14.0, current 24.x and 26.0.0 passed, as did the macOS sandbox fixture. Current Node 26.8.1 hit the backup test timeout on all three operating systems. Ubuntu sandbox startup failed before Python; [the diagnostic run](https://github.com/strobl/gitflash/actions/runs/33957365694) captured `bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted`. These failures remain open until an exact later revision supplies passing evidence or an explicit supported-platform limitation.
+
+The iteration-3 five-seat runtime correctly stopped intake when the prompt prematurely requested the future QA session identity. The next candidate clarifies stage timing while retaining the actual-session independence gate at QA. The original stopped job remains preserved. Final workflow, restored artifact, CI and release acceptance are not inferred from these partial results.
 
 ## Reproduce the candidate
 

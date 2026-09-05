@@ -11,7 +11,7 @@
   "sourcePathResolution": "sources resolve beside this integration manifest; destinations are relative to Engineering chosen content root",
   "packageManifest": {
     "source": "package/package-manifest.json",
-    "sha256": "5baed0750e7d6e04fda786ff0f0df7d1ca157ab0c9e89125f525b181d9f6791b"
+    "sha256": "8abe8e7cd0c04b60fdbc2753956babf7b3aaa0cba73cb79412df2f6c88a1380f"
   },
   "contentReview": {
     "source": "evidence/root-regression-review.json",
@@ -159,8 +159,8 @@
       "source": "package/install/product-studio/job.json",
       "destination": "install/product-studio/job.json",
       "purpose": "job-input",
-      "bytes": 9843,
-      "sha256": "40ec3fe9edab7267298575b90284217933bbf3d5f5afe531d578c8df7496687b"
+      "bytes": 10395,
+      "sha256": "f36f37053b57b7aa0bd062e9e8780ebe73aa0b518d70e3bbf9de7898014497f0"
     },
     {
       "source": "package/install/product-studio/brief.md",

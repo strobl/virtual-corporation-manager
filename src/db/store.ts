@@ -1,4 +1,5 @@
-import { DatabaseSync, backup as sqliteBackup } from 'node:sqlite';
+import { DatabaseSync } from 'node:sqlite';
+import { backupDatabase } from './backup.js';
 import { createHash, randomUUID } from 'node:crypto';
 import {
   chmodSync,
@@ -761,7 +762,7 @@ export function createWorkspaceStore(dataDir: string): WorkspaceStore {
       const temp = `${destination}.${randomUUID()}.tmp`;
       closeSync(openSync(temp, 'wx', 0o600));
       try {
-        await sqliteBackup(db, temp);
+        await backupDatabase(db, temp);
         const verified = verifyBackup(temp);
         verified.close();
         linkSync(temp, destination);
@@ -793,7 +794,7 @@ export async function restoreWorkspaceBackup(dataDir: string, source: string): P
     const candidate = verifyBackup(source);
     closeSync(openSync(temp, 'wx', 0o600));
     try {
-      await sqliteBackup(candidate, temp);
+      await backupDatabase(candidate, temp);
     } finally {
       candidate.close();
     }

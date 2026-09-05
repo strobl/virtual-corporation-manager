@@ -1,6 +1,6 @@
 # GitFlash
 
-**Review candidate `0.1.0-alpha.3-local.3`.** This package includes the delivery-hours Time Tracker, real Product Studio file workflows and the Little Powerhouse identity. It is awaiting release review. The public alpha.2 release remains a separate older version and does not contain these features.
+**Review candidate `0.1.0-alpha.3-local.4`.** This package includes the delivery-hours Time Tracker, real Product Studio file workflows and the Little Powerhouse identity. It is awaiting release review. The public alpha.2 release remains a separate older version and does not contain these features.
 
 **Build a company. Put it to work.**
 
@@ -13,7 +13,7 @@ This is a **technical alpha**. The local core and optional Codex execution are t
 Use **Node.js 24.14+ in the 24.x line, or 26.x**. The configured acceptance matrix targets macOS, Linux and Windows on both supported release lines; final candidate CI is pending, see [acceptance evidence](docs/acceptance.md) for the exact candidate results. Optional agent execution has its own [runtime prerequisites](docs/integrations.md).
 
 ```sh
-npm install --offline --ignore-scripts --prefix ./gitflash-preview ./gitflash-0.1.0-alpha.3-local.3.tgz
+npm install --offline --ignore-scripts --prefix ./gitflash-preview ./gitflash-0.1.0-alpha.3-local.4.tgz
 node ./gitflash-preview/node_modules/gitflash/dist/cli.js --data-dir ./my-company
 ```
 

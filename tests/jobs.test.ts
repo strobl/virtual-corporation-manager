@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { mkdtempSync, rmSync } from 'node:fs';
-import { rm, writeFile } from 'node:fs/promises';
+import { copyFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
@@ -11,7 +11,11 @@ import type { StudioContent } from '../src/jobs/content.js';
 import type { JobInfo, StageId } from '../src/jobs/contracts.js';
 import { captureFiles, type Files } from '../src/jobs/files.js';
 import { sha256 } from '../src/jobs/store.js';
-import type { WorkflowCodexInput, WorkflowCodexResult } from '../src/adapters/workflow-codex.js';
+import type {
+  WorkflowCodexInput,
+  WorkflowCodexResult,
+  WorkflowExecutionIdentity,
+} from '../src/adapters/workflow-codex.js';
 
 // Synthetic content deliberately contains no finished implementation. These tests
 // exercise orchestration and durable evidence; they do not claim provider or
@@ -71,18 +75,21 @@ interface FixtureOptions {
   preflight?: JobServiceOptions['check'];
   writeOutputs?: boolean;
   writeReceipt?: boolean;
+  afterReceipt?: (call: Call, result: WorkflowCodexResult) => Promise<void>;
 }
 async function executionReceipt(input: WorkflowCodexInput, result: WorkflowCodexResult) {
+  const identity: WorkflowExecutionIdentity = {
+    format: 'gitflash-observed-runtime-session',
+    sessionId: result.sessionId!,
+    runtimeVersion: result.runtimeVersion!,
+    observedAt: result.startedAt,
+  };
   await writeFile(
     join(input.directory, 'WORKFLOW-EXECUTION.json'),
-    JSON.stringify({
-      format: 'gitflash-observed-runtime-session',
-      sessionId: result.sessionId,
-      runtimeVersion: result.runtimeVersion,
-      observedAt: result.startedAt,
-    }),
+    JSON.stringify(identity, null, 2) + '\n',
     { flag: 'wx' },
   );
+  input.onSession?.(identity);
 }
 function success(): WorkflowCodexResult {
   const timestamp = new Date().toISOString();
@@ -205,6 +212,7 @@ function fixture(options: FixtureOptions = {}) {
     const initial = success();
     const result = (await options.execute?.(call, initial, calls.length - 1)) ?? initial;
     if (options.writeReceipt !== false) await executionReceipt(input, result);
+    await options.afterReceipt?.(call, result);
     return result;
   };
   const check: NonNullable<JobServiceOptions['check']> = async (...args) => {
@@ -418,6 +426,68 @@ describe('Product Studio job orchestration', () => {
     expect(job.error).toContain('distinct observed runtime session');
     expect(f.calls.map((call) => call.kind)).toEqual(['intake', 'requirements']);
     expect(job.ownerReview).toBeNull();
+  });
+
+  it.each(['observedAt', 'extra-field', 'formatting', 'removed', 'result-session'])(
+    'persists the original session receipt before execution returns and blocks %s changes',
+    async (tamper) => {
+      let original = '';
+      const f = fixture({
+        afterReceipt: async (call, result) => {
+          const path = join(call.input.directory, 'WORKFLOW-EXECUTION.json');
+          original = await readFile(path, 'utf8');
+          const current = f.service.list()[0]!;
+          expect(current.status).toBe('running');
+          const stage = current.stages[0]!;
+          expect(stage.sessionId).toBe(result.sessionId);
+          expect(stage.runtimeVersion).toBe(result.runtimeVersion);
+          const receipt = stage.artifacts.find((a) => a.path === 'WORKFLOW-EXECUTION.json')!;
+          expect(receipt.source).toBe('verifier');
+          expect(f.service.artifact(current.id, receipt.id).content).toBe(original);
+          expect(receipt.sha256).toBe(sha256(original));
+          const value = JSON.parse(original);
+          if (tamper === 'observedAt') value.observedAt = '2000-01-01T00:00:00.000Z';
+          if (tamper === 'extra-field') value.claim = 'Forged model claim';
+          if (tamper === 'removed') await rm(path);
+          else if (tamper === 'result-session') result.sessionId = randomUUID();
+          else
+            await writeFile(
+              path,
+              tamper === 'formatting'
+                ? JSON.stringify(value)
+                : JSON.stringify(value, null, 2) + '\n',
+            );
+        },
+      });
+      const job = await settled(f.service, f.start().id);
+      expect(job.status).toBe('blocked');
+      expect(job.error).toContain('receipt was changed');
+      expect(job.ownerReview).toBeNull();
+      expect(job.retryable).toBe(false);
+      expect(f.calls).toHaveLength(1);
+      const receipts = job.stages[0]!.artifacts.filter((a) => a.path === 'WORKFLOW-EXECUTION.json');
+      expect(receipts).toHaveLength(1);
+      expect(f.service.artifact(job.id, receipts[0]!.id).content).toBe(original);
+      expect(job.stages[0]!.sessionId).toBe(JSON.parse(original).sessionId);
+      // The blocked job retains authentic evidence and remains openable.
+      await f.close();
+      const reopened = createWorkspaceStore(f.dir);
+      reopened.close();
+    },
+  );
+
+  it('does not authenticate a model-created post-run receipt without the observed session callback', async () => {
+    const f = fixture({
+      writeReceipt: false,
+      afterReceipt: async (call, result) => {
+        await executionReceipt({ ...call.input, onSession: undefined }, result);
+      },
+    });
+    const job = await settled(f.service, f.start().id);
+    expect(job.status).toBe('failed');
+    expect(job.error).toContain('at session start');
+    expect(job.stages[0]!.artifacts.some((a) => a.path === 'WORKFLOW-EXECUTION.json')).toBe(false);
+    expect(f.calls).toHaveLength(1);
   });
 
   it('treats a QA pass contradicted by failed fixed-oracle evidence as a severe stop without repair', async () => {
@@ -889,112 +959,147 @@ describe('durable workflow recovery', () => {
     expect(store.time.snapshot().entries).toHaveLength(0);
   });
 
-  it('marks process-loss work failed without provider replay, then retries only incomplete stages explicitly', async () => {
-    const f = fixture({
-      execute: async (call, result) =>
-        call.kind === 'qa'
-          ? {
-              ...result,
-              status: 'failed',
-              error: { code: 'runtime', message: 'Simulated process loss before completion.' },
-            }
-          : result,
-    });
-    const before = await settled(f.service, f.start('process-loss-request').id);
-    await f.close();
-    const db = new DatabaseSync(join(f.dir, 'workspace.sqlite'));
-    before.status = 'running';
-    before.stages.at(-1)!.status = 'running';
-    db.prepare('UPDATE workflow_jobs SET info=? WHERE id=?').run(JSON.stringify(before), before.id);
-    db.close();
-    const store = createWorkspaceStore(f.dir);
-    cleanups.push(() => store.close());
-    const calls: string[] = [];
-    const service = createJobService(store, f.dir, {
-      content,
-      python: process.execPath,
-      check: async () => ({
-        status: 'completed',
-        exitCode: 0,
-        output: 'Synthetic check PASS',
-        runtimeVersion: 'test',
-        startedAt: new Date().toISOString(),
-        finishedAt: new Date().toISOString(),
-      }),
-      execute: async (input) => {
-        const kind = input.prompt.includes(', stage qa.') ? 'qa' : 'handoff';
-        calls.push(kind);
-        const files =
-          kind === 'qa'
-            ? { 'QA.json': JSON.stringify(report()), 'QA.md': 'Resumed independent review.' }
-            : { 'HANDOFF.md': 'Resumed handoff; owner review pending.' };
-        for (const [path, text] of Object.entries(files))
-          await writeFile(join(input.directory, path), text);
-        if (kind !== 'qa')
-          await writeFile(
-            join(input.directory, 'STAGE.json'),
-            JSON.stringify({
-              status: 'ready',
-              summary: 'Resumed handoff is ready for explicit owner review.',
-            }),
-          );
-        const result = success();
-        await executionReceipt(input, result);
-        return result;
-      },
-    });
-    cleanups.push(() => service.close());
-    expect(service.get(before.id).status).toBe('failed');
-    expect(service.get(before.id).error).toContain('stopped during this job');
-    expect(calls).toEqual([]);
-    service.retry(before.id, 'explicit-after-restart');
-    const after = await settled(service, before.id);
-    expect(after.status).toBe('waiting_owner');
-    expect(calls).toEqual(['qa', 'handoff']);
-    expect(after.stages.filter((s) => s.kind === 'build')).toEqual(
-      before.stages.filter((s) => s.kind === 'build'),
-    );
-  });
-
-  it.each(['bytes', 'cross-job', 'orphan', 'context', 'review-stage', 'session'])(
-    'rejects %s evidence corruption before accepting a workspace backup',
-    async (tamper) => {
-      const f = fixture();
-      const one = await settled(f.service, f.start().id);
-      const two = await settled(f.service, f.start().id);
-      const backup = join(f.dir, `tampered-${tamper}.sqlite`);
-      await f.store.backup(backup);
-      const db = new DatabaseSync(backup);
-      const artifact = one.stages[2]!.artifacts.find((a) => a.path === 'stock_alert.py')!;
-      if (tamper === 'bytes')
-        db.prepare('UPDATE workflow_artifacts SET content=? WHERE id=?').run(
-          'changed',
-          artifact.id,
-        );
-      if (tamper === 'cross-job')
-        db.prepare('UPDATE workflow_artifacts SET job_id=? WHERE id=?').run(two.id, artifact.id);
-      if (tamper === 'orphan')
-        db.prepare(
-          'INSERT INTO workflow_artifacts SELECT ?,job_id,stage_id,path,sha256,bytes,source,content FROM workflow_artifacts WHERE id=?',
-        ).run(randomUUID(), artifact.id);
-      if (tamper === 'context')
-        db.prepare('UPDATE workflow_jobs SET context=? WHERE id=?').run(
-          '{"agents":null,"content":null}',
-          one.id,
-        );
-      if (tamper === 'review-stage') {
-        one.stages[3]!.status = 'failed';
-        db.prepare('UPDATE workflow_jobs SET info=? WHERE id=?').run(JSON.stringify(one), one.id);
-      }
-      if (tamper === 'session') {
-        one.stages[3]!.sessionId = one.stages[2]!.sessionId;
-        db.prepare('UPDATE workflow_jobs SET info=? WHERE id=?').run(JSON.stringify(one), one.id);
-      }
-      db.close();
-      const target = directory('gitflash-job-corrupt-restore-');
-      await expect(restoreWorkspaceBackup(target, backup)).rejects.toMatchObject({
-        code: 'INVALID_BACKUP',
+  it.each([false, true])(
+    'recovers process-loss work (legacy receipt absent: %s) without provider replay, then retries only incomplete stages explicitly',
+    async (legacy) => {
+      const f = fixture({
+        execute: async (call, result) =>
+          call.kind === 'qa'
+            ? {
+                ...result,
+                status: 'failed',
+                error: { code: 'runtime', message: 'Simulated process loss before completion.' },
+              }
+            : result,
       });
+      const before = await settled(f.service, f.start('process-loss-request').id);
+      await f.close();
+      const db = new DatabaseSync(join(f.dir, 'workspace.sqlite'));
+      before.status = 'running';
+      before.stages.at(-1)!.status = 'running';
+      if (legacy) {
+        const interrupted = before.stages.at(-1)!;
+        const receipt = interrupted.artifacts.find((a) => a.path === 'WORKFLOW-EXECUTION.json')!;
+        db.prepare('DELETE FROM workflow_artifacts WHERE id=?').run(receipt.id);
+        interrupted.artifacts = interrupted.artifacts.filter((a) => a.id !== receipt.id);
+      }
+      db.prepare('UPDATE workflow_jobs SET info=? WHERE id=?').run(
+        JSON.stringify(before),
+        before.id,
+      );
+      db.close();
+      const store = createWorkspaceStore(f.dir);
+      cleanups.push(() => store.close());
+      const calls: string[] = [];
+      const service = createJobService(store, f.dir, {
+        content,
+        python: process.execPath,
+        check: async () => ({
+          status: 'completed',
+          exitCode: 0,
+          output: 'Synthetic check PASS',
+          runtimeVersion: 'test',
+          startedAt: new Date().toISOString(),
+          finishedAt: new Date().toISOString(),
+        }),
+        execute: async (input) => {
+          const kind = input.prompt.includes(', stage qa.') ? 'qa' : 'handoff';
+          calls.push(kind);
+          const files =
+            kind === 'qa'
+              ? { 'QA.json': JSON.stringify(report()), 'QA.md': 'Resumed independent review.' }
+              : { 'HANDOFF.md': 'Resumed handoff; owner review pending.' };
+          for (const [path, text] of Object.entries(files))
+            await writeFile(join(input.directory, path), text);
+          if (kind !== 'qa')
+            await writeFile(
+              join(input.directory, 'STAGE.json'),
+              JSON.stringify({
+                status: 'ready',
+                summary: 'Resumed handoff is ready for explicit owner review.',
+              }),
+            );
+          const result = success();
+          await executionReceipt(input, result);
+          return result;
+        },
+      });
+      cleanups.push(() => service.close());
+      expect(service.get(before.id).status).toBe('failed');
+      expect(service.get(before.id).error).toContain('stopped during this job');
+      expect(calls).toEqual([]);
+      service.retry(before.id, 'explicit-after-restart');
+      const after = await settled(service, before.id);
+      expect(after.status).toBe('waiting_owner');
+      expect(calls).toEqual(['qa', 'handoff']);
+      expect(after.stages.filter((s) => s.kind === 'build')).toEqual(
+        before.stages.filter((s) => s.kind === 'build'),
+      );
     },
   );
+
+  it.each([
+    'bytes',
+    'cross-job',
+    'orphan',
+    'context',
+    'review-stage',
+    'session',
+    'unique-session',
+    'runtime-version',
+    'missing-receipt',
+  ])('rejects %s evidence corruption before accepting a workspace backup', async (tamper) => {
+    const f = fixture();
+    const one = await settled(f.service, f.start().id);
+    const two = await settled(f.service, f.start().id);
+    const backup = join(f.dir, `tampered-${tamper}.sqlite`);
+    await f.store.backup(backup);
+    const db = new DatabaseSync(backup);
+    const artifact = one.stages[2]!.artifacts.find((a) => a.path === 'stock_alert.py')!;
+    if (tamper === 'bytes')
+      db.prepare('UPDATE workflow_artifacts SET content=? WHERE id=?').run('changed', artifact.id);
+    if (tamper === 'cross-job')
+      db.prepare('UPDATE workflow_artifacts SET job_id=? WHERE id=?').run(two.id, artifact.id);
+    if (tamper === 'orphan')
+      db.prepare(
+        'INSERT INTO workflow_artifacts SELECT ?,job_id,stage_id,path,sha256,bytes,source,content FROM workflow_artifacts WHERE id=?',
+      ).run(randomUUID(), artifact.id);
+    if (tamper === 'context')
+      db.prepare('UPDATE workflow_jobs SET context=? WHERE id=?').run(
+        '{"agents":null,"content":null}',
+        one.id,
+      );
+    if (tamper === 'review-stage') {
+      one.stages[3]!.status = 'failed';
+      db.prepare('UPDATE workflow_jobs SET info=? WHERE id=?').run(JSON.stringify(one), one.id);
+    }
+    if (tamper === 'session') {
+      one.stages[3]!.sessionId = one.stages[2]!.sessionId;
+      db.prepare('UPDATE workflow_jobs SET info=? WHERE id=?').run(JSON.stringify(one), one.id);
+    }
+    if (tamper === 'unique-session' || tamper === 'runtime-version') {
+      if (tamper === 'unique-session') one.stages[3]!.sessionId = randomUUID();
+      else one.stages[3]!.runtimeVersion = 'codex-cli invented';
+      db.prepare('UPDATE workflow_jobs SET info=? WHERE id=?').run(JSON.stringify(one), one.id);
+    }
+    if (tamper === 'missing-receipt') {
+      const stage = one.stages[3]!;
+      const receipt = stage.artifacts.find((a) => a.path === 'WORKFLOW-EXECUTION.json')!;
+      db.prepare('DELETE FROM workflow_artifacts WHERE id=?').run(receipt.id);
+      stage.artifacts = stage.artifacts.filter((a) => a.id !== receipt.id);
+      db.prepare('UPDATE workflow_jobs SET info=? WHERE id=?').run(JSON.stringify(one), one.id);
+    }
+    db.close();
+    if (tamper === 'unique-session') {
+      const corruptDirectory = directory('gitflash-job-corrupt-open-');
+      copyFileSync(backup, join(corruptDirectory, 'workspace.sqlite'));
+      expect(() => createWorkspaceStore(corruptDirectory)).toThrow(
+        expect.objectContaining({ code: 'INVALID_DATABASE' }),
+      );
+    }
+    const target = directory('gitflash-job-corrupt-restore-');
+    await expect(restoreWorkspaceBackup(target, backup)).rejects.toMatchObject({
+      code: 'INVALID_BACKUP',
+    });
+  });
 });

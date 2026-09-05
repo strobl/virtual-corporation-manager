@@ -108,6 +108,37 @@ export function validateJobData(db: DatabaseSync): void {
         )
           return fail();
         stageOwners.set(stage.id, info.id);
+        const receipts = stage.artifacts.filter((a) => a.path === 'WORKFLOW-EXECUTION.json');
+        // Older interrupted stages may predate synchronous receipt capture. They
+        // can recover as failed, but completed evidence always needs its receipt.
+        if (receipts.length > 1 || (stage.status === 'completed' && receipts.length !== 1))
+          return fail();
+        if (receipts.length) {
+          const artifact = receipts[0]!;
+          const row = db
+            .prepare(
+              'SELECT content FROM workflow_artifacts WHERE id=? AND job_id=? AND stage_id=?',
+            )
+            .get(artifact.id, info.id, stage.id);
+          if (!row || artifact.source !== 'verifier') return fail();
+          const receipt = JSON.parse(String(row.content));
+          if (
+            !receipt ||
+            Object.keys(receipt).sort().join(',') !==
+              'format,observedAt,runtimeVersion,sessionId' ||
+            receipt.format !== 'gitflash-observed-runtime-session' ||
+            typeof receipt.sessionId !== 'string' ||
+            !receipt.sessionId.trim() ||
+            receipt.sessionId !== stage.sessionId ||
+            typeof receipt.runtimeVersion !== 'string' ||
+            !receipt.runtimeVersion.trim() ||
+            receipt.runtimeVersion !== stage.runtimeVersion ||
+            typeof receipt.observedAt !== 'string' ||
+            !Number.isFinite(Date.parse(receipt.observedAt)) ||
+            new Date(receipt.observedAt).toISOString() !== receipt.observedAt
+          )
+            return fail();
+        }
         for (const artifact of stage.artifacts) {
           if (references.has(artifact.id) || artifact.stageId !== stage.id) return fail();
           references.set(artifact.id, { jobId: info.id, artifact });

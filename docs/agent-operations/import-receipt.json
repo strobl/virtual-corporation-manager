@@ -1,6 +1,6 @@
 {
   "contentVersion": "1.2.2",
-  "manifestSha256": "207b26732335bb72fd522dfa1250d174d2c8cf3393d967d6f853cb1ff83075bd",
+  "manifestSha256": "092c20d44c9baa48b87b16457c49e48564d2bb38f3c7101ec18a4900dd8643b7",
   "oracleSha256": "2d7bdda0280b92f3a499aa405bd19ac1871309ee9fb0076e4762725612af527b",
   "roleIds": [
     "ao.role.delivery-manager",

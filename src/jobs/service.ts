@@ -1,11 +1,11 @@
 import { randomUUID } from 'node:crypto';
-import { accessSync, constants } from 'node:fs';
+import { accessSync, constants, readFileSync } from 'node:fs';
 import { rm } from 'node:fs/promises';
 import { delimiter, isAbsolute, join, resolve } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import type { Agent, WorkspaceStore } from '../domain/contracts.js';
 import { DomainError } from '../domain/errors.js';
-import { executeWorkflowCodex } from '../adapters/workflow-codex.js';
+import { executeWorkflowCodex, WORKFLOW_EXECUTION_FILE } from '../adapters/workflow-codex.js';
 import { executeWorkflowCheck } from '../adapters/workflow-check.js';
 import { executeProcess, runtimeEnvironment } from '../adapters/process.js';
 import { studioContent, workflowInfo, type StudioContent } from './content.js';
@@ -181,6 +181,7 @@ export function createJobService(
     files: Files,
     source: JobArtifact['source'] = 'runtime',
   ) => {
+    const previousArtifactCount = stage.artifacts.length;
     db.exec('BEGIN IMMEDIATE');
     try {
       putArtifacts(job, stage, files, source);
@@ -188,6 +189,7 @@ export function createJobService(
       db.exec('COMMIT');
     } catch (error) {
       db.exec('ROLLBACK');
+      stage.artifacts.length = previousArtifactCount;
       throw error;
     }
   };
@@ -294,6 +296,16 @@ export function createJobService(
             permittedTools:
               'Read the supplied files, write only this stage outputs, and execute local standard-library Python checks. No external actions or spending authority.',
           },
+          reviewIdentityCheckpoint: {
+            reviewerSeat: ctx.agents.qa.id,
+            producerSeat: ctx.agents.build.id,
+            capacity:
+              'Reserved by the fixed sequential scheduler; only one workflow stage executes at a time.',
+            verification:
+              'Actual producer and reviewer session IDs are verified when QA executes after build. Before those stages execute, independence is NOT VERIFIED and its check is NOT RUN; neither a future session nor a review verdict exists yet.',
+            intakeRule:
+              'Intake names the assigned producer and reserved independent reviewer. Missing future execution receipts do not block this pre-build stage. Do not invent a future session ID or claim independence PASS. The later QA stage must compare the actual producer receipt with its own WORKFLOW-EXECUTION.json before passing.',
+          },
           priorStages: job.stages
             .filter((s) => s.status === 'completed')
             .map((s) => ({
@@ -325,15 +337,27 @@ export function createJobService(
       persistStage(job, stage, { 'oracle-result.json': inputs['oracle-result.json'] }, 'verifier');
     const directory = join(resolve(dataDir), 'workflow-runs', job.id, stage.id);
     await materializeInputs(directory, inputs);
+    let observedExecution: string | undefined;
     const result = await execute(
       {
         directory,
         prompt,
         signal: active!.controller.signal,
         onSession: (identity) => {
+          // The adapter writes this reserved file before notifying us. Capture it
+          // synchronously, before any model command can rewrite its contents.
+          const expected = JSON.stringify(identity, null, 2) + '\n';
+          const bytes = readFileSync(join(directory, WORKFLOW_EXECUTION_FILE));
+          if (
+            !bytes.equals(Buffer.from(expected)) ||
+            (observedExecution !== undefined && observedExecution !== expected)
+          )
+            return fail('EVIDENCE_CHANGED', 'The observed runtime session receipt was changed.');
+          if (observedExecution !== undefined) return;
           stage.sessionId = identity.sessionId;
           stage.runtimeVersion = identity.runtimeVersion;
-          save(job);
+          persistStage(job, stage, { [WORKFLOW_EXECUTION_FILE]: expected }, 'verifier');
+          observedExecution = expected;
         },
       },
       env,
@@ -343,8 +367,10 @@ export function createJobService(
       },
     );
     stage.output = result.output;
-    stage.sessionId = result.sessionId;
-    stage.runtimeVersion = result.runtimeVersion;
+    if (observedExecution === undefined) {
+      stage.sessionId = result.sessionId;
+      stage.runtimeVersion = result.runtimeVersion;
+    }
     stage.commands = result.commands;
     stage.finishedAt = result.finishedAt;
     let files: Files;
@@ -355,33 +381,25 @@ export function createJobService(
       save(job);
       throw error;
     }
-    const execution = files['WORKFLOW-EXECUTION.json'];
-    if (result.status === 'completed' && !execution)
+    const execution = files[WORKFLOW_EXECUTION_FILE];
+    if (result.status === 'completed' && observedExecution === undefined)
       return fail(
         'RUNTIME_SESSION',
-        'The stage removed or did not retain its observed runtime session receipt.',
+        'The stage did not provide an observed runtime session receipt at session start.',
       );
-    if (execution) {
-      let receipt;
-      try {
-        receipt = JSON.parse(execution);
-      } catch {
-        return fail('RUNTIME_SESSION', 'Observed runtime session receipt is invalid.');
-      }
-      if (
-        receipt.format !== 'gitflash-observed-runtime-session' ||
-        receipt.sessionId !== result.sessionId ||
-        receipt.runtimeVersion !== result.runtimeVersion
-      )
-        return fail(
-          'EVIDENCE_CHANGED',
-          'The observed runtime session receipt was changed or mismatched.',
-        );
-      persistStage(job, stage, { 'WORKFLOW-EXECUTION.json': execution }, 'verifier');
-    }
+    if (
+      observedExecution !== undefined &&
+      (execution !== observedExecution ||
+        stage.sessionId !== result.sessionId ||
+        stage.runtimeVersion !== result.runtimeVersion)
+    )
+      return fail(
+        'EVIDENCE_CHANGED',
+        'The observed runtime session receipt was changed or mismatched.',
+      );
     const changes = Object.fromEntries(
       Object.entries(files).filter(
-        ([path, text]) => path !== 'WORKFLOW-EXECUTION.json' && inputs[path] !== text,
+        ([path, text]) => path !== WORKFLOW_EXECUTION_FILE && inputs[path] !== text,
       ),
     );
     persistStage(job, stage, changes);

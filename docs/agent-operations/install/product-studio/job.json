@@ -15,7 +15,7 @@
     {
       "id": "intake",
       "role": "ao.role.delivery-manager",
-      "prompt": "Validate the shipped PS-001 brief, inputs, exact PS-A1\u2013A5 rubric, actual user-start authority and available Python >=3.8 capability. Name PS-BUILD, a different executing PS-QA identity and the actual human acceptance owner. Keep one accountable PS-DM job owner. Record action-specific permissions, source versions and the next checkpoint; missing essential authority/input routes to the manager without invented approval."
+      "prompt": "Validate the shipped PS-001 brief, inputs, exact PS-A1\u2013A5 rubric, actual user-start authority and available Python >=3.8 capability. Name the assigned PS-BUILD and PS-QA seats, reserve QA capacity for a separate execution, and name the actual human acceptance owner. At intake, future build and QA execution IDs need not exist yet: record them as pending future execution and review independence as NOT VERIFIED / NOT RUN. Their absence alone must not block an otherwise complete, authorized intake. This records a review plan, not verified independence. At the QA checkpoint, compare the actual recorded producer and reviewer execution IDs for the exact candidate; missing, unverified or identical IDs block QA and must not produce a QA PASS, reviewed handoff or acceptance. Keep one accountable PS-DM job owner. Record action-specific permissions, source versions and the next checkpoint; missing essential authority/input routes to the manager without invented approval."
     },
     {
       "id": "requirements",

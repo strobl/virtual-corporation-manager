@@ -139,12 +139,14 @@ try:
  pathlib.Path(${JSON.stringify(`${directory}-outside.txt`)}).write_text('must be blocked')
  result['outside_denied']=False
 except OSError as error: result['outside_denied']=error.errno in (errno.EPERM,errno.EACCES,errno.EROFS)
-connection=socket.socket()
+connection=None
 try:
+ connection=socket.socket()
  connection.connect(('127.0.0.1',9))
  result['network_denied']=False
 except OSError as error: result['network_denied']=error.errno in (errno.EPERM,errno.EACCES)
-finally: connection.close()
+finally:
+ if connection is not None: connection.close()
 print(json.dumps(result))
 `);
     expect(restricted, JSON.stringify(restricted)).toMatchObject({

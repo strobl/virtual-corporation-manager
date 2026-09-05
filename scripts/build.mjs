@@ -15,7 +15,7 @@ const serverOutput = await bundle({
   format: 'esm',
   packages: 'bundle',
   banner: {
-    js: "import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);",
+    js: "import { createRequire as __gitflashCreateRequire } from 'node:module'; const require = __gitflashCreateRequire(import.meta.url);",
   },
   define: {
     __GITFLASH_VERSION__: JSON.stringify(version),
