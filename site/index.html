@@ -5,257 +5,259 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Virtual Corporation Manager. Build the structure of your AI company. Assign work. Review the results. Runs locally with your own optional runtime."
+      content="VCM — Virtual Corporation Manager. Run a task, review the result, and track delivery hours in a local open-source workspace. Unpublished preview."
     />
-    <meta name="theme-color" content="#F3F0E7" />
-    <title>GitFlash — Virtual Corporation Manager</title>
-    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#FFFFFF" />
+    <title>VCM — Virtual Corporation Manager</title>
+    <link rel="icon" href="./vcm-favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <div class="page-shell">
       <header class="site-header">
-        <a class="wordmark" href="./" aria-label="GitFlash home">
-          <span class="identity-lockup"
-            ><img src="./gitflash-wordmark.svg" alt="GitFlash" width="144" height="32" /><span
-              >Virtual Corporation Manager</span
-            ></span
-          >
-        </a>
+        <a class="identity" href="./" aria-label="VCM home"
+          ><img src="./vcm-wordmark.svg" alt="VCM" width="122" height="32" /><span
+            >Virtual Corporation Manager</span
+          ></a
+        >
         <nav aria-label="Main navigation">
-          <a href="https://github.com/strobl/gitflash#readme">Docs</a
-          ><a href="https://github.com/strobl/gitflash">Source ↗</a
-          ><a class="nav-install" href="#install">Install locally ↓</a>
+          <a href="#tasks">Tasks</a><a href="https://github.com/strobl/gitflash">Source ↗</a
+          ><a class="button primary" href="#install">Set up locally</a>
         </nav>
       </header>
       <main id="main" tabindex="-1">
         <section class="hero" aria-labelledby="hero-title">
-          <div class="hero-copy">
-            <p class="eyebrow">
-              <span class="status-dot" aria-hidden="true"></span>Open source · Technical alpha
-            </p>
-            <h1 id="hero-title">Your company.<br /><span>In your hands.</span></h1>
-            <p class="intro">
-              Build the structure of your AI company. Assign work. Review the results.
-            </p>
-            <div class="hero-actions">
-              <a class="button primary" href="#install">Start on your computer ↗</a
-              ><a class="text-link" href="#how-it-works">See how it works ↓</a>
-            </div>
-            <p class="hero-note">Free local core. Your files. Your optional runtime.</p>
-          </div>
-          <figure class="org-figure">
-            <div class="figure-bar">
-              <span
-                ><img class="little-mark" src="./flash-mark.svg" alt="" width="24" height="24" />
-                Company workspace</span
-              ><span>Illustrative roles</span>
-            </div>
-            <div
-              class="org-diagram"
-              role="img"
-              aria-label="Illustrative organization: Idea Studio brings together Product, Marketing and Customer Care roles. A selected Product Analyst has a clear responsibility. This is a concept illustration, not a shipped template or running activity."
+          <p class="eyebrow">Local app · Open source · Unpublished preview</p>
+          <h1 id="hero-title">Run a task.<br />Review the result.</h1>
+          <p class="intro">
+            Choose the work, inspect the output, and keep track of delivery hours.
+          </p>
+          <p class="setup-note">
+            VCM runs on your computer. These links explain the real local actions; they do not run
+            work in this website.
+          </p>
+          <nav class="task-grid" id="tasks" aria-label="Choose a local task guide">
+            <a class="task-card" href="#run-task"
+              ><span class="task-icon blue" aria-hidden="true"
+                ><svg viewBox="0 0 24 24"><path d="m9 5 11 7-11 7Z" /></svg></span
+              ><span class="task-arrow" aria-hidden="true">↗</span><strong>Run a task</strong
+              ><span>Review the included brief and start the Product Studio job.</span
+              ><small>Local task guide</small></a
             >
-              <div class="company-node">
-                <img
-                  class="company-flash"
-                  src="./flash-character.svg"
-                  alt=""
-                  width="84"
-                  height="84"
-                />
-                <div>
-                  <span class="node-label">YOUR CORPORATION</span><strong>Idea Studio</strong
-                  ><span class="node-description">Give your idea a place to work.</span>
-                </div>
-              </div>
-              <div class="org-branches">
-                <div class="department-node selected">
-                  <span class="node-label">PRODUCT</span><strong>Find the right problem</strong>
-                  <div class="agent-chip"><span>PA</span>Product Analyst</div>
-                </div>
-                <div class="department-node">
-                  <span class="node-label">MARKETING</span><strong>Tell the story</strong>
-                  <div class="agent-chip"><span>MW</span>Marketing Writer</div>
-                </div>
-                <div class="department-node">
-                  <span class="node-label">CUSTOMER CARE</span><strong>Help people succeed</strong>
-                  <div class="agent-chip"><span>CG</span>Customer Guide</div>
-                </div>
-              </div>
-              <div class="role-detail">
-                <div>
-                  <span class="node-label">ILLUSTRATIVE ROLE</span><strong>Product Analyst</strong>
-                </div>
-                <p>
-                  Clarify the problem and compare options.<br />Bring the evidence back for your
-                  decision.
-                </p>
-                <span class="review-label">✓ Review before applying changes</span>
-              </div>
-            </div>
-            <figcaption>
-              Illustrative roles, not a template catalogue. Configuring roles does not start agents.
-            </figcaption>
-          </figure>
-        </section>
-        <div class="principles" aria-label="Core properties">
-          <span>Runs on localhost</span><span>SQLite on your computer</span
-          ><span>Works offline after install</span><span>MIT licensed</span>
-        </div>
-        <section class="workflow section" id="how-it-works" aria-labelledby="workflow-title">
-          <div class="section-heading">
-            <p class="eyebrow">A company you can understand</p>
-            <h2 id="workflow-title">Structure first.<br />Then a concrete task.</h2>
-            <p>
-              Keep responsibilities, changes and actual work in one place. You choose when an agent
-              starts.
-            </p>
-          </div>
-          <ol class="steps">
-            <li>
-              <span class="step-number">01</span>
-              <div>
-                <h3>Give every role a job.</h3>
-                <p>
-                  Create a company from scratch or preview a software delivery template with 20 or
-                  100 differentiated roles. Inspect departments, managers, instructions and
-                  responsibilities before applying it.
-                </p>
-              </div>
-            </li>
-            <li>
-              <span class="step-number">02</span>
-              <div>
-                <h3>Review the change.</h3>
-                <p>
-                  Navigate the company map, reporting lines and searchable agent list. Configuration
-                  changes have an exact preview, atomic apply and version-aware undo.
-                </p>
-              </div>
-            </li>
-            <li>
-              <span class="step-number">03</span>
-              <div>
-                <h3>Run. Inspect. Accept.</h3>
-                <p>
-                  Connect your optional runtime and submit an explicit task. Review the actual
-                  output, run ID, duration and hash. Accept a result when it meets your standard.
-                </p>
-              </div>
-            </li>
-          </ol>
-        </section>
-        <section class="alpha-section section" aria-labelledby="alpha-title">
-          <div class="section-heading">
-            <p class="eyebrow">Built in the open</p>
-            <h2 id="alpha-title">An alpha with<br />clear boundaries.</h2>
-            <p>
-              The local workspace and optional Codex execution are the first supported journey. No
-              customer or human-pilot validation is claimed.
-            </p>
-            <a
-              class="text-link"
-              href="https://github.com/strobl/gitflash/blob/main/docs/acceptance.md"
-              >Read the acceptance evidence ↗</a
+            <a class="task-card" href="#review-results"
+              ><span class="task-icon green" aria-hidden="true"
+                ><svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="m8 12 3 3 5-6" /></svg></span
+              ><span class="task-arrow" aria-hidden="true">↗</span><strong>Review results</strong
+              ><span>Open the files, check the evidence, and make a decision.</span
+              ><small>Local review guide</small></a
             >
-          </div>
-          <div class="status-list">
-            <div class="status-row">
-              <div>
-                <h3>Local company workspace</h3>
-                <p>Templates, search, assignments, relationships, import/export and recovery.</p>
-              </div>
-              <span class="status-tag verified">Implemented</span>
-            </div>
-            <div class="status-row">
-              <div>
-                <h3>Optional Codex execution</h3>
-                <p>
-                  A real task produced recorded output. Uses your separately installed,
-                  authenticated Codex CLI.
-                </p>
-              </div>
-              <span class="status-tag verified">Output verified</span>
-            </div>
-            <div class="status-row">
-              <div>
-                <h3>Buzz</h3>
-                <p>Native team import exercised. End-to-end task dispatch is still pending.</p>
-              </div>
-              <span class="status-tag experimental">Experimental</span>
-            </div>
-            <div class="status-row">
-              <div>
-                <h3>Slack</h3>
-                <p>
-                  Optional adapter available. End-to-end delivery and reply validation is still
-                  pending.
-                </p>
-              </div>
-              <span class="status-tag experimental">Experimental</span>
-            </div>
-            <p class="runtime-note">
-              100 configured roles are not 100 running processes. The initial executor runs one task
-              at a time. Optional providers require your own access and may incur costs.
-            </p>
+            <a class="task-card" href="#delivery-hours"
+              ><span class="task-icon amber" aria-hidden="true"
+                ><svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 7v5l3 2" /></svg></span
+              ><span class="task-arrow" aria-hidden="true">↗</span
+              ><strong>Track delivery hours</strong
+              ><span>Book hours and inspect corrections, history and analytics.</span
+              ><small>Local hours guide</small></a
+            >
+            <a class="task-card" href="#company-setup"
+              ><span class="task-icon purple" aria-hidden="true"
+                ><svg viewBox="0 0 24 24">
+                  <path
+                    d="M5 21V3h14v18M3 21h18M9 7h1m4 0h1M9 11h1m4 0h1M10 21v-6h4v6"
+                  /></svg></span
+              ><span class="task-arrow" aria-hidden="true">↗</span><strong>Set up a company</strong
+              ><span>Create the team and responsibilities behind the work.</span
+              ><small>Local company guide</small></a
+            >
+          </nav>
+          <div class="local-properties">
+            <span>Free local core</span><span>No required account</span
+            ><span>You confirm before work starts</span>
           </div>
         </section>
         <section class="install-section" id="install" aria-labelledby="install-title">
-          <div class="install-heading">
-            <p class="eyebrow">Your next company starts here</p>
-            <h2 id="install-title">Open a terminal.<br />Open your company.</h2>
+          <div class="section-heading">
+            <p class="eyebrow">Local setup</p>
+            <h2 id="install-title">Open VCM on your computer.</h2>
             <p>
-              Use Node.js 24.14 or newer in the 24.x line. Install the alpha release, then start
-              GitFlash.
+              This page describes review candidate <code>0.1.0-alpha.3-local.4</code>. It has not
+              been published as a downloadable VCM release.
+            </p>
+            <p>
+              If you received the candidate archive for review, verify its matching handoff checksum
+              and use the commands below. The local version alone does not identify a candidate.
             </p>
           </div>
           <div class="install-panel">
-            <div class="terminal-bar"><span>Terminal</span><span>v0.1.0-alpha.2</span></div>
+            <div class="panel-heading">
+              <strong>Supplied review archive</strong><span>Node.js 24.14+ in 24.x, or 26.x</span>
+            </div>
             <pre
               tabindex="0"
-              aria-label="Install and run commands"
-            ><code>npm install --global "https://github.com/strobl/gitflash/releases/download/v0.1.0-alpha.2/gitflash-0.1.0-alpha.2.tgz"
-gitflash</code></pre>
+              aria-label="Install the supplied candidate archive and start the local workspace"
+            ><code>npm install --offline --ignore-scripts --prefix ./gitflash-preview ./gitflash-0.1.0-alpha.3-local.4.tgz
+node ./gitflash-preview/node_modules/gitflash/dist/cli.js --data-dir ./my-company</code></pre>
             <p>
-              The CLI opens a loopback URL in your browser. Your workspace lives in
-              <code>~/.gitflash</code>. Downloading requires a connection; the installed core works
-              offline.
+              Open the loopback URL printed by the CLI. The technical package and command remain
+              <code>gitflash</code>. The default workspace is <code>~/.gitflash</code>; the command
+              above uses a separate folder.
             </p>
-            <a href="https://github.com/strobl/gitflash/releases/tag/v0.1.0-alpha.2"
-              >Release &amp; download ↗</a
-            >
           </div>
+          <p class="setup-boundary">
+            Obtaining the archive requires a connection. The supplied archive installs offline, and
+            company setup and time tracking work locally. Executing the Product Studio job uses your
+            separately installed Codex CLI, Python and runtime access.
+          </p>
+          <details class="legacy-release">
+            <summary>Looking for the existing public release?</summary>
+            <p>
+              The public
+              <a href="https://github.com/strobl/gitflash/releases/tag/v0.1.0-alpha.2"
+                >v0.1.0-alpha.2 release</a
+              >
+              is an older GitFlash version. It does not include the VCM entry screen, delivery-hours
+              Time Tracker or Product Studio company file workflows shown here. Its own release
+              notes and requirements apply.
+            </p>
+          </details>
         </section>
-        <section class="closing" aria-label="Contribute">
-          <p>Understand the code.<br /><strong>Make the company yours.</strong></p>
-          <div>
-            <a class="button secondary" href="https://github.com/strobl/gitflash"
-              >Explore the source ↗</a
-            ><a
-              class="text-link"
-              href="https://github.com/strobl/gitflash/blob/main/CONTRIBUTING.md"
-              >Contribute</a
-            >
+        <section class="task-guides" aria-labelledby="guides-title">
+          <div class="section-heading">
+            <p class="eyebrow">In the installed app</p>
+            <h2 id="guides-title">A clear next step for each action.</h2>
           </div>
+          <article class="guide" id="run-task">
+            <span class="guide-number">01</span>
+            <div>
+              <h3>Run a task</h3>
+              <p>
+                The included PS-001 Stock Alert exercise creates a Python utility for fictional
+                Meadow Tools inventory. It does not connect to an inventory system or place orders.
+              </p>
+              <dl>
+                <dt>Input</dt>
+                <dd>
+                  The included brief, acceptance criteria, synthetic inventory in
+                  <code>input.json</code> and a named review owner.
+                </dd>
+                <dt>Output</dt>
+                <dd>
+                  <code>stock_alert.py</code> with <code>reorder_items(products)</code>, tests,
+                  expected output, usage instructions and review evidence in a downloadable ZIP.
+                </dd>
+                <dt>Next action</dt>
+                <dd>
+                  Open <strong>Home → Run a task</strong>. In an empty workspace, choose and review
+                  the <strong>Product Studio (5 seats)</strong> template first. Review the job form
+                  and prerequisites, then explicitly choose <strong>Start job</strong>.
+                </dd>
+              </dl>
+              <a class="text-link" href="#install">Need the app? See local setup ↑</a>
+            </div>
+          </article>
+          <article class="guide" id="review-results">
+            <span class="guide-number">02</span>
+            <div>
+              <h3>Review results</h3>
+              <p>
+                Keep the evidence beside the decision. A successful automated check does not accept
+                the result for you.
+              </p>
+              <dl>
+                <dt>Input</dt>
+                <dd>A completed company job or individual task in your workspace.</dd>
+                <dt>Output</dt>
+                <dd>
+                  Files and receipts to inspect, followed by your explicit acceptance or rejection
+                  with a note.
+                </dd>
+                <dt>Next action</dt>
+                <dd>
+                  Open <strong>Home → Review results</strong>. Select the result, inspect its
+                  evidence, and download the files you want to review. If there is no result yet,
+                  start the first task.
+                </dd>
+              </dl>
+              <a class="text-link" href="#run-task">No result yet? Start with the task guide ↑</a>
+            </div>
+          </article>
+          <article class="guide" id="delivery-hours">
+            <span class="guide-number">03</span>
+            <div>
+              <h3>Track delivery hours</h3>
+              <p>
+                Book human-equivalent delivery hours with a manual entry or a shared reference
+                estimate. Runtime duration never creates booked hours.
+              </p>
+              <dl>
+                <dt>Input</dt>
+                <dd>
+                  A company, an activity and delivery hours, or an estimate from the 124-definition
+                  reference catalog.
+                </dd>
+                <dt>Output</dt>
+                <dd>Saved entries, corrections with history, and delivery-hours analytics.</dd>
+                <dt>Next action</dt>
+                <dd>
+                  Open <strong>Home → Track delivery hours</strong>. Create an entry, review its
+                  basis and save. Use the history and analytics views to inspect your records.
+                </dd>
+              </dl>
+              <a class="text-link" href="#install">Open the local workspace ↑</a>
+            </div>
+          </article>
+          <article class="guide" id="company-setup">
+            <span class="guide-number">04</span>
+            <div>
+              <h3>Set up a company</h3>
+              <p>
+                Organize the people, agent roles and responsibilities that own the work. Creating or
+                importing a company never starts inference.
+              </p>
+              <dl>
+                <dt>Input</dt>
+                <dd>A company name and purpose, followed by its team or a reviewed template.</dd>
+                <dt>Output</dt>
+                <dd>
+                  A saved local organization with departments, assignments and responsibilities.
+                </dd>
+                <dt>Next action</dt>
+                <dd>
+                  Open <strong>Home → Set up a company</strong>, review the proposed change and
+                  apply it. Organization views, search, templates and undo remain available.
+                </dd>
+              </dl>
+              <a class="text-link" href="#run-task">For the included job, use Product Studio ↑</a>
+            </div>
+          </article>
         </section>
+        <aside class="alpha-note" aria-label="Preview status">
+          <strong>Technical alpha, under review.</strong>
+          <p>
+            Optional providers require your own access and may incur costs. Buzz task dispatch and
+            Slack round trips remain experimental. No human-pilot, adoption or time-to-result claim
+            is made. This static page provides setup and task instructions; it does not upload
+            files, run agents or submit requests.
+          </p>
+        </aside>
       </main>
       <footer>
-        <a class="wordmark" href="./"
-          ><img
-            class="brand-mark"
-            src="./flash-mark.svg"
-            alt=""
-            width="28"
-            height="28"
-          />GitFlash</a
-        >
-        <p>Local by default. Open by design.</p>
+        <div class="footer-identity">
+          <img src="./vcm-wordmark.svg" alt="VCM" width="106" height="28" /><span
+            >Virtual Corporation Manager</span
+          >
+        </div>
+        <p>
+          Selected destination: <code>virtualcorporationmanager.com</code><br />Domain activation
+          and publication remain unverified.
+        </p>
         <nav aria-label="Project resources">
-          <a href="https://github.com/strobl/gitflash/blob/main/docs/integrations.md"
-            >Integrations</a
-          ><a href="https://github.com/strobl/gitflash/blob/main/SECURITY.md">Security</a
+          <a href="https://github.com/strobl/gitflash">Technical repository ↗</a
           ><a href="https://github.com/strobl/gitflash/blob/main/LICENSE">MIT license</a>
         </nav>
       </footer>

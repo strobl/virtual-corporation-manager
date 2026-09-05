@@ -1,15 +1,27 @@
-# GitFlash technical alpha page
+# VCM repository fallback page
 
-Static HTML, CSS and SVG. Publish this directory as the GitHub Pages artifact. No build step, JavaScript, analytics, remote fonts or external page assets; GitHub links are ordinary navigation. Relative assets support the /gitflash/ subpath.
+Static HTML, CSS and native SVG. This directory is the repository fallback page source, separate from the CMO-owned Lovable draft. It has no build step, JavaScript, analytics, remote fonts, uploads or task execution. Relative assets support a repository subpath such as `/gitflash/`.
 
-Serve this directory with any static HTTP server for local preview. The install command uses the direct release tarball documented in the repository README. The release owner verifies the version and asset exist before publication.
+The public identity is **VCM — Virtual Corporation Manager** and the headline is **Run a task. Review the result.** Four distinct links explain the corresponding installed actions: **Run a task**, **Review results**, **Track delivery hours**, **Set up a company**. Each guide names the input, output and actual next action. The primary website setup action is **Set up locally**; the website does not impersonate a hosted tool.
 
-After publishing the verified release, deploy its matching reviewed `main` revision with `gh workflow run pages.yml --repo strobl/gitflash --ref main`. The Pages environment accepts `main`; release tags are not deployment sources. Verify the completed workflow and live HTML/CSS before calling the page updated.
+## Candidate and release boundary
 
-The organization diagram is explicitly an illustration. Integration copy distinguishes actual Codex output, exercised Buzz native import, pending Buzz dispatch and pending Slack round trips. No human pilot, adoption metric, testimonial or hosted account service is claimed.
+This source describes unpublished review candidate `0.1.0-alpha.3-local.4`. Its installation commands require the supplied archive and matching handoff checksum. There is no invented candidate download URL. The existing `v0.1.0-alpha.2` link is explicitly historical and does not promise the VCM screen, Time Tracker or Product Studio company workflows. Technical repository, package, CLI and default data identifiers remain `gitflash`.
 
-## Local branding candidate
+`virtualcorporationmanager.com` is the selected target text. Registration, ownership, DNS, TLS and live deployment remain unverified. Do not add a canonical URL or claim this page is live until the actual destination is verified. GitFlash's existing FDE site and domains remain unchanged.
 
-The Flash character and compact mark are copied from the application's own `public/` SVGs; `favicon.svg` is the same dark monochrome 16px silhouette as `public/flash-favicon.svg`. These are local assets with relative URLs. System fonts, warm canvas, dark company/install panels and the shared ink/amber/teal palette form the accepted local design direction. Product, Marketing and Customer Care in the diagram are illustrative roles, explicitly separate from the shipped 20/100-role software delivery templates.
+The VCM wordmark and favicon are byte-for-byte copies of `public/vcm-wordmark.svg` and `public/vcm-favicon.svg`. White surfaces, a blue action accent, system typography and visible keyboard focus match the product candidate. Retained older F-mark assets are not referenced by this page.
 
-This branding revision is a local review candidate, not a released product version. The install command and release link intentionally continue to identify the actually published `v0.1.0-alpha.2`. Preparing or serving this folder locally does not authorize a push, Pages deployment, release or replacement of that public tarball. Root owns actual rendered review at desktop, 390px and true 200% zoom, as well as reduced-motion and under-path asset checks before any later approved publication.
+## Review before publication
+
+Serve this directory through a static server for local review. Check desktop and mobile layouts, keyboard navigation, true 200% zoom, relative assets under a repository subpath, every local anchor and the exact supplied install commands. These are required review checks, not claims of completed visual acceptance.
+
+Preparing, serving or reviewing these files does not publish them. Keep the existing release, public `main`, Pages configuration, repository About/Homepage fields and domains unchanged during candidate review.
+
+At an explicitly authorized release, the owner should:
+
+1. Verify the final source revision, release tag, archive checksum and actual downloadable asset. Update candidate copy and installation links to that exact release; recheck runtime requirements and task routes.
+2. Coordinate the final page owner and destination with CMO and PMO. Do not deploy this fallback page over the separate Lovable project or the GitFlash FDE site.
+3. Review repository About text for the VCM descriptor. Set the Homepage field only after the actual VCM destination has been verified; the technical repository name need not change.
+4. Inspect the current Pages workflow, allowed branch and environment before dispatch. If this fallback remains the chosen deployment, deploy the approved revision and verify the completed job plus live HTML, CSS, SVGs and task/setup links.
+5. Verify domain ownership, DNS, TLS and target content separately. Keep unrelated existing domains intact. Record the live URL and evidence before calling the VCM site published.

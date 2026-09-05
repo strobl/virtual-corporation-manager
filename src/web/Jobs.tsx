@@ -80,6 +80,8 @@ export function JobsView({
   onTime,
   onRefresh,
   onJobsChanged,
+  startRequested = false,
+  onStartRequestHandled,
 }: {
   state: WorkspaceState;
   companyId: string | null;
@@ -92,6 +94,8 @@ export function JobsView({
   onTime: () => void;
   onRefresh: () => void;
   onJobsChanged: (jobs: JobInfo[]) => void;
+  startRequested?: boolean;
+  onStartRequestHandled?: () => void;
 }) {
   const [workflows, setWorkflows] = useState<WorkflowInfo[]>([]);
   const [jobs, setJobs] = useState<JobInfo[]>([]);
@@ -148,6 +152,12 @@ export function JobsView({
     };
   }, [running, companyId, refresh]);
   const workflow = workflows[0];
+  useEffect(() => {
+    if (!startRequested || !workflow) return;
+    setSelectedId(null);
+    setStartOpen(true);
+    onStartRequestHandled?.();
+  }, [startRequested, workflow, onStartRequestHandled]);
   const selected = scoped.find((job) => job.id === selectedId) ?? null;
   const target = state.companies.find(
     (company) => company.id === selectedCompanyId && company.status === 'active',
@@ -175,9 +185,11 @@ export function JobsView({
     <div className="page-content jobs-page">
       <div className="section-intro">
         <div>
-          <span className="eyebrow">Your company, at work</span>
-          <h2>Make something you can point to.</h2>
-          <p>A brief, a builder, an independent check. The final call stays with you.</p>
+          <span className="eyebrow">Company tasks</span>
+          <h2>Tasks & results</h2>
+          <p>
+            Review the brief, open the delivered files, and decide whether to accept the result.
+          </p>
           <label className="work-scope-control">
             Work scope
             <select
@@ -225,8 +237,8 @@ export function JobsView({
       )}
       {!loading && !loadError && !workflow && (
         <p className="connection-note">
-          No installed workflows are available. Check that the complete GitFlash package is
-          installed.
+          No installed workflows are available. Check that the complete <code>gitflash</code>{' '}
+          package is installed.
         </p>
       )}
       {!loading && workflow && !scoped.length && (
@@ -236,10 +248,7 @@ export function JobsView({
               <Layers3 size={16} />
               Product Studio · {workflow.id}
             </span>
-            <h3>
-              A small job.
-              <br />A real handoff.
-            </h3>
+            <h3>Start your first company task</h3>
             <p>{workflow.description}</p>
             <span className="studio-sample-label">
               Synthetic stock-alert exercise · Python standard library
@@ -529,8 +538,8 @@ function StartJobDialog({
               role uses a separate session. Final acceptance stays with you.
             </p>
             <p className="small">
-              {status?.costNotice ||
-                'GitFlash is free. Codex uses your own account and provider allowance; usage may incur charges.'}
+              {status?.costNotice?.replaceAll('GitFlash', 'VCM') ||
+                'VCM is free. Codex uses your own account and provider allowance; usage may incur charges.'}
             </p>
           </div>
         </div>

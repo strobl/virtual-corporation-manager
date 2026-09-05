@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 152 40" width="152" height="40" role="img" aria-labelledby="title">
+  <title id="title">VCM</title>
+  <rect width="40" height="40" rx="10" fill="#2857E8"/>
+  <path d="m11 19 7 8 13-15" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#182230">
+    <path d="M51 8h7.5l8 23 8-23H82L71 34H62Z"/>
+    <path d="M106 10.5 102.5 16q-3-2.5-6.5-2.5-6.5 0-6.5 7.5t6.5 7.5q3.5 0 6.5-2.5l3.5 5.5q-4.5 3.5-10.5 3.5-13 0-13-14T95.5 7q6 0 10.5 3.5Z"/>
+    <path d="M111 8h8l10 17 10-17h8v26h-7V20l-8.5 14h-5L118 20v14h-7Z"/>
+  </g>
+</svg>

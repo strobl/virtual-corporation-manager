@@ -169,8 +169,8 @@ export function RunDialog({
             : (status?.buzz.message ?? 'Checking Buzz…')}
         </p>
         <p className="muted small">
-          {status?.costNotice ||
-            'GitFlash is free. External runtimes may require an account and incur provider charges.'}
+          {status?.costNotice?.replaceAll('GitFlash', 'VCM') ||
+            'VCM is free. External runtimes may require an account and incur provider charges.'}
         </p>
         {error && (
           <p className="error-box" role="alert">
@@ -545,7 +545,7 @@ export function IntegrationsView({
           </p>
           <p className="muted small">
             Install and authenticate Codex CLI in your terminal, then check connections. Your
-            existing provider access is separate from GitFlash.
+            existing provider access is separate from VCM.
           </p>
         </article>
         <article className="integration-card">
@@ -613,7 +613,7 @@ export function IntegrationsView({
         <div>
           <strong>Your local company is always free.</strong>
           <p>
-            {status?.costNotice ||
+            {status?.costNotice?.replaceAll('GitFlash', 'VCM') ||
               'External runtimes and services may require their own accounts, credentials, or paid usage. No connection is required to create and organize your agents.'}
           </p>
         </div>

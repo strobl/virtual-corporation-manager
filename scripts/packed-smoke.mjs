@@ -103,7 +103,7 @@ try {
   const data = join(temp, 'data');
   let app = await start(entry, data);
   const html = await (await fetch(app.url)).text();
-  assert.match(html, /GitFlash/);
+  assert.match(html, /VCM — Virtual Corporation Manager/);
   const assets = [...html.matchAll(/(?:src|href)="([^"#]+\.(?:js|css))"/g)].map((m) => m[1]);
   assert(assets.length >= 2);
   for (const path of assets) {

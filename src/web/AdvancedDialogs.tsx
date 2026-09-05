@@ -33,7 +33,7 @@ function DefinitionImport({ busy, error, onClose, onSubmit }: Props) {
     try {
       const definition = JSON.parse(text) as CompanyDefinition;
       if (definition === null || typeof definition !== 'object' || Array.isArray(definition))
-        throw new Error('Choose a GitFlash company definition JSON file.');
+        throw new Error('Choose a company definition JSON file.');
       await onSubmit(
         [{ type: 'definition.import', definition }],
         `Import company definition: ${definition.name || fileName || 'organization'}`,
@@ -46,7 +46,7 @@ function DefinitionImport({ busy, error, onClose, onSubmit }: Props) {
     <Dialog title="Import a company definition" wide onClose={onClose}>
       <form className="dialog-body editor-form" onSubmit={submit}>
         <p className="muted">
-          Choose a definition exported by GitFlash. Its companies, departments, agents, and
+          Choose an exported company definition. Its companies, departments, agents, and
           relationships are validated locally before you review and apply any changes.
         </p>
         <label>

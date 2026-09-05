@@ -13,6 +13,7 @@ import {
   GitBranch,
   Layers3,
   LayoutGrid,
+  House,
   List,
   Menu,
   Pencil,
@@ -26,7 +27,7 @@ import {
   Undo2,
   X,
 } from 'lucide-react';
-import { brand } from '../brand';
+import { brand } from './identity';
 import type {
   Agent,
   ChangePreview,
@@ -65,9 +66,10 @@ import {
   type RunInfo,
 } from './Work';
 
-type Area = 'organization' | 'work' | 'time' | 'integrations' | 'activity' | 'settings';
+type Area = 'home' | 'organization' | 'work' | 'time' | 'integrations' | 'activity' | 'settings';
 type View = 'map' | 'reporting' | 'list';
 const AREA_NAMES: Record<Area, string> = {
+  home: 'Home',
   organization: 'Organization',
   work: 'Work',
   time: 'Time Tracker',
@@ -76,6 +78,7 @@ const AREA_NAMES: Record<Area, string> = {
   settings: 'Settings',
 };
 const AREAS = [
+  { id: 'home', icon: House },
   { id: 'organization', icon: Building2 },
   { id: 'work', icon: Activity },
   { id: 'time', icon: Clock3 },
@@ -93,9 +96,14 @@ export function App() {
   const [status, setStatus] = useState<IntegrationStatus | null>(null);
   const [runs, setRuns] = useState<RunInfo[]>([]);
   const [jobs, setJobs] = useState<JobInfo[]>([]);
-  const [area, setArea] = useState<Area>('organization');
+  const [area, setArea] = useState<Area>('home');
+  useEffect(() => {
+    document.getElementById('main')?.focus();
+  }, [area]);
   const [workScope, setWorkScope] = useState<'company' | 'all'>('company');
   const [workMode, setWorkMode] = useState<'jobs' | 'tasks'>('jobs');
+  const [startRequested, setStartRequested] = useState(false);
+  const [setupAction, setSetupAction] = useState<'task' | 'time' | null>(null);
   const [view, setView] = useState<View>('map');
   const [selection, setSelection] = useState<Selection | null>(() =>
     parseSelection(new URLSearchParams(location.search).get('selected') ?? ''),
@@ -259,15 +267,17 @@ export function App() {
     try {
       const result = await client.apply(preview.id);
       setState(result.state);
-      if (pending?.kind === 'template' && pending.id === 'product-studio') {
+      if (setupAction || (pending?.kind === 'template' && pending.id === 'product-studio')) {
         const created = result.state.companies.find(
           (company) => !state?.companies.some((previous) => previous.id === company.id),
         );
         if (created) setSelection({ kind: 'company', id: created.id });
         setWorkScope('company');
         setWorkMode('jobs');
-        setArea('work');
+        setArea(setupAction === 'time' ? 'time' : 'work');
+        if (setupAction === 'task' && created) setStartRequested(true);
       }
+      setSetupAction(null);
       setPreview(null);
       setPending(null);
       announce(
@@ -328,6 +338,8 @@ export function App() {
         )),
   );
   const navigate = (value: Area) => {
+    setStartRequested(false);
+    setSetupAction(null);
     setInitialRunId(null);
     if (value === 'work') {
       setWorkScope('company');
@@ -336,6 +348,32 @@ export function App() {
     }
     setArea(value);
     setNavOpen(false);
+  };
+  const startTask = () => {
+    if (!companyId) {
+      setSetupAction('task');
+      setModalError(null);
+      setTemplatesOpen(true);
+      return;
+    }
+    setInitialRunId(null);
+    setWorkScope('company');
+    setWorkMode('jobs');
+    setStartRequested(true);
+    setArea('work');
+    setNavOpen(false);
+  };
+  const reviewResults = () => {
+    navigate('work');
+    setWorkMode(
+      companyJobs.some((job) => job.status === 'waiting_owner')
+        ? 'jobs'
+        : companyWork?.stats.reviewable
+          ? 'tasks'
+          : companyJobs.length || !runs.some((run) => run.companyId === companyId)
+            ? 'jobs'
+            : 'tasks',
+    );
   };
   const openAgentContext = (id: string, originCompanyId: string) => {
     if (!state) return;
@@ -357,7 +395,10 @@ export function App() {
   };
 
   return (
-    <div className="gitflash" style={{ '--brand-accent': brand.accent } as React.CSSProperties}>
+    <div
+      className="gitflash vcm-workspace"
+      style={{ '--brand-accent': brand.accent } as React.CSSProperties}
+    >
       <a className="skip-link" href="#main">
         Skip to workspace
       </a>
@@ -405,13 +446,7 @@ export function App() {
         </button>
         <a className="brand" href="/" aria-label={`${brand.name} home`}>
           <span className="brand-copy">
-            <img
-              className="brand-lockup"
-              src="/gitflash-wordmark.svg"
-              width={170}
-              height={40}
-              alt=""
-            />
+            <img className="brand-lockup" src="/vcm-wordmark.svg" width={112} height={40} alt="" />
             <small>{brand.descriptor}</small>
           </span>
           <span className="local-badge">local</span>
@@ -518,6 +553,10 @@ export function App() {
           >
             <Menu size={20} />
           </button>
+          <span className="mobile-brand">
+            <BrandMark size={22} decorative />
+            {brand.name}
+          </span>
           <div className="breadcrumb">
             <span>{AREA_NAMES[area]}</span>
             {company && area === 'organization' && (
@@ -574,91 +613,118 @@ export function App() {
           {loading ? (
             <div className="empty-state">
               <RefreshCw className="spin" size={25} />
-              <h2>Opening your company…</h2>
+              <h2>Opening your workspace…</h2>
               <p>Connecting to the local server.</p>
             </div>
           ) : !state ? (
             <div className="empty-state">
               <h2>The local server is unavailable</h2>
-              <p>Start GitFlash in your terminal, then retry.</p>
+              <p>
+                Run <code>gitflash start</code> in your terminal, then retry.
+              </p>
               <button className="button primary" onClick={() => void refresh()}>
                 Try again
               </button>
             </div>
           ) : (
             <>
+              {area === 'home' && (
+                <section className="task-home" aria-label="Workspace actions">
+                  <div className="task-home-intro">
+                    <span className="eyebrow">{brand.descriptor}</span>
+                    <h1>What do you want to get done?</h1>
+                    <p>Run a task, review the result, or keep track of delivery hours.</p>
+                  </div>
+                  <div className="task-actions">
+                    {[
+                      {
+                        label: 'Run a task',
+                        description: 'Choose a company task and review the brief.',
+                        icon: Play,
+                        action: startTask,
+                      },
+                      {
+                        label: 'Review results',
+                        description: 'Open the files, check the evidence, and decide.',
+                        icon: CheckCircle2,
+                        action: reviewResults,
+                      },
+                      {
+                        label: 'Track delivery hours',
+                        description: 'Book hours and review your delivery history.',
+                        icon: Clock3,
+                        action: () => navigate('time'),
+                      },
+                      {
+                        label: 'Set up a company',
+                        description: 'Create a company and organize its team.',
+                        icon: Building2,
+                        action: () => openEditor({ kind: 'company' }),
+                      },
+                    ].map(({ label, description, icon: Icon, action }) => (
+                      <button className="task-action" key={label} onClick={action}>
+                        <span className="task-action-icon">
+                          <Icon size={25} />
+                        </span>
+                        <span className="task-action-copy">
+                          <strong>{label}</strong>
+                          <span>{description}</span>
+                        </span>
+                        <ArrowUpRight size={18} aria-hidden="true" />
+                      </button>
+                    ))}
+                  </div>
+                  <div className="task-home-context">
+                    {activeCompanies.length ? (
+                      <>
+                        <label htmlFor="home-company">Working in</label>
+                        <select
+                          id="home-company"
+                          value={companyId ?? ''}
+                          onChange={(event) => select({ kind: 'company', id: event.target.value })}
+                        >
+                          {activeCompanies.map((item) => (
+                            <option key={item.id} value={item.id}>
+                              {item.name}
+                            </option>
+                          ))}
+                        </select>
+                        <button className="text-button" onClick={() => navigate('organization')}>
+                          View organization <ArrowRight size={14} />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <p>Start with a company. You can review its setup before saving.</p>
+                        <button className="text-button" onClick={() => setTemplatesOpen(true)}>
+                          Browse company templates <ArrowRight size={14} />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  <p className="task-home-note">
+                    <ShieldCheck size={15} /> Saved on your computer. Starting work always requires
+                    your confirmation.
+                  </p>
+                </section>
+              )}
               {area === 'organization' && (
                 <>
                   {!activeCompanies.length ? (
-                    <div className="welcome">
-                      <div className="welcome-copy">
-                        <span className="eyebrow">GIVE YOUR IDEA A PLACE TO WORK</span>
-                        <h1>
-                          {brand.heroLines[0]}
-                          <br />
-                          <span>{brand.heroLines[1]}</span>
-                        </h1>
-                        <p>
-                          Your own company of AI agents. Organize your team, assign work, and decide
-                          what happens next.
-                        </p>
-                        <div className="welcome-actions">
-                          <button
-                            className="button primary large"
-                            onClick={() => openEditor({ kind: 'company' })}
-                          >
-                            Create a company
-                            <ArrowRight size={17} />
-                          </button>
-                          <button className="button large" onClick={() => setTemplatesOpen(true)}>
-                            Explore templates
-                          </button>
-                        </div>
-                        <div className="welcome-note">
-                          <ShieldCheck size={15} />
-                          Local first. Open source. No account required.
-                        </div>
-                      </div>
-                      <div className="welcome-illustration">
-                        <div className="flash-stage">
-                          <span className="flash-orbit" aria-hidden="true" />
-                          <img
-                            className="welcome-flash"
-                            src="/flash-character.svg"
-                            width={300}
-                            height={300}
-                            alt="The GitFlash company tower and work floors"
-                          />
-                          <div className="flash-role role-product">
-                            <span aria-hidden="true">P</span>Product
-                          </div>
-                          <div className="flash-role role-marketing">
-                            <span aria-hidden="true">M</span>Marketing
-                          </div>
-                          <div className="flash-role role-care">
-                            <span aria-hidden="true">C</span>Customer care
-                          </div>
-                        </div>
-                        <span className="illustration-caption">
-                          Example roles · Your company starts empty
-                        </span>
-                      </div>
-                      <div className="welcome-steps">
-                        <div>
-                          <b>01</b>
-                          <strong>Shape your company</strong>
-                          <span>Start small or use a ready-made team.</span>
-                        </div>
-                        <div>
-                          <b>02</b>
-                          <strong>Make ownership clear</strong>
-                          <span>Connect departments, agents, and responsibilities.</span>
-                        </div>
-                        <div>
-                          <b>03</b>
-                          <strong>Get useful work done</strong>
-                          <span>Connect a runtime and inspect the real result.</span>
-                        </div>
+                    <div className="empty-state company-setup-empty">
+                      <Building2 size={30} />
+                      <h1>Set up your company</h1>
+                      <p>Create a company, then add its team or start from a template.</p>
+                      <div className="welcome-actions">
+                        <button
+                          className="button primary"
+                          onClick={() => openEditor({ kind: 'company' })}
+                        >
+                          Set up a company <ArrowRight size={16} />
+                        </button>
+                        <button className="button" onClick={() => setTemplatesOpen(true)}>
+                          Browse templates
+                        </button>
                       </div>
                     </div>
                   ) : (
@@ -1124,11 +1190,16 @@ export function App() {
                       selectedCompanyName={company?.name ?? null}
                       status={status}
                       onScopeChange={setWorkScope}
-                      onTemplate={(id) => void prepare({ kind: 'template', id })}
+                      onTemplate={(id) => {
+                        setSetupAction('task');
+                        void prepare({ kind: 'template', id });
+                      }}
                       onIntegrations={() => navigate('integrations')}
                       onTime={() => navigate('time')}
                       onRefresh={() => void refresh()}
                       onJobsChanged={setJobs}
+                      startRequested={startRequested}
+                      onStartRequestHandled={() => setStartRequested(false)}
                     />
                   ) : (
                     <WorkView
@@ -1151,14 +1222,36 @@ export function App() {
                 </>
               )}
               {area === 'time' && (
-                <TimeTracker
-                  state={state}
-                  selectedCompanyId={companyId}
-                  selectedAgentId={selectedAgent?.id ?? null}
-                  onChanged={refresh}
-                  onOpenAgent={openAgentContext}
-                  onOpenCompany={openCompanyContext}
-                />
+                <>
+                  {!activeCompanies.length && (
+                    <div className="page-content">
+                      <div className="connection-note">
+                        <p>
+                          Set up a company and its team before booking delivery hours. The reference
+                          catalog is already available.
+                        </p>
+                        <button
+                          className="button"
+                          onClick={() => {
+                            setSetupAction('time');
+                            setModalError(null);
+                            setTemplatesOpen(true);
+                          }}
+                        >
+                          Set up a company
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  <TimeTracker
+                    state={state}
+                    selectedCompanyId={companyId}
+                    selectedAgentId={selectedAgent?.id ?? null}
+                    onChanged={refresh}
+                    onOpenAgent={openAgentContext}
+                    onOpenCompany={openCompanyContext}
+                  />
+                </>
               )}
               {area === 'integrations' && (
                 <IntegrationsView
@@ -1293,7 +1386,7 @@ export function App() {
                       <h3>Local storage</h3>
                       <p>
                         Your company configuration and work records are saved in SQLite on this
-                        computer. No GitFlash account is required.
+                        computer. No account is required.
                       </p>
                       <dl className="details-list">
                         <dt>Companies</dt>
@@ -1391,7 +1484,10 @@ export function App() {
           busy={busy}
           error={modalError}
           onClose={() => {
-            if (!busy) setEditor(null);
+            if (!busy) {
+              setEditor(null);
+              setSetupAction(null);
+            }
           }}
           onSubmit={command}
         />
@@ -1406,6 +1502,7 @@ export function App() {
               setPreview(null);
               setPending(null);
               setModalError(null);
+              setSetupAction(null);
             }
           }}
           onApply={() => void apply()}
@@ -1516,39 +1613,57 @@ export function App() {
       )}
       {templatesOpen && (
         <Dialog
-          title="Start with a clear structure"
+          title={
+            setupAction === 'task'
+              ? 'Set up a company for your task'
+              : setupAction === 'time'
+                ? 'Set up a company to track hours'
+                : 'Choose a company template'
+          }
           wide
           onClose={() => {
-            if (!busy) setTemplatesOpen(false);
+            if (!busy) {
+              setTemplatesOpen(false);
+              setSetupAction(null);
+            }
           }}
         >
           <div className="dialog-body">
             <p className="muted">
-              A template gives your agents roles and responsibilities. Preview the entire structure
-              before adding it. It contains no fabricated work.
+              {setupAction === 'task'
+                ? 'Your first task needs a company with the right roles. Choose a team, review its setup, then continue to the task brief. No agents run during setup.'
+                : setupAction === 'time'
+                  ? 'Choose a company and assigned team to book delivery hours. Review the structure before saving, then continue to Time Tracker.'
+                  : 'A template gives your agents roles and responsibilities. Review the structure before adding it. No agents run during setup.'}
             </p>
             <div className="template-grid">
-              {templates.map((template) => (
-                <button
-                  className="template-card"
-                  key={template.id}
-                  disabled={busy}
-                  onClick={() => void prepare({ kind: 'template', id: template.id })}
-                >
-                  <span className="template-icon">
-                    <Layers3 size={22} />
-                  </span>
-                  <h3>{template.name}</h3>
-                  <p>{template.description}</p>
-                  <span className="template-counts">
-                    {template.agentCount} agents · {template.departmentCount} departments
-                  </span>
-                  <span className="text-button">
-                    {busy ? 'Preparing…' : 'Preview structure'}
-                    <ArrowRight size={14} />
-                  </span>
-                </button>
-              ))}
+              {templates
+                .filter(
+                  (template) =>
+                    setupAction !== 'task' ||
+                    ['product-studio', 'studio-100'].includes(template.id),
+                )
+                .map((template) => (
+                  <button
+                    className="template-card"
+                    key={template.id}
+                    disabled={busy}
+                    onClick={() => void prepare({ kind: 'template', id: template.id })}
+                  >
+                    <span className="template-icon">
+                      <Layers3 size={22} />
+                    </span>
+                    <h3>{template.name}</h3>
+                    <p>{template.description}</p>
+                    <span className="template-counts">
+                      {template.agentCount} agents · {template.departmentCount} departments
+                    </span>
+                    <span className="text-button">
+                      {busy ? 'Preparing…' : 'Preview structure'}
+                      <ArrowRight size={14} />
+                    </span>
+                  </button>
+                ))}
             </div>
             {!templates.length && (
               <p className="connection-note">
