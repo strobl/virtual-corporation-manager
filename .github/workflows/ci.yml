@@ -30,7 +30,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        # Keep latest Linux as a compatibility probe; test an explicitly named
+        # runner too, without changing any host namespace or AppArmor policy.
+        os: [ubuntu-latest, ubuntu-22.04, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4

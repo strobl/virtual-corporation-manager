@@ -64,6 +64,23 @@ async function reportSandboxStartupFailure(python: string): Promise<void> {
         .split(stage)
         .join('<isolated-stage>')
         .slice(0, 4000);
+    const namespacePrerequisites =
+      process.platform === 'linux'
+        ? Object.fromEntries(
+            await Promise.all(
+              [
+                'kernel/unprivileged_userns_clone',
+                'kernel/apparmor_restrict_unprivileged_userns',
+                'user/max_user_namespaces',
+              ].map(async (key) => [
+                key,
+                await readFile(`/proc/sys/${key}`, 'utf8')
+                  .then((value) => value.trim().slice(0, 80))
+                  .catch(() => 'unavailable'),
+              ]),
+            ),
+          )
+        : undefined;
     console.error(
       'Fixed local sandbox startup diagnostic: ' +
         JSON.stringify({
@@ -72,6 +89,7 @@ async function reportSandboxStartupFailure(python: string): Promise<void> {
           exitCode: diagnostic.code,
           stdout: redact(diagnostic.stdout),
           stderr: redact(diagnostic.stderr),
+          namespacePrerequisites,
         }),
     );
   } catch {
