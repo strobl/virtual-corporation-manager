@@ -1,14 +1,83 @@
 import { afterEach, expect, it } from 'vitest';
-import { access, mkdtemp, readFile, rm } from 'node:fs/promises';
+import { access, mkdir, mkdtemp, readFile, realpath, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { executeProcess, runtimeEnvironment } from '../src/adapters/process.js';
+import { dirname, join } from 'node:path';
+import { executeProcess, findExecutable, runtimeEnvironment } from '../src/adapters/process.js';
 import { executeWorkflowCheck } from '../src/adapters/workflow-check.js';
 
 // Explicit opt-in integration proof. No model invocation or login is required.
 // CI must install the pinned CLI and provide an installed Python >=3.8 interpreter.
 const enabled = process.env.GITFLASH_LIVE_SANDBOX === '1';
 let directory = '';
+
+async function reportSandboxStartupFailure(python: string): Promise<void> {
+  // Only after a failed live preflight: observe the primary CLI error using the
+  // same permission boundary and a fixed harmless command. No model or login.
+  const executable = findExecutable('codex', process.env);
+  if (!executable) return;
+  const stage = await realpath(directory);
+  const command = await realpath(python);
+  const home = join(stage, '.diagnostic-home');
+  await mkdir(home, { mode: 0o700 });
+  const env = {
+    ...runtimeEnvironment(process.env),
+    HOME: home,
+    USERPROFILE: home,
+    CODEX_HOME: home,
+    TMPDIR: stage,
+    TMP: stage,
+    TEMP: stage,
+  };
+  const filesystem = {
+    ':minimal': 'read',
+    ':workspace_roots': 'write',
+    [dirname(command)]: 'read',
+  };
+  const permissions = `{${Object.entries(filesystem)
+    .map(([key, value]) => `${JSON.stringify(key)}=${JSON.stringify(value)}`)
+    .join(',')}}`;
+  try {
+    const diagnostic = await executeProcess(
+      executable,
+      [
+        'sandbox',
+        '--permissions-profile',
+        'gitflash-check',
+        '--include-managed-config',
+        '--cd',
+        stage,
+        '-c',
+        `permissions.gitflash-check={filesystem=${permissions},network={enabled=false}}`,
+        '--',
+        command,
+        '-I',
+        '-B',
+        '-c',
+        'import json,sys;print(json.dumps({"format":"gitflash-sandbox-startup-diagnostic","python":sys.version_info[:3]}))',
+      ],
+      { env, cwd: stage, timeoutMs: 5000, maxBytes: 16000 },
+    );
+    const redact = (value: string) =>
+      value
+        .split(home)
+        .join('<isolated-auth>')
+        .split(stage)
+        .join('<isolated-stage>')
+        .slice(0, 4000);
+    console.error(
+      'Fixed local sandbox startup diagnostic: ' +
+        JSON.stringify({
+          node: process.version,
+          platform: process.platform,
+          exitCode: diagnostic.code,
+          stdout: redact(diagnostic.stdout),
+          stderr: redact(diagnostic.stderr),
+        }),
+    );
+  } catch {
+    console.error('Fixed local sandbox startup diagnostic was unavailable or exceeded its bound.');
+  }
+}
 afterEach(async () => {
   if (directory) {
     await rm(directory, { recursive: true, force: true });
@@ -38,6 +107,7 @@ it.runIf(enabled)(
     const passing = await run(
       "import pathlib;pathlib.Path('check-output.txt').write_text('actual local check');print('PASS')",
     );
+    if (passing.status !== 'completed') await reportSandboxStartupFailure(python);
     expect(passing, JSON.stringify(passing)).toMatchObject({
       status: 'completed',
       exitCode: 0,
