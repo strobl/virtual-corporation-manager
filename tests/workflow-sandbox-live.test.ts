@@ -1,5 +1,5 @@
 import { afterEach, expect, it } from 'vitest';
-import { access, mkdir, mkdtemp, readFile, realpath, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { executeProcess, findExecutable, runtimeEnvironment } from '../src/adapters/process.js';
@@ -132,13 +132,23 @@ it.runIf(enabled)(
     const failing = await run("import sys;print('assertion failed',file=sys.stderr);sys.exit(1)");
     expect(failing, JSON.stringify(failing)).toMatchObject({ status: 'completed', exitCode: 1 });
     expect(failing.output).toContain('assertion failed');
+    const outside = `${directory}-outside.txt`;
+    const hostCanary = 'host canary must remain unchanged';
+    await writeFile(outside, hostCanary, { flag: 'wx' });
     const restricted = await run(`
 import errno,json,pathlib,socket
 result={}
+outside=pathlib.Path(${JSON.stringify(`${directory}-outside.txt`)})
+try: result['outside_before']=outside.read_text()
+except OSError as error: result['outside_before']=errno.errorcode[error.errno]
 try:
- pathlib.Path(${JSON.stringify(`${directory}-outside.txt`)}).write_text('must be blocked')
+ outside.write_text('must be blocked')
  result['outside_denied']=False
 except OSError as error: result['outside_denied']=error.errno in (errno.EPERM,errno.EACCES,errno.EROFS)
+try: result['outside_after']=outside.read_text()
+except OSError as error: result['outside_after']=errno.errorcode[error.errno]
+if pathlib.Path('/proc/self/mountinfo').exists():
+ result['private_mounts']=[{'mount':line.split()[4],'type':line.split(' - ')[-1].split()[0]} for line in pathlib.Path('/proc/self/mountinfo').read_text().splitlines() if line.split()[4] in ('/','/tmp')]
 connection=None
 try:
  connection=socket.socket()
@@ -155,11 +165,17 @@ print(json.dumps(result))
     });
     // The platform's Python launcher may write ordinary startup diagnostics to
     // stderr; the first stdout line remains the fixed check's structured result.
-    expect(JSON.parse(restricted.output.split('\n')[0])).toEqual({
+    const observed = JSON.parse(restricted.output.split('\n')[0]);
+    const hostAfter = await readFile(outside, 'utf8');
+    console.error(
+      'Sandbox host canary diagnostic: ' +
+        JSON.stringify({ observed, hostUnchanged: hostAfter === hostCanary }),
+    );
+    expect(hostAfter).toBe(hostCanary);
+    expect(observed).toMatchObject({
       outside_denied: true,
       network_denied: true,
     });
-    await expect(access(`${directory}-outside.txt`)).rejects.toMatchObject({ code: 'ENOENT' });
   },
   60_000,
 );
