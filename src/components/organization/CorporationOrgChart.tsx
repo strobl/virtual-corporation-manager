@@ -284,7 +284,7 @@ export function CorporationOrgChart({
                       <h4 className="text-xs font-semibold text-foreground">Level {level}</h4>
                       <span className="text-micro text-muted-foreground">
                         {levelCaption(level)} · {row.length}{' '}
-                        {row.length === 1 ? 'person' : 'people'}
+                        {row.length === 1 ? 'member' : 'members'}
                       </span>
                     </header>
                     {groupByDepartment ? (

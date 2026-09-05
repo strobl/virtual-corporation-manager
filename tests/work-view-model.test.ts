@@ -432,3 +432,107 @@ describe('task company handoff', () => {
     expect(missing).toContain('class="button primary" disabled=""');
   });
 });
+
+describe('result hierarchy', () => {
+  function resultDialog(value: RunInfo, work: WorkRecord[] = []) {
+    const state = workspace(work);
+    const before = JSON.stringify({ value, state });
+    const html = renderToStaticMarkup(
+      createElement(WorkView, {
+        state,
+        runs: [value],
+        companyId: value.companyId,
+        initialRunId: value.id,
+        onSelectAgent: () => {},
+        onRefresh: () => {},
+        onAccept: () => {},
+      }),
+    );
+    expect(JSON.stringify({ value, state })).toBe(before);
+    const dialog = html.match(/<dialog\b[\s\S]*?<\/dialog>/)?.[0];
+    expect(dialog).toBeDefined();
+    return dialog!;
+  }
+
+  it('presents exact output before native technical disclosure and retains complete context and explicit actions', () => {
+    const value = run('receipt-original-id', {
+      task:
+        'Original task: keep <tags> & "quotes".\n  Preserve whitespace and all instructions.\n' +
+        'Long context '.repeat(60),
+      output:
+        "Output first.\n<script>alert('plain text')</script>\n  Keep tabs\tand trailing spaces.  ",
+      agentName: 'A deliberately long agent identity '.repeat(10),
+      runtimeVersion: 'runtime-test-version',
+      durationMs: 1250,
+      outputSha256: 'a'.repeat(64),
+    });
+    const dialog = resultDialog(value, [record(value)]);
+    const escaped = (text: string) =>
+      text.replace(
+        /[&<>"']/g,
+        (character) =>
+          ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#x27;',
+          })[character]!,
+      );
+    const output = dialog.match(/<pre\b[^>]*aria-label="Task output"[^>]*>([\s\S]*?)<\/pre>/);
+    const task = dialog.match(/<pre\b[^>]*aria-label="Original task"[^>]*>([\s\S]*?)<\/pre>/);
+    expect(output?.[1]).toBe(escaped(value.output));
+    expect(task?.[1]).toBe(escaped(value.task));
+    expect(dialog).not.toContain('<script>');
+    expect(dialog.indexOf('Needs your review')).toBeLessThan(
+      dialog.indexOf('aria-label="Task output"'),
+    );
+    expect(dialog.indexOf('aria-label="Task output"')).toBeLessThan(
+      dialog.indexOf('<summary>Technical details</summary>'),
+    );
+    expect(dialog.indexOf('<summary>Technical details</summary>')).toBeLessThan(
+      dialog.indexOf('<summary>Read original task</summary>'),
+    );
+    const technical = dialog.match(
+      /<details([^>]*)><summary>Technical details<\/summary>([\s\S]*?)<\/details>/,
+    );
+    expect(technical).not.toBeNull();
+    // Native details/summary supply keyboard activation and expanded state; no custom role or tab suppression.
+    expect(technical![1]).not.toMatch(/\bopen(?:=|\s|$)|\brole=|tabindex/);
+    for (const label of ['Runtime', 'Started', 'Duration', 'Run ID', 'Output SHA-256']) {
+      expect(technical![2]).toContain(`<dt>${label}</dt>`);
+    }
+    expect(technical![2]).toContain('codex runtime-test-version');
+    expect(technical![2]).toContain('1.3 seconds');
+    expect(technical![2]).toContain(value.id);
+    expect(technical![2]).toContain(value.outputSha256);
+    expect(dialog).toContain(escaped(value.agentName));
+    expect(dialog).toContain('Accept result');
+    expect(dialog).toContain('Download result');
+    expect(dialog).toContain('tabindex="0" role="region" aria-label="Task output"');
+    expect(dialog).toContain('tabindex="0" role="region" aria-label="Original task"');
+  });
+
+  it.each(['queued', 'running', 'failed', 'completed'] as const)(
+    'keeps the %s empty-output explanation before technical details without granting acceptance',
+    (status) => {
+      const value = run(`no-output-${status}`, {
+        status,
+        output: '',
+        error: status === 'failed' ? 'The runtime returned no result.' : null,
+      });
+      const dialog = resultDialog(value);
+      const message =
+        status === 'failed' || status === 'completed'
+          ? 'No output was returned.'
+          : 'Waiting for the runtime to return its result…';
+      expect(dialog.indexOf(message)).toBeGreaterThan(-1);
+      expect(dialog.indexOf(message)).toBeLessThan(
+        dialog.indexOf('<summary>Technical details</summary>'),
+      );
+      expect(dialog).not.toContain('Accept result');
+      expect(dialog).not.toContain('Download result');
+      if (value.error) expect(dialog).toContain(`role="alert">${value.error}</p>`);
+    },
+  );
+});

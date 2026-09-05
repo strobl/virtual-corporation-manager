@@ -393,37 +393,15 @@ export function WorkView({
             </span>
             <h3 className="preview-title task-result-title">{textExcerpt(run.task)}</h3>
             <button
-              className="text-button"
+              className="text-button work-result-agent"
               onClick={() => {
                 onSelectAgent(run.agentId);
                 setSelectedRun(null);
               }}
             >
-              {run.agentName}
+              <span className="work-result-agent-name">{run.agentName}</span>
               <ArrowUpRight size={13} />
             </button>
-            <dl className="result-meta">
-              <dt>Runtime</dt>
-              <dd>
-                {run.transport} {run.runtimeVersion ?? ''}
-              </dd>
-              <dt>Started</dt>
-              <dd>{run.startedAt ? date(run.startedAt) : 'Queued'}</dd>
-              <dt>Duration</dt>
-              <dd>
-                {run.durationMs !== null
-                  ? `${(run.durationMs / 1000).toFixed(1)} seconds`
-                  : 'In progress'}
-              </dd>
-              <dt>Run ID</dt>
-              <dd className="mono">{run.id}</dd>
-              {run.outputSha256 && (
-                <>
-                  <dt>Output SHA-256</dt>
-                  <dd className="mono">{run.outputSha256}</dd>
-                </>
-              )}
-            </dl>
             {run.error && (
               <p className="error-box" role="alert">
                 {run.error}
@@ -440,6 +418,31 @@ export function WorkView({
                   : 'Waiting for the runtime to return its result…'}
               </p>
             )}
+            <details className="text-disclosure work-technical-details">
+              <summary>Technical details</summary>
+              <dl className="result-meta">
+                <dt>Runtime</dt>
+                <dd>
+                  {run.transport} {run.runtimeVersion ?? ''}
+                </dd>
+                <dt>Started</dt>
+                <dd>{run.startedAt ? date(run.startedAt) : 'Queued'}</dd>
+                <dt>Duration</dt>
+                <dd>
+                  {run.durationMs !== null
+                    ? `${(run.durationMs / 1000).toFixed(1)} seconds`
+                    : 'In progress'}
+                </dd>
+                <dt>Run ID</dt>
+                <dd className="mono">{run.id}</dd>
+                {run.outputSha256 && (
+                  <>
+                    <dt>Output SHA-256</dt>
+                    <dd className="mono">{run.outputSha256}</dd>
+                  </>
+                )}
+              </dl>
+            </details>
             <details className="text-disclosure">
               <summary>Read original task</summary>
               <pre className="full-text" tabIndex={0} role="region" aria-label="Original task">

@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="GitFlash is an open-source local workspace for a company of AI agents. Configure roles, review changes and run explicit tasks with your own optional runtime."
+      content="The open-source control center for your AI company. Organize your team, assign work, and review what comes back. Runs locally with your own optional runtime."
     />
-    <meta name="theme-color" content="#f4dc42" />
-    <title>GitFlash — Build a company. Put it to work.</title>
+    <meta name="theme-color" content="#F3F0E7" />
+    <title>GitFlash — Your company. In your hands.</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
@@ -17,7 +17,13 @@
     <div class="page-shell">
       <header class="site-header">
         <a class="wordmark" href="./" aria-label="GitFlash home"
-          ><span class="brand-mark" aria-hidden="true">↯</span>GitFlash</a
+          ><img
+            class="brand-mark"
+            src="./flash-mark.svg"
+            alt=""
+            width="40"
+            height="40"
+          />GitFlash</a
         >
         <nav aria-label="Main navigation">
           <a href="https://github.com/strobl/gitflash#readme">Docs</a
@@ -31,10 +37,10 @@
             <p class="eyebrow">
               <span class="status-dot" aria-hidden="true"></span>Open source · Technical alpha
             </p>
-            <h1 id="hero-title">Build a company.<br /><span>Put it to work.</span></h1>
+            <h1 id="hero-title">Your company.<br /><span>In your hands.</span></h1>
             <p class="intro">
-              A local workspace for your company of AI agents. Give every role a purpose, review the
-              organization, and turn a specific task into a result you can inspect.
+              The open-source control center for your AI company. Organize your team, assign work,
+              and review what comes back.
             </p>
             <div class="hero-actions">
               <a class="button primary" href="#install">Start on your computer ↗</a
@@ -44,48 +50,56 @@
           </div>
           <figure class="org-figure">
             <div class="figure-bar">
-              <span><span class="little-mark" aria-hidden="true">↯</span> Company workspace</span
-              ><span>Local configuration</span>
+              <span
+                ><img class="little-mark" src="./flash-mark.svg" alt="" width="24" height="24" />
+                Company workspace</span
+              ><span>Illustrative roles</span>
             </div>
             <div
               class="org-diagram"
               role="img"
-              aria-label="Illustrative organization: Product Studio contains Product, Engineering and Quality departments with configured agent roles. A selected engineer has explicit instructions and responsibilities. This is an illustration, not running activity."
+              aria-label="Illustrative organization: Idea Studio brings together Product, Marketing and Customer Care roles. A selected Product Analyst has a clear responsibility. This is a concept illustration, not a shipped template or running activity."
             >
               <div class="company-node">
-                <span class="node-symbol" aria-hidden="true">P</span>
+                <img
+                  class="company-flash"
+                  src="./flash-character.svg"
+                  alt=""
+                  width="84"
+                  height="98"
+                />
                 <div>
-                  <span class="node-label">COMPANY</span><strong>Product Studio</strong
-                  ><span class="node-description">Build useful products, together.</span>
+                  <span class="node-label">YOUR COMPANY</span><strong>Idea Studio</strong
+                  ><span class="node-description">Give your idea a place to work.</span>
                 </div>
               </div>
               <div class="org-branches">
-                <div class="department-node">
+                <div class="department-node selected">
                   <span class="node-label">PRODUCT</span><strong>Find the right problem</strong>
                   <div class="agent-chip"><span>PA</span>Product Analyst</div>
                 </div>
-                <div class="department-node selected">
-                  <span class="node-label">ENGINEERING</span><strong>Make it work</strong>
-                  <div class="agent-chip"><span>RE</span>React Engineer</div>
+                <div class="department-node">
+                  <span class="node-label">MARKETING</span><strong>Tell the story</strong>
+                  <div class="agent-chip"><span>MW</span>Marketing Writer</div>
                 </div>
                 <div class="department-node">
-                  <span class="node-label">QUALITY</span><strong>Check the evidence</strong>
-                  <div class="agent-chip"><span>SR</span>Security Reviewer</div>
+                  <span class="node-label">CUSTOMER CARE</span><strong>Help people succeed</strong>
+                  <div class="agent-chip"><span>CG</span>Customer Guide</div>
                 </div>
               </div>
               <div class="role-detail">
                 <div>
-                  <span class="node-label">SELECTED ROLE</span><strong>React Engineer</strong>
+                  <span class="node-label">ILLUSTRATIVE ROLE</span><strong>Product Analyst</strong>
                 </div>
                 <p>
-                  Own the interface implementation.<br />Report the changes, checks and remaining
-                  uncertainty.
+                  Clarify the problem and compare options.<br />Bring the evidence back for your
+                  decision.
                 </p>
                 <span class="review-label">✓ Review before applying changes</span>
               </div>
             </div>
             <figcaption>
-              Organization illustration · Configuring roles does not start agents.
+              Illustrative roles, not a template catalogue. Configuring roles does not start agents.
             </figcaption>
           </figure>
         </section>
@@ -108,9 +122,9 @@
               <div>
                 <h3>Give every role a job.</h3>
                 <p>
-                  Create a company from scratch or preview a template with 20 or 100 differentiated
-                  roles. Inspect departments, managers, instructions and responsibilities before
-                  applying it.
+                  Create a company from scratch or preview a software delivery template with 20 or
+                  100 differentiated roles. Inspect departments, managers, instructions and
+                  responsibilities before applying it.
                 </p>
               </div>
             </li>
@@ -232,7 +246,13 @@ gitflash</code></pre>
       </main>
       <footer>
         <a class="wordmark" href="./"
-          ><span class="brand-mark" aria-hidden="true">↯</span>GitFlash</a
+          ><img
+            class="brand-mark"
+            src="./flash-mark.svg"
+            alt=""
+            width="28"
+            height="28"
+          />GitFlash</a
         >
         <p>Local by default. Open by design.</p>
         <nav aria-label="Project resources">

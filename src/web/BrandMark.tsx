@@ -1,3 +1,5 @@
+import { brand } from '../brand';
+
 export interface BrandMarkProps {
   size?: number;
   className?: string;
@@ -5,16 +7,16 @@ export interface BrandMarkProps {
   monochrome?: boolean;
 }
 
-/** Flash's compact silhouette. Small sizes omit the mouth and use larger, simpler eyes. */
+/** Flash uses a clear monochrome silhouette at 16 px; larger marks retain the face. */
 export function BrandMark({
   size = 32,
   className,
   decorative = false,
-  monochrome = false,
+  monochrome = size <= 16,
 }: BrandMarkProps) {
   const small = size <= 20;
-  const amber = monochrome ? 'currentColor' : '#F4A340';
-  const wood = monochrome ? 'currentColor' : '#C9A576';
+  const amber = monochrome ? 'currentColor' : brand.accent;
+  const wood = monochrome ? 'currentColor' : brand.wood;
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -23,7 +25,7 @@ export function BrandMark({
       height={size}
       className={className}
       role={decorative ? undefined : 'img'}
-      aria-label={decorative ? undefined : 'GitFlash'}
+      aria-label={decorative ? undefined : brand.name}
       aria-hidden={decorative || undefined}
       focusable="false"
     >
@@ -41,8 +43,8 @@ export function BrandMark({
       />
       {!monochrome && (
         <>
-          <rect x="8" y="14" width="16" height="10" rx="4" fill="#F6DDB5" />
-          <g fill="#202824">
+          <rect x="8" y="14" width="16" height="10" rx="4" fill={brand.face} />
+          <g fill={brand.ink}>
             <ellipse cx="12" cy="18.5" rx={small ? 1.25 : 1.1} ry="1.4" />
             <ellipse cx="20" cy="18.5" rx={small ? 1.25 : 1.1} ry="1.4" />
           </g>
@@ -50,7 +52,7 @@ export function BrandMark({
             <path
               d="M14.5 21c.9.8 2.1.8 3 0"
               fill="none"
-              stroke="#202824"
+              stroke={brand.ink}
               strokeWidth="1"
               strokeLinecap="round"
             />

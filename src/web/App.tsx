@@ -536,9 +536,9 @@ export function App() {
                       <div className="welcome-copy">
                         <span className="eyebrow">GIVE YOUR IDEA A PLACE TO WORK</span>
                         <h1>
-                          Your company.
+                          {brand.heroLines[0]}
                           <br />
-                          <span>In your hands.</span>
+                          <span>{brand.heroLines[1]}</span>
                         </h1>
                         <p>
                           Your own company of AI agents. Organize your team, assign work, and decide
@@ -679,7 +679,7 @@ export function App() {
                           <small>{companyWork?.stats.queued ?? 0} queued</small>
                         </div>
                         <button
-                          className="company-instrument instrument-review"
+                          className={`company-instrument instrument-review${companyWork?.stats.reviewable ? ' instrument-review-active' : ''}`}
                           onClick={() => navigate('work')}
                         >
                           <span>
@@ -1227,7 +1227,7 @@ export function App() {
                         <dt>Companies</dt>
                         <dd>{activeCompanies.length}</dd>
                         <dt>Configured agents</dt>
-                        <dd>{activeAgents.length}</dd>
+                        <dd>{activeAgents.filter((row) => row.kind === 'agent').length}</dd>
                         <dt>Schema</dt>
                         <dd>{state.schemaVersion}</dd>
                         <dt>Revision</dt>
