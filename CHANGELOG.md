@@ -4,6 +4,7 @@
 
 - Keep the completed delivery-hours Time Tracker and existing SQLite records through workflow integration.
 - Capture original execution receipts at session start and reject changed identities or bytes during execution and restore.
+- Include the pinned brief, acceptance requirements, intake and scope in the reviewed download alongside the generated files and QA record.
 - Clarify that intake assigns independent seats; actual session independence is checked when QA runs.
 - Complete native SQLite backups on Node 26 even when no other JavaScript callbacks are pending.
 - Fix the bundled CLI module-name collision and recognize Linux network denial at socket creation as well as connection.

@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { startServer } from '../src/server/index.js';
 import type { JobInfo } from '../src/jobs/contracts.js';
 import { sha256 } from '../src/jobs/store.js';
+import { studioContent } from '../src/jobs/content.js';
 
 const TEST_OWNER = 'Synthetic test owner';
 const cleanups: (() => Promise<void>)[] = [];
@@ -300,7 +301,25 @@ describe('workflow HTTP boundary and downloads', () => {
     expect(bundled.headers.get('content-disposition')).toContain('attachment;');
     const zip = Buffer.from(await bundled.arrayBuffer());
     expect(zip.subarray(0, 4)).toEqual(Buffer.from([0x50, 0x4b, 0x03, 0x04]));
+    // Read the stored ZIP entries rather than finding names inside provenance.
+    const entries = new Map<string, Buffer>();
+    for (let offset = 0; zip.readUInt32LE(offset) === 0x04034b50;) {
+      expect(zip.readUInt16LE(offset + 8)).toBe(0);
+      const size = zip.readUInt32LE(offset + 18);
+      const nameLength = zip.readUInt16LE(offset + 26);
+      const extraLength = zip.readUInt16LE(offset + 28);
+      const name = zip.subarray(offset + 30, offset + 30 + nameLength).toString();
+      const dataStart = offset + 30 + nameLength + extraLength;
+      expect(entries.has(name)).toBe(false);
+      entries.set(name, zip.subarray(dataStart, dataStart + size));
+      offset = dataStart + size;
+    }
     for (const filename of [
+      'input.json',
+      'brief.md',
+      'requirements.md',
+      'INTAKE.md',
+      'SCOPE.md',
       'stock_alert.py',
       'test_stock_alert.py',
       'expected.json',
@@ -311,7 +330,14 @@ describe('workflow HTTP boundary and downloads', () => {
       'oracle-result.json',
       'PROVENANCE.json',
     ])
-      expect(zip.includes(Buffer.from(filename))).toBe(true);
+      expect(entries.has(filename)).toBe(true);
+    expect(entries.size).toBe(14);
+    expect(entries.get('brief.md')?.toString()).toBe(studioContent.files['brief.md']);
+    expect(entries.get('requirements.md')?.toString()).toBe(studioContent.files['requirements.md']);
+    for (const name of ['INTAKE.md', 'SCOPE.md', 'stock_alert.py']) {
+      const captured = body.artifacts.find((a: { path: string }) => a.path === name);
+      expect(sha256(entries.get(name)!.toString())).toBe(captured.sha256);
+    }
     const second = await f.settle((await f.start(companyId)).body.id);
     expect(
       (await fetch(`${f.app.url}/api/jobs/${second.id}/artifacts/${artifact.id}`)).status,

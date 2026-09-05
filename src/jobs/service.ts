@@ -765,8 +765,11 @@ export function createJobService(
           'REVIEW_NOT_READY',
           'The deliverable bundle is available once the reviewed handoff is ready. Individual stage evidence remains available.',
         );
-      const files: Files = { 'input.json': context(id).content.files['input.json'] };
-      for (const kind of ['build', 'qa', 'handoff'] as const) {
+      const pinned = context(id).content.files;
+      const files: Files = Object.fromEntries(
+        ['input.json', 'brief.md', 'requirements.md'].map((path) => [path, pinned[path]]),
+      );
+      for (const kind of stageOrder) {
         const stage = completed(job, kind)!;
         const captured = stageFiles(id, stage.id);
         for (const path of requiredOutputs[kind]) files[path] = captured[path];
