@@ -1,5 +1,14 @@
 import { spawn, spawnSync } from 'node:child_process';
-import { mkdtemp, readFile, rm, mkdir, writeFile, realpath, readdir } from 'node:fs/promises';
+import {
+  mkdtemp,
+  readFile,
+  rm,
+  mkdir,
+  writeFile,
+  realpath,
+  readdir,
+  rename,
+} from 'node:fs/promises';
 import { tmpdir, cpus, platform, arch } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -125,7 +134,13 @@ async function stop(app) {
 let evidence;
 try {
   const packed = JSON.parse(command(['pack', '--json', '--pack-destination', temp]))[0];
-  const tarball = join(temp, packed.filename);
+  // npm names the archive from the compatibility package name. The released
+  // artifact is deliberately VCM-facing, so exercise the same filename users
+  // download while keeping the package manifest and installed directory
+  // unchanged.
+  const archiveFilename = `vcm-${packed.filename.replace(/^gitflash-/, '')}`;
+  const tarball = join(temp, archiveFilename);
+  await rename(join(temp, packed.filename), tarball);
   const bytes = await readFile(tarball);
   const forbidden = packed.files.filter((f) =>
     /(^|\/)\.env|\.sqlite|source-prototype|audit\/|\.lovable|\.map$/.test(f.path),
@@ -383,7 +398,7 @@ try {
   ]);
   assert.deepEqual(await readFile(join(data, 'workspace.sqlite')), dataBeforeUninstall);
   evidence = {
-    artifact: packed.filename,
+    artifact: archiveFilename,
     sha256: createHash('sha256').update(bytes).digest('hex'),
     bytes: bytes.length,
     files: packed.files.length,

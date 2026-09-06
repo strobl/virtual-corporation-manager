@@ -10,15 +10,15 @@ Serve `site/` using any static HTTP server. Directory routes are `./`, `./docs/`
 
 Check the homepage and Docs install blocks, command-copy success/failure feedback, local example download, FAQ, responsive screenshots, image viewer Close/Escape/Tab/focus return, legal links and narrow-width overflow. Without JavaScript, all document and source links still work and product images open as ordinary image links. Clipboard failures give an honest manual-copy instruction.
 
-## Alpha 7 technical prerelease handoff
+## Alpha 8 distribution-name maintenance handoff
 
-This site accompanies the **0.1.0-alpha.7 technical prerelease**. Publish the site only after Engineering verifies the actual release, public archive download and displayed installation commands. The exact release asset is:
+This site accompanies the **0.1.0-alpha.8 distribution-name maintenance release**. Publish the site only after Engineering verifies the actual release, public archive download and displayed installation commands. The exact release asset is:
 
-`https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.7/gitflash-0.1.0-alpha.7.tgz`
+`https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.8/vcm-0.1.0-alpha.8.tgz`
 
-The displayed command installs into `./vcm-preview` without lifecycle scripts, checks `vcm --version`, and starts with explicit `./my-company` data. Requires Node.js `>=24.14.0 <25 || >=26.0.0 <27` and npm. The download needs network access; installed local core operation does not. The package name remains `gitflash`; `vcm` is canonical and `gitflash` a compatibility alias. No public npm namespace is assumed.
+The displayed command installs the compatibility package from the VCM-named archive into `./vcm-preview` without lifecycle scripts, checks `vcm --version`, and starts with explicit `./my-company` data. Requires Node.js `>=24.14.0 <25 || >=26.0.0 <27` and npm. The download needs network access; installed local core operation does not. The package name remains `gitflash`; `vcm` is canonical and `gitflash` a compatibility alias. No public npm namespace is assumed.
 
-Alpha 7 combines the accepted company-management product with VCM naming. Its release manifest binds the actual source, archive checksum and verification results. The published Alpha 5 and Alpha 6 archives and tags retain their identities. Release publication and Pages deployment require their own observed results; source preparation does not establish either.
+Alpha 8 carries the accepted company-management product with a VCM-named visible archive. Its release manifest binds the actual source, archive checksum and verification results. Alpha 7, Alpha 6 and Alpha 5 retain their original release identities; only current visible distribution labels are changed here.
 
 The install path leads with plain company setup and optional Human/Agent membership. The separate execution guide retains both actual Alpha 5 PS-001 intake timeouts: the initial attempt and one retry each failed after 300 seconds at `ultra`. No v2 delivery bundle or owner acceptance exists. The prior v1 download remains rejected for its missing expected-reference file; the current v2 acceptance and useful-result journey remain open. No further provider attempt or reasoning change is authorized by this copy update.
 

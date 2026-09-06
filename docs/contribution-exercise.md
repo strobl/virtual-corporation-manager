@@ -2,7 +2,7 @@
 
 This is a historical record of a completed local code contribution exercise by an internal coding agent for the then-unpublished `0.1.0-alpha.5-local.1` candidate. The issue below was prepared for maintainer review; it was not posted to GitHub as part of this exercise and is not an external contributor's pull request. It used the repository's shipped example, source and checks. No private planning access, provider account or executed agent work was needed.
 
-The current product version is `0.1.0-alpha.7`; consult its versioned release for source and package evidence. Use the [README installation route](../README.md#install-the-reviewed-archive) and [first-company guide](first-company.md) for its current setup. The reproduction labels and verification results below belong to alpha.5-local.1; they do not establish acceptance of alpha.7. In the current interface, import the example through **Settings → Import a company definition**, open **Corporations → Patchwork Studio (example)**, then use **Tools → Organization tools → Reporting lines** to inspect the organization summary.
+The current product version is `0.1.0-alpha.8`; consult its versioned release for source and package evidence. Use the [README installation route](../README.md#install-the-reviewed-archive) and [first-company guide](first-company.md) for its current setup. The reproduction labels and verification results below belong to alpha.5-local.1; they do not establish acceptance of alpha.8. In the current interface, import the example through **Settings → Import a company definition**, open **Corporations → Patchwork Studio (example)**, then use **Tools → Organization tools → Reporting lines** to inspect the organization summary.
 
 ## Historical review-ready issue
 

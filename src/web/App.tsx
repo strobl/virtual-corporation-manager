@@ -1639,7 +1639,7 @@ export function App() {
                         responsibilities. Use the CLI backup command to preserve the complete
                         workspace, including work and history.
                       </p>
-                      <a className="button" href="/api/export" download="gitflash-company.json">
+                      <a className="button" href="/api/export" download="vcm-company.json">
                         <Download size={14} />
                         Export company definition
                       </a>

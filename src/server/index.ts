@@ -139,10 +139,7 @@ export async function startServer(options: ServerOptions) {
         if (path === '/api/time') return json(res, store.time.snapshot());
         if (path === '/api/time/catalog') return json(res, store.time.snapshot().catalog);
         if (path === '/api/time/export') {
-          res.setHeader(
-            'Content-Disposition',
-            'attachment; filename="gitflash-delivery-hours.json"',
-          );
+          res.setHeader('Content-Disposition', 'attachment; filename="vcm-delivery-hours.json"');
           return json(res, {
             format: 'gitflash-delivery-hours',
             version: 1,
@@ -161,14 +158,14 @@ export async function startServer(options: ServerOptions) {
             res.writeHead(200, {
               'Content-Type': 'application/zip',
               'Cache-Control': 'no-store',
-              'Content-Disposition': 'attachment; filename="gitflash-PS-001.zip"',
+              'Content-Disposition': 'attachment; filename="vcm-PS-001.zip"',
             });
             return res.end(bytes);
           }
           if (jobGet[2] === 'export') {
             res.setHeader(
               'Content-Disposition',
-              'attachment; filename="gitflash-workflow-evidence.json"',
+              'attachment; filename="vcm-workflow-evidence.json"',
             );
             return json(res, jobs.export(jobGet[1]));
           }
@@ -185,7 +182,7 @@ export async function startServer(options: ServerOptions) {
           return json(res, jobs.get(jobGet[1]));
         }
         if (path === '/api/export') {
-          res.setHeader('Content-Disposition', 'attachment; filename="gitflash-company.json"');
+          res.setHeader('Content-Disposition', 'attachment; filename="vcm-company.json"');
           return json(res, store.exportDefinition());
         }
         if (path === '/api/integrations') return json(res, await integration.status());
@@ -196,7 +193,7 @@ export async function startServer(options: ServerOptions) {
           return json(res, run);
         }
         if (path === '/api/buzz/team') {
-          res.setHeader('Content-Disposition', 'attachment; filename="gitflash.team.json"');
+          res.setHeader('Content-Disposition', 'attachment; filename="vcm.team.json"');
           return json(
             res,
             integration.exportBuzzTeam(url.searchParams.get('companyId') ?? undefined),

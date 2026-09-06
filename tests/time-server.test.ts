@@ -237,14 +237,18 @@ describe('independent loopback Time Tracker API', () => {
     expect(before.history.filter((h) => h.entryId === original.id)).toHaveLength(3);
     const response = await fetch(f.app.url + '/api/time/export');
     expect(response.status).toBe(200);
-    expect(response.headers.get('content-disposition')).toContain('gitflash-delivery-hours.json');
+    expect(response.headers.get('content-disposition')).toContain('vcm-delivery-hours.json');
     expect(await response.json()).toEqual({
       format: 'gitflash-delivery-hours',
       version: 1,
       ...before,
     });
     expect(await f.time()).toEqual(before);
-    const definition = await (await fetch(f.app.url + '/api/export')).json();
+    const definitionResponse = await fetch(f.app.url + '/api/export');
+    expect(definitionResponse.headers.get('content-disposition')).toContain(
+      'attachment; filename="vcm-company.json"',
+    );
+    const definition = await definitionResponse.json();
     expect(definition.schemaVersion).toBe(1);
     expect(definition).not.toHaveProperty('entries');
     expect(definition).not.toHaveProperty('time');
