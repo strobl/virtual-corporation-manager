@@ -4,7 +4,7 @@ This guide covers the native PS-001 workflow described in [FIRST-COMPANY.md](FIR
 
 ## Intake and responsibility
 
-Use [GitFlash Issues](https://github.com/strobl/gitflash/issues) for appropriate public reports and [private vulnerability reporting](https://github.com/strobl/gitflash/security/advisories/new) for suspected vulnerabilities. The included [support guide](SUPPORT.md) defines the minimal redacted report. Public replies require an authorized maintainer.
+Use [VCM Issues](https://github.com/strobl/virtual-corporation-manager/issues) for appropriate public reports and [private vulnerability reporting](https://github.com/strobl/virtual-corporation-manager/security/advisories/new) for suspected vulnerabilities. The included [support guide](SUPPORT.md) defines the minimal redacted report. Public replies require an authorized maintainer.
 
 The repository's administrative maintainer is `strobl`. A named operational receiving person and backup/escalation arrangement for this release have not been confirmed. The functions below describe responsibility; they are not claims of actual GitHub assignment, staffed capacity or an on-call commitment. PMO must confirm the receiver and backup with the maintainer before claiming operational coverage. No paid-support SLA or response deadline is promised.
 

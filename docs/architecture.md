@@ -2,7 +2,7 @@
 
 VCM — Virtual Corporation Manager is one TypeScript application for one local operator. A Node.js process serves a bundled React console on `127.0.0.1` and opens a SQLite workspace. Company setup, organization editing, recorded work and the Time Tracker require no account, network, hosted database, billing service or telemetry.
 
-This describes the current `0.1.0-alpha.5` review candidate. The [system architecture](system-architecture.md) maps its three core containers, components, persisted data and execution flows to source. [Architecture for contributors](developer-architecture.md) explains the domain and change workflow; [acceptance evidence](acceptance.md) records verification separately.
+This describes the current `0.1.0-alpha.6` review candidate. The [system architecture](system-architecture.md) maps its three core containers, components, persisted data and execution flows to source. [Architecture for contributors](developer-architecture.md) explains the domain and change workflow; [acceptance evidence](acceptance.md) records verification separately.
 
 The browser submits typed configuration commands to the local runtime. Domain validation produces a persisted preview at a specific workspace revision. Explicit confirmation applies that exact preview and its audit receipt in one transaction. Replaying confirmation is idempotent; intervening configuration or time writes invalidate stale previews. Supported undo is version-aware and does not reverse an external action. An uncertain Apply receipt survives browser reload for explicit retry. See the [workspace store](../src/db/store.ts), [domain model](../src/domain/model.ts) and [browser recovery](../src/web/change-recovery.ts).
 

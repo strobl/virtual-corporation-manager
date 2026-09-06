@@ -1,6 +1,6 @@
 # Company data and change semantics
 
-GitFlash stores the local company, execution records, workflow artifacts and Time Tracker in one SQLite database: `workspace.sqlite` inside the workspace directory. The default directory is `~/.gitflash`; `--data-dir` or `GITFLASH_DATA_DIR` selects another directory. There is no account, hosted database or model requirement for configuring a company or booking delivery hours.
+VCM stores the local company, execution records, workflow artifacts and Time Tracker in one SQLite database: `workspace.sqlite` inside the workspace directory. The default directory is `~/.gitflash`; `--data-dir` or `GITFLASH_DATA_DIR` selects another directory. There is no account, hosted database or model requirement for configuring a company or booking delivery hours.
 
 ## Company structure
 
@@ -23,11 +23,11 @@ A task that completes after its agent was archived can still record its result a
 ## Preview, apply and undo
 
 1. A preview validates the entire proposed batch against a specific workspace revision. It records exact field values and changes, but does not change the company.
-2. Applying that preview rechecks its base revision inside a SQLite transaction. If anything has changed, GitFlash refuses the stale preview and requests a fresh review.
+2. Applying that preview rechecks its base revision inside a SQLite transaction. If anything has changed, VCM refuses the stale preview and requests a fresh review.
 3. A successful apply writes all company changes and their audit receipt together, then increments the workspace revision. Retrying the same preview ID returns its existing result without applying it again.
 4. Only the latest configuration change is eligible for undo. Undo is an audited transaction with a new revision. It does not delete the audit trail.
 
-Work creation and work acceptance are permanent evidence and cannot be undone through configuration undo. Configuration undo preserves recorded work and the execution ledger. It also cannot reverse an external runtime action or a message already delivered outside GitFlash.
+Work creation and work acceptance are permanent evidence and cannot be undone through configuration undo. Configuration undo preserves recorded work and the execution ledger. It also cannot reverse an external runtime action or a message already delivered outside VCM.
 
 The interface returns the newest 200 audit receipts; the database retains the complete change history. Entity versions describe their saved state; the workspace revision is the concurrency boundary for all preview/apply/undo operations.
 

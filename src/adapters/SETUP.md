@@ -1,39 +1,39 @@
 # Optional runtimes and integrations
 
-Company creation, configuration, local storage and browsing work without accounts or network access. Running an AI task is a separate, explicit action. GitFlash is free; your selected runtime can consume an existing subscription allowance or paid API usage. GitFlash does not purchase credits, provision paid inference or start tasks in the background on launch.
+Company creation, configuration, local storage and browsing work without accounts or network access. Running an AI task is a separate, explicit action. VCM is free; your selected runtime can consume an existing subscription allowance or paid API usage. VCM does not purchase credits, provision paid inference or start tasks in the background on launch.
 
 ## Codex CLI
 
-Install the optional [Codex CLI](https://learn.chatgpt.com/docs/codex-cli) using its official instructions, then run `codex login` and `codex login status`. GitFlash detects `codex` on PATH; an operator can set `GITFLASH_CODEX_PATH` to an absolute executable path when needed. GitFlash uses the CLI's saved authentication and deliberately does not inherit unrelated connector credentials or user-configured MCP servers.
+Install the optional [Codex CLI](https://learn.chatgpt.com/docs/codex-cli) using its official instructions, then run `codex login` and `codex login status`. VCM detects `codex` on PATH; an operator can set `GITFLASH_CODEX_PATH` to an absolute executable path when needed. VCM uses the CLI's saved authentication and deliberately does not inherit unrelated connector credentials or user-configured MCP servers.
 
-Select an active company agent, enter the actual task and choose Run. GitFlash queues at most 20 tasks and executes one at a time. The subprocess runs in a dedicated task directory with a read-only sandbox. It receives the selected role, current company context and the five latest nonfailed company outputs. It returns its deliverable through the supported JSONL event stream. The app saves a result only after successful process and terminal task completion. A submitted work record still needs human acceptance.
+Select an active company agent, enter the actual task and choose Run. VCM queues at most 20 tasks and executes one at a time. The subprocess runs in a dedicated task directory with a read-only sandbox. It receives the selected role, current company context and the five latest nonfailed company outputs. It returns its deliverable through the supported JSONL event stream. The app saves a result only after successful process and terminal task completion. A submitted work record still needs human acceptance.
 
-GitFlash probes the installed executable for required flags, including `--ignore-user-config`. If the CLI is too old, upgrade it. GitFlash never adds approval-bypass arguments. The default task limit is five minutes; cancellation or shutdown terminates the subprocess. Interrupted tasks remain visible as failed and require a new explicit request; uncertain external effects are never silently repeated. [Official execution reference](https://learn.chatgpt.com/docs/non-interactive-mode).
+VCM probes the installed executable for required flags, including `--ignore-user-config`. If the CLI is too old, upgrade it. VCM never adds approval-bypass arguments. The default task limit is five minutes; cancellation or shutdown terminates the subprocess. Interrupted tasks remain visible as failed and require a new explicit request; uncertain external effects are never silently repeated. [Official execution reference](https://learn.chatgpt.com/docs/non-interactive-mode).
 
 The workspace SQLite database contains the task ledger, request IDs, input context, complete outputs and hashes. The normal workspace backup therefore includes runtime history and idempotency records. Copies under `runs/<id>/result.md` are convenience artifacts; the complete result remains retrievable from the restored ledger without them. Backups contain private task context and outputs. Keep them private like the workspace itself.
 
-Workspace data, staged task context, outputs and backups are stored in plaintext; GitFlash does not encrypt them at rest. Local file permissions provide access control. The read-only runtime sandbox restricts tool-driven writes but is not an isolated operating-system user or virtual machine and does not guarantee that other local files are unreadable. Submit only information you intend to share with the selected model provider. GitFlash does not display or persist raw provider stderr; failure messages use bounded, redacted diagnostics.
+Workspace data, staged task context, outputs and backups are stored in plaintext; VCM does not encrypt them at rest. Local file permissions provide access control. The read-only runtime sandbox restricts tool-driven writes but is not an isolated operating-system user or virtual machine and does not guarantee that other local files are unreadable. Submit only information you intend to share with the selected model provider. VCM does not display or persist raw provider stderr; failure messages use bounded, redacted diagnostics.
 
 ## Buzz
 
-Export a canonical `.team.json` from GitFlash. In Buzz Desktop, use Agents → Agent teams → Import, inspect its preview and confirm the team. This is a configuration transfer; importing creates new identities, and repeating an import can create duplicates. GitFlash does not start these agents or claim that they executed work. The generated snapshot includes role instructions, empty memory, Codex as optional runtime, one worker per identity and owner-only response policy. Verify native import compatibility with your installed Buzz release. Persona-pack files are a different format and are not a Desktop activation path.
+Export a canonical `.team.json` from VCM. In Buzz Desktop, use Agents → Agent teams → Import, inspect its preview and confirm the team. This is a configuration transfer; importing creates new identities, and repeating an import can create duplicates. VCM does not start these agents or claim that they executed work. The generated snapshot includes role instructions, empty memory, Codex as optional runtime, one worker per identity and owner-only response policy. Verify native import compatibility with your installed Buzz release. Persona-pack files are a different format and are not a Desktop activation path.
 
-A two-role snapshot generated by GitFlash was successfully imported in native Buzz 0.5.8; both roles remained stopped. Confirm the effective runtime and model before starting imported agents: the native cards can display inherited provider defaults. This test establishes configuration import, not task execution. Import can synchronize team/profile metadata to your configured relay.
+A two-role snapshot generated by VCM was successfully imported in native Buzz 0.5.8; both roles remained stopped. Confirm the effective runtime and model before starting imported agents: the native cards can display inherited provider defaults. This test establishes configuration import, not task execution. Import can synchronize team/profile metadata to your configured relay.
 
-For the optional CLI task path, an operator supplies these environment values to the local GitFlash process:
+For the optional CLI task path, an operator supplies these environment values to the local VCM process:
 
 ```text
 GITFLASH_BUZZ_PATH=/absolute/path/to/buzz
 GITFLASH_BUZZ_RELAY_URL=https://your-relay.example
 GITFLASH_BUZZ_CHANNEL_ID=<channel UUID>
-GITFLASH_BUZZ_AGENT_MAP={"<GitFlash agent ID>":"<Buzz agent public key>"}
+GITFLASH_BUZZ_AGENT_MAP={"<VCM agent ID>":"<Buzz agent public key>"}
 BUZZ_PRIVATE_KEY=<sender identity secret supplied securely>
 BUZZ_AUTH_TAG=<owner attestation when required by the relay>
 ```
 
 Do not put credentials in company definitions, URLs, argv or team exports. Prefer the supported Buzz-managed credential environment; do not copy secrets from Desktop's private stores. The sender and target need channel membership, and the target agent's response policy must permit the sender. Start the selected agent through Buzz's supported controls with your own configured runtime access.
 
-Selecting Buzz for an explicit task dispatches through the CLI, records the relay acknowledgment and waits for a signed response from the mapped identity in the task thread. Relay acceptance is not task completion. Network uncertainty after sending is shown as uncertain; inspect the channel for the task ID before retrying. GitFlash does not auto-resend. [Buzz source and releases](https://github.com/block/buzz), [canonical snapshot schema](https://github.com/block/buzz/blob/main/desktop/src-tauri/src/managed_agents/team_snapshot.rs).
+Selecting Buzz for an explicit task dispatches through the CLI, records the relay acknowledgment and waits for a signed response from the mapped identity in the task thread. Relay acceptance is not task completion. Network uncertainty after sending is shown as uncertain; inspect the channel for the task ID before retrying. VCM does not auto-resend. [Buzz source and releases](https://github.com/block/buzz), [canonical snapshot schema](https://github.com/block/buzz/blob/main/desktop/src-tauri/src/managed_agents/team_snapshot.rs).
 
 ## Slack
 
@@ -47,6 +47,6 @@ GITFLASH_SLACK_OWNER_ID=<authorized human user ID>
 GITFLASH_SLACK_TEAM_ID=<optional expected workspace ID>
 ```
 
-Then explicitly connect Slack in the host integration API. Startup never connects automatically. The initial adapter admits only that workspace, channel and owner. Use `@GitFlash Agent name: your bounded task`. Ambiguous names return guidance without starting inference. The mention queues local Codex execution, and the result is posted to the originating thread with the contributing agent name. Keep the local GitFlash process running to receive tasks. Socket Mode needs no public HTTP endpoint, tunnel or exposed local server. [Slack Socket Mode](https://docs.slack.dev/tools/bolt-js/concepts/socket-mode/).
+Then explicitly connect Slack in the host integration API. Startup never connects automatically. The initial adapter admits only that workspace, channel and owner. Use `@VCM Agent name: your bounded task`. Ambiguous names return guidance without starting inference. The mention queues local Codex execution, and the result is posted to the originating thread with the contributing agent name. Keep the local VCM process running to receive tasks. Socket Mode needs no public HTTP endpoint, tunnel or exposed local server. [Slack Socket Mode](https://docs.slack.dev/tools/bolt-js/concepts/socket-mode/).
 
 The release must distinguish automated fixture tests from live integration acceptance. A generated team, successful token check, connected socket or mocked response alone does not prove a working agent company. A live proof needs a real task, a useful reviewed deliverable and matching runtime/transport evidence.

@@ -48,7 +48,7 @@ export function createIntegrationService(
     db.close();
     throw new IntegrationError(
       'schema-version',
-      'Initialize the workspace with a compatible GitFlash release before starting integrations.',
+      'Initialize the workspace with a compatible VCM release before starting integrations.',
     );
   }
   let closed = false;
@@ -109,7 +109,7 @@ export function createIntegrationService(
       } else {
         run.status = 'failed';
         run.error =
-          'GitFlash stopped before this task completed. Review any external activity before starting a new request.';
+          'VCM stopped before this task completed. Review any external activity before starting a new request.';
         run.completedAt = new Date().toISOString();
       }
       save(run);
@@ -240,7 +240,7 @@ export function createIntegrationService(
     if (closed)
       throw new IntegrationError(
         'closed',
-        'GitFlash is shutting down. Restart before submitting a task.',
+        'VCM is shutting down. Restart before submitting a task.',
       );
     if (
       !request ||
@@ -352,7 +352,7 @@ export function createIntegrationService(
         activeRuns: all.filter((run) => run.status === 'running').length,
         queuedRuns: all.filter((run) => run.status === 'queued').length,
         costNotice:
-          'GitFlash is free and company setup is local. Optional Codex, Buzz and Slack services require your own access; model execution can consume subscription allowances or API credits.',
+          'VCM is free and company setup is local. Optional Codex, Buzz and Slack services require your own access; model execution can consume subscription allowances or API credits.',
       };
     },
     run: (request: RunRequest) => enqueue(request),
@@ -383,8 +383,7 @@ export function createIntegrationService(
       for (const run of runs())
         if (run.status === 'queued') {
           run.status = 'failed';
-          run.error =
-            'GitFlash stopped before this queued task started. Submit a new request to retry.';
+          run.error = 'VCM stopped before this queued task started. Submit a new request to retry.';
           run.completedAt = new Date().toISOString();
           save(run);
         }

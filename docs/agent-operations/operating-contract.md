@@ -1,6 +1,6 @@
 # Operating contract — version 1.2.2
 
-This is an English content package for GitFlash, not a runtime specification. Every company uses these rules. Public company names describe the example service, not GitFlash's market positioning.
+This is an English content package for VCM, not a runtime specification. Every company uses these rules. Public company names describe the example service, not VCM's market positioning.
 
 ## Owner and work
 
@@ -46,7 +46,7 @@ Record four independent fields; higher levels never imply the others:
 - **Content complete**: required company, roles, flow, artifacts and rubric exist.
 - **Example checked**: a named fixture was assessed against a named rubric with findings.
 - **Agent rehearsed**: named agent task, input/output, environment and observed checks are retained. State the exact steps exercised.
-- **GitFlash verified**: the package was configured and run via GitFlash, with target-side run and acceptance evidence. This package does not claim this level.
+- **VCM verified**: the package was configured and run via VCM, with target-side run and acceptance evidence. This package does not claim this level.
 
 Configured seats are organizational records. Active agents have observed execution in a named interval. Accepted work is a separately reviewed artifact with actual owner acceptance. They are different denominators. Synthetic work, internal test results, customer outcomes and agent configurations remain distinguishable. Unknown time, costs and customer demand are `not measured`, not zero.
 

@@ -4,19 +4,19 @@ Create a virtual corporation, give its agents a place, and record delivery hours
 
 ## Install and check prerequisites
 
-This guide targets **0.1.0-alpha.5** and the developer-first corporation interface. At preparation on 5 September 2026, final release checks and public availability remain pending. The earlier accepted local candidate is `0.1.0-alpha.5-local.1`; public alpha.2 is an older product without this interface, the Time Tracker or company workflow. A version string alone does not identify reviewed bytes.
+This guide targets the **0.1.0-alpha.6** branding maintenance release and the developer-first corporation interface. Its exact release checks and publication status are recorded in [acceptance](acceptance.md#branding-maintenance-release--6-september-2026). The published alpha.5 and earlier candidates remain separate artifacts. A version string alone does not identify reviewed bytes.
 
-Use Node.js **24.14 or newer in the 24.x line, or 26.x**. Check `node --version`. The [versioned GitHub release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.5) is the public distribution route. Its intended asset is [gitflash-0.1.0-alpha.5.tgz](https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.5/gitflash-0.1.0-alpha.5.tgz); it is not claimed available until publication and an independent public download pass. For local review, use the supplied candidate archive instead. Verify the corresponding source and SHA-256 from the release or review manifest, then run:
+Use Node.js **24.14 or newer in the 24.x line, or 26.x**. Check `node --version`. The [versioned GitHub release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.6) is the public distribution route. Its intended asset is [gitflash-0.1.0-alpha.6.tgz](https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.6/gitflash-0.1.0-alpha.6.tgz); it is not claimed available until publication and an independent public download pass. For local review, use the supplied candidate archive instead. Verify the corresponding source and SHA-256 from the release or review manifest, then run:
 
 ```sh
-npm install --offline --ignore-scripts --prefix ./vcm-preview ./gitflash-0.1.0-alpha.5.tgz
+npm install --offline --ignore-scripts --prefix ./vcm-preview ./gitflash-0.1.0-alpha.6.tgz
 npm exec --offline --prefix ./vcm-preview -- vcm --version
 npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./vcm-first-company --no-open
 ```
 
-The version must print `0.1.0-alpha.5`. Keep it with the archive checksum for any support report. Use a new data directory for this exercise; open the loopback URL printed in the terminal. If its port is occupied, add `--port 4311`. Keep that process running while using the workspace, then stop and restart with the same working directory and `--data-dir` to verify persistence.
+The version must print `0.1.0-alpha.6`. Keep it with the archive checksum for any support report. Use a new data directory for this exercise; open the loopback URL printed in the terminal. If its port is occupied, add `--port 4311`. Keep that process running while using the workspace, then stop and restart with the same working directory and `--data-dir` to verify persistence.
 
-`vcm` is the canonical command; `gitflash` remains a compatible alias for the same binary. Both preserve the existing `~/.gitflash` default, `GITFLASH_DATA_DIR` and explicit data paths. The package remains `gitflash`; no npm package named `vcm` is required.
+Use `vcm` for all commands. Existing installations keep the same data directory and settings; see the [naming and compatibility contract](branding.md).
 
 ## Create your corporation
 

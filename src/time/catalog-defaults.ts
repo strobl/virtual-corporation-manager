@@ -1,6 +1,6 @@
 import type { CatalogItem } from './contracts.js';
 
-/** Generic shared deliverable defaults from the founder's original GitFlash catalog.
+/** Generic shared deliverable defaults from the founder's original catalog.
  * Source: https://org-manager-console.lovable.app/work-logs, Catalog tab.
  * PMO-authorized capture: 2026-09-05T00:51:01.890Z; 124 Shared rows, zero local overrides.
  * Transfer: compact source entries 15542 ASCII characters, FNV-1a32 356e2b3f.

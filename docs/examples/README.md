@@ -12,7 +12,7 @@ The file configures these roles. It contains no executed work, accepted result, 
 
 ## Import and inspect
 
-Use the exact `0.1.0-alpha.5` archive from the [README distribution route](../../README.md#install-the-reviewed-archive), or its supplied review candidate before publication. Follow [the quickstart](../developer-quickstart.md), then open **Settings → Import a company definition**. Select the JSON file or paste its full contents, choose **Review import**, inspect the changes and choose **Apply changes**. Open the corporation from **Your corporations**.
+Use the exact `0.1.0-alpha.6` archive from the [README distribution route](../../README.md#install-the-reviewed-archive), or its supplied review candidate before publication. Follow [the quickstart](../developer-quickstart.md), then open **Settings → Import a company definition**. Select the JSON file or paste its full contents, choose **Review import**, inspect the changes and choose **Apply changes**. Open the corporation from **Your corporations**.
 
 The installed example is at `vcm-preview/node_modules/gitflash/docs/examples/three-agent-studio.json`. **Settings → Export company definition** exports the workspace's configuration. Importing that export creates fresh IDs and preserves existing companies; repeated import adds another company with a suffixed short code. A SQLite backup is the full recovery route.
 

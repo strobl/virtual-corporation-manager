@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Install VCM locally, import a three-agent example, review configuration changes and preserve your workspace. Alpha 5 technical prerelease documentation."
+      content="Install VCM locally, import a three-agent example, review configuration changes and preserve your workspace. Alpha 6 technical prerelease documentation."
     />
     <meta name="theme-color" content="#f6f4ef" />
     <title>Developer quickstart — VCM</title>
@@ -67,13 +67,13 @@
             <p class="kicker">Local setup</p>
             <h2 id="install-title">Install VCM</h2>
             <p>
-              <strong>Alpha 5 technical prerelease.</strong> The commands below install the
-              published <code>0.1.0-alpha.5</code> archive for local workspace evaluation.
+              <strong>Alpha 6 technical prerelease.</strong> The commands below install the
+              published <code>0.1.0-alpha.6</code> archive for local workspace evaluation.
             </p>
             <p>
-              <strong>PS-001 did not complete.</strong> Intake and one retry each timed out after
-              300 seconds at <code>ultra</code>. No v2 bundle or owner acceptance exists; the
-              earlier v1 download was rejected. <a href="#execution">Known workflow limits →</a>
+              <strong>PS-001 did not complete in Alpha 5.</strong> Intake and one retry each timed
+              out after 300 seconds at <code>ultra</code>. No v2 bundle or owner acceptance exists;
+              the earlier v1 download was rejected. <a href="#execution">Known workflow limits →</a>
             </p>
             <p>
               Use Node.js <strong>24.14 or later within 24.x, or 26.x</strong> with npm:
@@ -82,7 +82,7 @@
               <code>checksums.txt</code> and <code>release-manifest.json</code>.
             </p>
             <div class="command-panel">
-              <p class="kicker">Terminal · Alpha 5 technical prerelease</p>
+              <p class="kicker">Terminal · Alpha 6 technical prerelease</p>
               <button
                 class="copy-button"
                 type="button"
@@ -96,14 +96,14 @@
                 class="command-block"
                 id="install-command"
                 tabindex="0"
-                aria-label="Install Alpha 5, check its version and start VCM"
-              ><code>npm install --ignore-scripts --prefix ./vcm-preview https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.5/gitflash-0.1.0-alpha.5.tgz
+                aria-label="Install Alpha 6, check its version and start VCM"
+              ><code>npm install --ignore-scripts --prefix ./vcm-preview https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.6/gitflash-0.1.0-alpha.6.tgz
 npm exec --offline --prefix ./vcm-preview -- vcm --version
 npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code></pre>
               <p class="copy-status" role="status" aria-live="polite"></p>
             </div>
             <p>
-              Expected version: <code>0.1.0-alpha.5</code>. The first command downloads the archive;
+              Expected version: <code>0.1.0-alpha.6</code>. The first command downloads the archive;
               subsequent commands use the isolated installation. Open the loopback URL printed by
               VCM. Use the same working directory and data directory when restarting. Add
               <code>--port 4311</code> if port 4310 is occupied, or <code>--no-open</code> to open
@@ -116,7 +116,7 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code><
             </p>
             <p>
               <a
-                href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.5"
+                href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.6"
                 >Versioned release</a
               >
               · <a href="#local-data">Keep the same workspace</a>
@@ -247,14 +247,15 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company --no-op
               stock-alert utility from fictional input; it is not an arbitrary workflow engine.
             </p>
             <p>
-              Current v2 acceptance remains <strong>open</strong> after the two 300-second intake
-              timeouts at <code>ultra</code>. The earlier v1 run completed five role sessions, but
-              its downloaded ZIP was rejected because <code>EXPECTED-REFERENCE.json</code> was
-              missing. Format 2 includes that reference and supporting files; it has no successful
-              useful-result or owner-acceptance proof. See the
+              Current v2 acceptance remains <strong>open</strong> after the two Alpha 5 intake
+              timeouts of 300 seconds at <code>ultra</code>. The earlier v1 run completed five role
+              sessions, but its downloaded ZIP was rejected because
+              <code>EXPECTED-REFERENCE.json</code> was missing. Format 2 includes that reference and
+              supporting files; it has no successful useful-result or owner-acceptance proof. See
+              the
               <a
                 href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.5"
-                >release notes and evidence limits</a
+                >Alpha 5 release notes and evidence limits</a
               >.
             </p>
             <p>
@@ -343,13 +344,13 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./restored-company -
               contributions need no provider credentials or private planning access.
             </p>
             <p>
-              Use the source revision recorded in the Alpha 5 release manifest. In that checkout,
+              Use the source revision recorded in the Alpha 6 release manifest. In that checkout,
               install development dependencies and run the checks:
             </p>
             <pre
               class="command-block"
               tabindex="0"
-              aria-label="Check the Alpha 5 source checkout"
+              aria-label="Check the Alpha 6 source checkout"
             ><code>npm ci --ignore-scripts
 npm run check
 npm run format:check

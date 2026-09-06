@@ -23,11 +23,11 @@ If an Apply response is interrupted, the UI shows **Save confirmation pending** 
 
 The browser uses the canonical corporation-frame glyph, lockup and favicon, with deep ink, restrained teal, warm surfaces and system typography. Browser configuration is in `src/web/identity.ts`. Source and support links use [strobl/virtual-corporation-manager](https://github.com/strobl/virtual-corporation-manager).
 
-- The npm package, `gitflash` CLI, `~/.gitflash` directory, environment variables, SQLite schema and API identifiers keep their technical names. Repository renaming does not rename local data.
+- The canonical command is `vcm`, with the established compatibility alias. Package, data-directory, environment-variable and protocol identifiers follow the [naming and compatibility contract](branding.md). Repository renaming does not rename local data.
 - Global manager relationships and primary/additional dated agent assignments remain truthful. Reporting hierarchy is distinct from company ownership; no decorative control pretends to save a relationship.
 - Time Tracker retains 124 reference definitions, explicit delivery hours, correction/void history, catalog versions and analytics. Runtime duration and owner acceptance never create hours.
 - Backup/restore, individual tasks, integrations and historical records remain accessible. Stored names, owners, receipts and artifact bytes are not rewritten for branding.
-- Canonical Agent Operations source content and its import receipt retain their accepted identities. The separately maintained active VCM Operations overlay does not replace those sources.
+- Agent Operations source hashes and original import receipts retain their accepted identities. Shipped product wording uses VCM through a separately recorded [branding adaptation](agent-operations/branding-receipt.json); role, rubric and oracle behavior is preserved.
 
 ## Review and publication boundary
 
@@ -35,4 +35,4 @@ Record the exact successor checkout/archive, isolated data directory and local U
 
 Historical UI source `8638887434d3316238189b25bc236006cf56f3cf` and runtime baseline `53d97457ea2b7ec78f730c8c9466036d9f07870c` identify earlier accepted work. The frozen alpha.3 source `d47e1984949b9d93106e0c211326cc56f8351981` predates this redesign. Their earlier local.4/alpha.3 package and browser evidence remains attached to those exact bytes, not transferred to this successor. Prior review workspaces remain intact.
 
-Repository rename, public code merge, release publication, website deployment and custom-domain activation are distinct events. The repository URL above is current; a new release or domain is not asserted by this document. Verify the eventual tag, downloaded archive and intended deployment target separately. Keep GitFlash's FDE website and historical releases unchanged. Do not direct an installation to an older artifact while claiming that this UI is included. No new provider run or external human usefulness pilot is implied by these changes.
+Repository rename, public code merge, release publication, website deployment and custom-domain activation are distinct events. The repository URL above is current; a new release or domain is not asserted by this document. Verify the eventual tag, downloaded archive and intended deployment target separately. The separate FDE website and historical releases retain their existing identities. Do not direct an installation to an older artifact while claiming that this UI is included. No new provider run or external human usefulness pilot is implied by these changes.

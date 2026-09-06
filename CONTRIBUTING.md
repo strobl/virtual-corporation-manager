@@ -17,7 +17,7 @@ npm run format:check
 npm run test:package
 ```
 
-For the frozen `0.1.0-alpha.5` release, obtain the exact revision from its [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.5). The default branch may contain later documentation or development changes. For a release, pull request or review candidate, check out its recorded tag or commit after `cd virtual-corporation-manager` and before `npm ci`. Record `git rev-parse HEAD` with your results. `npm run check` checks types, runs the tests and builds the CLI and browser. `npm run test:package` installs the real tarball into a temporary directory and exercises the documented local journey, persistence, recovery and Time Tracker. CI is configured to run type/test/build and packaged acceptance on macOS, Linux and Windows with minimum/current Node 24.x and 26.x. Check the exact revision's results in [acceptance evidence](docs/acceptance.md); configuration alone is not a passing matrix. Mock workflow tests exercise failure and recovery; they are not evidence of a live provider run.
+For the frozen `0.1.0-alpha.6` release, obtain the exact revision from its [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.6). The default branch may contain later documentation or development changes. For a release, pull request or review candidate, check out its recorded tag or commit after `cd virtual-corporation-manager` and before `npm ci`. Record `git rev-parse HEAD` with your results. `npm run check` checks types, runs the tests and builds the CLI and browser. `npm run test:package` installs the real tarball into a temporary directory and exercises the documented local journey, persistence, recovery and Time Tracker. CI is configured to run type/test/build and packaged acceptance on macOS, Linux and Windows with minimum/current Node 24.x and 26.x. Check the exact revision's results in [acceptance evidence](docs/acceptance.md); configuration alone is not a passing matrix. Mock workflow tests exercise failure and recovery; they are not evidence of a live provider run.
 
 ## Try your build
 
@@ -39,7 +39,7 @@ The optional **Product Studio (5 seats)** and **100-agent Product Studio** templ
 
 ## Keep changes reviewable
 
-Keep the local core usable without accounts or network. Preserve atomic configuration changes, migration checksums, full backups and the distinction between configured roles and real execution. Use fresh temporary workspaces for tests; never commit databases, credentials or task outputs. Existing migration statements are immutable: add a new numbered migration for schema changes.
+Use VCM or Virtual Corporation Manager in current product copy and `vcm` in command examples. Preserve the explicit exceptions in the [naming and compatibility contract](docs/branding.md). Keep the local core usable without accounts or network. Preserve atomic configuration changes, migration checksums, full backups and the distinction between configured roles and real execution. Use fresh temporary workspaces for tests; never commit databases, credentials or task outputs. Existing migration statements are immutable: add a new numbered migration for schema changes.
 
 Adapters must disclose prerequisites, restrict execution, preserve observed evidence and produce actionable errors. Do not mark external integrations operational based on mocks. Runtime completion, independent QA, owner acceptance and delivery-hours entries are separate facts.
 

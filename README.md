@@ -10,7 +10,7 @@ If your roles currently live in a document, prompts or scripts, try representing
 
 Tested local features include company and agent management and the Time Tracker. Execution is experimental; the install → configure → execute → useful-result journey remains incomplete.
 
-**Available: `0.1.0-alpha.5` technical prerelease.** Evaluate the local workspace using the [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.5), its exact archive and checksum. The earlier local alpha.5-local.1 and public alpha.2 remain distinct artifacts. The release record identifies the reviewed source, successful CI, installation evidence and remaining limits.
+**`0.1.0-alpha.6` branding maintenance release.** Evaluate the local workspace using the [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.6), its exact archive and checksum. Release verification is recorded in [acceptance](docs/acceptance.md#branding-maintenance-release--6-september-2026). The published alpha.5 and earlier local candidates remain separate artifacts.
 
 **Product Studio PS-001 did not complete:** intake and one retry each timed out after 300 seconds at `ultra`. No v2 delivery bundle or owner acceptance exists. The earlier v1 download was rejected because its expected-reference file was missing. This technical prerelease does not complete the intended useful-result journey. [Observed failures and evidence](docs/acceptance.md#technical-prerelease--6-september-2026)
 
@@ -24,19 +24,19 @@ _Actual local candidate: Patchwork is a fictional three-agent example with no ex
 
 Use **Node.js 24.14+ in the 24.x line, or Node 26.x**, with npm. The declared local-core targets are macOS, Linux and native Windows; consult the exact release's [OS/Node acceptance](docs/acceptance.md) rather than inferring a passing matrix from these targets. No database compiler, provider account or Python installation is needed for corporation management, the Time Tracker or the example below.
 
-The distribution artifact is [gitflash-0.1.0-alpha.5.tgz](https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.5/gitflash-0.1.0-alpha.5.tgz). Download it and verify it against the release's [checksums.txt](https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.5/checksums.txt) before going offline. The accompanying manifest records the frozen package identity; no npm registry namespace is required.
+The distribution artifact is [gitflash-0.1.0-alpha.6.tgz](https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.6/gitflash-0.1.0-alpha.6.tgz). Download it and verify it against the release's [checksums.txt](https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.6/checksums.txt) before going offline. The accompanying manifest records the frozen package identity; no npm registry namespace is required.
 
 Run these commands in the directory containing that verified archive. They install into a separate folder and start its `vcm` binary:
 
 ```sh
-npm install --offline --ignore-scripts --prefix ./vcm-preview ./gitflash-0.1.0-alpha.5.tgz
+npm install --offline --ignore-scripts --prefix ./vcm-preview ./gitflash-0.1.0-alpha.6.tgz
 npm exec --offline --prefix ./vcm-preview -- vcm --version
 npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company
 ```
 
-Expected version: `0.1.0-alpha.5`. Open the loopback URL printed by the command if the browser does not open. Use the same working directory and `--data-dir` when restarting. Add `--port 4311` if 4310 is occupied, or `--no-open` to open the URL yourself.
+Expected version: `0.1.0-alpha.6`. Open the loopback URL printed by the command if the browser does not open. Use the same working directory and `--data-dir` when restarting. Add `--port 4311` if 4310 is occupied, or `--no-open` to open the URL yourself.
 
-The package name and archive prefix remain `gitflash`; **`vcm` is the canonical command and `gitflash` is its compatibility alias**. Both use the same existing `~/.gitflash` default, `GITFLASH_DATA_DIR` setting and explicit `--data-dir`. There is no automatic move to a new data directory and no claim that the npm name `vcm` is available. Technical export and protocol identifiers retain their compatibility names. GitFlash's separate FDE website is unchanged.
+**Run VCM with `vcm`.** Existing installations keep their workspace and settings. The archive retains its established package name for compatibility; see the [naming and compatibility contract](docs/branding.md).
 
 To build a source checkout instead:
 
