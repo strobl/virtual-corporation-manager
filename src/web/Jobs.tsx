@@ -185,10 +185,11 @@ export function JobsView({
     <div className="page-content jobs-page">
       <div className="section-intro">
         <div>
-          <span className="eyebrow">Company tasks</span>
-          <h2>Tasks & results</h2>
+          <span className="eyebrow">Optional execution</span>
+          <h2>Workflow examples</h2>
           <p>
-            Review the brief, open the delivered files, and decide whether to accept the result.
+            Try a predefined workflow with an eligible company. These examples have their own fixed
+            brief and role requirements.
           </p>
           <label className="work-scope-control">
             Work scope
@@ -217,7 +218,7 @@ export function JobsView({
           {!!scoped.length && workflow && (
             <button className="button primary" onClick={() => setStartOpen(true)}>
               <Play size={14} />
-              New job
+              Run example
             </button>
           )}
         </div>
@@ -242,13 +243,13 @@ export function JobsView({
         </p>
       )}
       {!loading && workflow && !scoped.length && (
-        <section className="studio-intro" aria-label="Product Studio first job">
+        <section className="studio-intro" aria-label="Product Studio example">
           <div className="studio-intro-copy">
             <span className="studio-kicker">
               <Layers3 size={16} />
               Product Studio · {workflow.id}
             </span>
-            <h3>Start your first company task</h3>
+            <h3>Try the Product Studio example</h3>
             <p>{workflow.description}</p>
             <span className="studio-sample-label">
               Synthetic stock-alert exercise · Python standard library
@@ -257,7 +258,7 @@ export function JobsView({
               {readyRoles ? (
                 <button className="button primary" onClick={() => setStartOpen(true)}>
                   <Play size={15} />
-                  Set up first job
+                  Set up example
                 </button>
               ) : (
                 <button className="button primary" onClick={() => onTemplate(workflow.templateId)}>
@@ -334,7 +335,7 @@ export function JobsView({
       )}
       {workflow && !selected && (
         <details className="text-disclosure studio-help">
-          <summary>How this company job works</summary>
+          <summary>How this example works</summary>
           <ol>
             {workflow.stages.map((stage) => (
               <li key={stage.id}>

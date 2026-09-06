@@ -84,7 +84,13 @@ export function RunDialog({
   onStarted: (run: RunInfo) => Promise<void>;
 }) {
   const [task, setTask] = useState('');
-  const [transport, setTransport] = useState<'codex' | 'buzz'>('codex');
+  const [transport, setTransport] = useState<'codex' | 'buzz'>(() =>
+    status?.codex.state === 'ready'
+      ? 'codex'
+      : status?.buzz.available && status.buzz.state === 'configured'
+        ? 'buzz'
+        : 'codex',
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const attempt = useRef<{ task: string; transport: string; requestId: string } | null>(null);
@@ -94,6 +100,7 @@ export function RunDialog({
       : status?.buzz.available && status?.buzz.state === 'configured';
   const submit = async (event: FormEvent) => {
     event.preventDefault();
+    if (busy || !ready || !actualCompanyName || !task.trim()) return;
     setBusy(true);
     setError(null);
     if (
@@ -316,10 +323,10 @@ export function WorkView({
           <span className="empty-icon">
             <Terminal size={25} />
           </span>
-          <h3>Your first useful result starts here</h3>
+          <h3>No recorded agent work yet</h3>
           <p>
-            Choose an agent in your organization, connect a supported runtime, and give it a
-            specific task. Its result and execution evidence will appear here.
+            Optional agent runs and manually recorded contributions appear here. Open a member in
+            your corporation to give an agent a task or record a person’s completed work.
           </p>
           <p className="muted small">Creating agents does not automatically run them.</p>
         </div>

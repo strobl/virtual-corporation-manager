@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "product": "VCM \u2014 Virtual Corporation Manager",
+  "version": "0.1.0-alpha.7",
+  "capturedAt": "2026-09-06T17:47:15.154268+00:00",
+  "method": "Native mounted-browser screenshots; JPEG capture converted to PNG without changing decoded pixels",
+  "data": "Fictional Linden Studio and Human member Morgan. No provider execution or booked hours created during capture. These are illustrative QA records, not customer activity or installation defaults.",
+  "sourceBasis": "Accepted company-management source combined with VCM naming and reviewed usability fixes; final source commit is bound in the versioned release manifest.",
+  "sourceFileHashes": {
+    "src/web/AdvancedDialogs.tsx": "323f2a46c9cb615f2092771f982cad4a8de348c906195d0a5bd25e703dcdbb7a",
+    "src/web/AgentPlacement.tsx": "dadbf67f6fc0c991f9e82c110aa48252909b33ae3a802aba1f636959bbd06d2c",
+    "src/web/App.tsx": "2937ee600c22be72e1a88874c7eca28d4c383f9c060c242247535e6e8a80083f",
+    "src/web/BrandMark.tsx": "a22d9c198b84e03763a942132f8087737bba9ed5c0687798eeb054948689da92",
+    "src/web/CompanyConsole.tsx": "c5cb9840f060f20ee89bfec1c85f3d65a473d2e50a6f6ff3957a5ad0a788d769",
+    "src/web/CompanyMap.tsx": "7def4d8d90327a235526f3124ff918787fd317fcf7e151529749f6b0887580ea",
+    "src/web/CorporationSetup.tsx": "f37cda96c2e4c9910faee93cc46d951fcbf4f617ee83a6ac2ce715928a09d6fd",
+    "src/web/CorporationWorkspace.tsx": "ed67c1769849a14cdaf8b1cae54e4e3787a0c1bd209c0baa78b75e3f4580f024",
+    "src/web/Dialogs.tsx": "a14d225bd94240af9b9fa74455ba2629d361fe29330f5f95b8b67b3b26b15ae8",
+    "src/web/HumanResultDialog.tsx": "7fd28510768328fbc3bf4b3adbcd7126f6176a3d16ac79b6cfc6bba78821a369",
+    "src/web/Jobs.tsx": "78bdcfc68c309e84e5d23f2ceb7446eb82d26a7d6a5b921c87311d07aa83e46c",
+    "src/web/QuickCompanySetup.tsx": "9438801906e985cc903ac1d7c7fed7705c6bfc590214a09c7ed8fe5da3e826a9",
+    "src/web/TextDisclosure.tsx": "658c3b591916ed70d7671c1d8bc1d1ca4df3cb93d1cfd3bdeb6afde466218ae2",
+    "src/web/TimeTracker.tsx": "c0a099e55ddeb344c1e4c762e4117c9bb30f361681d9125f432ed8df6bcfba57",
+    "src/web/Work.tsx": "33325d9587c4d396bcbea06eba8a8a4acc8a47a65efb5e077bf6b45272f329b8",
+    "src/web/agent-context.ts": "6faa27521220c1cc34b721a8de4ac4347a850e061e1ed6b6d6cb42da49d652bb",
+    "src/web/brand-candidate.css": "3f2a3fd644f6af4a5b25b5cd751d4621df9498f9ab69257c6edc1081f725458e",
+    "src/web/change-recovery.ts": "4837bbbcf59400dc8145b8ab6fece31ae03473f4b45bcbf129a30e6722caa99a",
+    "src/web/client.ts": "6fd0e2813f5a448162b1e245e12dc030883b01ee54db93405c79c0916a44d42e",
+    "src/web/company-console-model.ts": "73ee9c42153b52b5d859d8eae77c9de565a5295291397613e5313fc419d96673",
+    "src/web/company-console.css": "a3c6d60eb93da90a6926f16a8bd5bce958eab81907762cdd0fa8ac5fe8e8ed9c",
+    "src/web/corporation-setup.ts": "08b92546aa1e9fff1f829730db48aaf16b3b963af3da125f7eb2f24d0829fb91",
+    "src/web/corporation.css": "a04639311b29fc7879281afdc86de325ca4572743d14fb91b2cd2259152d762d",
+    "src/web/identity.ts": "55867e28963762467965a239d9c133151498ef99038823b409c3cc6caa1901f7",
+    "src/web/jobs.css": "2e3b5b3f2e03af926a6795102505ea171d2588ed31b879fee462cd7086faaae5",
+    "src/web/main.tsx": "97ea0530aea9dc22eec79fc3df14ab99e394bc46659af087f20afb9539f25776",
+    "src/web/model.ts": "73abe56d267c72fb32f6f3fcb79b3235691cc01d5ce2c56509d57b6e4adaf277",
+    "src/web/styles.css": "d1c0e3f005a7aa1353f5f7a15674104ebec1e5832d16f25ac07d0bdb9ffb3a7f",
+    "src/web/time-view-model.ts": "2e0cdf424ebbd37d04d8ecd96dc4890b135a762211b2685a9e7c8849356f7790",
+    "src/web/vcm.css": "523b0f4c5b0fb66dd42347b60b789e07745b64b3120d02c643cde80e95382b01",
+    "src/web/work-view-model.ts": "21f5d0d724228a7672d7598580d5be6e807e8c21786f99b0f75beee4d779204b"
+  },
+  "servedAssets": [
+    {
+      "path": "assets/index-CPMlqWWb.css",
+      "sha256": "0312f6ce20e80343ce31cd363cebdc392c3cd30a44bb946397a1242ba125cdcd",
+      "bytes": 143279
+    },
+    {
+      "path": "assets/index-D3No-l9M.js",
+      "sha256": "4ffc93707eb6dd63c0a819e44ff74ca052bb330b361a45402a807d438401737c",
+      "bytes": 431768
+    },
+    {
+      "path": "fonts/Rubik-Bold.ttf",
+      "sha256": "b1c36dfcbc5fe5011c552c76725c84d989a71d56440e8bfbfa0cb68b593dbad6",
+      "bytes": 140396
+    },
+    {
+      "path": "fonts/Rubik-OFL-1.1.txt",
+      "sha256": "a1d9cc536b8327829aaaeb6957bb105d6926b0a45766050257c1461ac519b575",
+      "bytes": 4228
+    },
+    {
+      "path": "index.html",
+      "sha256": "91eef7d0c4bc664443671ebe02c8e4e04eec3eb66cb3aeee3677a7cb8be504f4",
+      "bytes": 733
+    },
+    {
+      "path": "vcm-favicon.svg",
+      "sha256": "64afa41ac7a74119eb1b4f8c2449972afbe2a669087b7aff8194554d88d31527",
+      "bytes": 259
+    },
+    {
+      "path": "vcm-glyph.svg",
+      "sha256": "a15b3eced932f638d0bfac26dbafe6bd8aaf24ec91047e86fa3c382cefaad2b9",
+      "bytes": 355
+    },
+    {
+      "path": "vcm-lockup.svg",
+      "sha256": "d657ae61de1ebe8d8b7152c3a18350cf039151053bb5cf3a68ce7d90ff953dde",
+      "bytes": 702
+    },
+    {
+      "path": "vcm-wordmark.svg",
+      "sha256": "4c5c8e0f8b9eb13211c9595cd6756b8543b1baa11e8f9db2bc1bea812060e3b7",
+      "bytes": 429
+    }
+  ],
+  "captures": {
+    "desktop": {
+      "file": "corporation-desktop.png",
+      "sha256": "0e49d950408858e2eec5b19ce5943215ede8655f030b3ef6b7114d8677e7dc5b",
+      "bytes": 369864,
+      "viewport": {
+        "width": 1280,
+        "height": 850
+      },
+      "observed": {
+        "height": 850,
+        "scripts": ["http://127.0.0.1:4390/assets/index-D3No-l9M.js"],
+        "scrollY": 0,
+        "styles": ["http://127.0.0.1:4390/assets/index-CPMlqWWb.css"],
+        "url": "http://127.0.0.1:4390/?selected=company%3A3696643c-e8af-4cae-b2c1-ad89286dd00f%2Fagent%3Af8323722-5f94-4ee0-a92d-bb0c4a76d545&area=corporation",
+        "width": 1280,
+        "at": "2026-09-06T17:46:47.499Z"
+      }
+    },
+    "mobile": {
+      "file": "corporation-mobile.png",
+      "sha256": "540613f5378a6521804bb90003f7288d3c1be8ce74367be984d6601d7192d470",
+      "bytes": 99689,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "observed": {
+        "documentWidth": 390,
+        "focused": "Morgan member details",
+        "height": 844,
+        "scripts": ["http://127.0.0.1:4390/assets/index-D3No-l9M.js"],
+        "scrollY": 769,
+        "url": "http://127.0.0.1:4390/?selected=company%3A3696643c-e8af-4cae-b2c1-ad89286dd00f%2Fagent%3Af8323722-5f94-4ee0-a92d-bb0c4a76d545&area=corporation",
+        "width": 390,
+        "at": "2026-09-06T17:47:03.312Z"
+      }
+    }
+  }
+}

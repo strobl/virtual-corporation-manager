@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.7 — corporation management
+
+- Make the company the main workspace: people and AI agents, responsibilities, reporting, membership and company relationships stay in one context.
+- Create an empty company with a name and optional purpose. Add members when needed; no template or execution setup is required.
+- Put agent runs, workflow examples and connections under secondary tools. Humans can record a contribution without agent execution controls.
+- Preserve Time Tracker behavior and data. Company totals open all company members, member booking stays scoped, and mobile member navigation retains visible focus.
+- Carry forward the complete VCM naming and compatibility changes from alpha.6. Existing runtime, integration and external-usefulness limitations remain open.
+
 ## 0.1.0-alpha.6 — branding maintenance, 6 September 2026
 
 - Apply VCM / Virtual Corporation Manager consistently to current product copy, command examples, help, agent prompts and repository links. Use `vcm` as the canonical command.

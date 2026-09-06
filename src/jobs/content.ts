@@ -16,15 +16,28 @@ export interface StudioContent {
 }
 export const studioContent: StudioContent = data;
 export function workflowInfo(content = studioContent): WorkflowInfo {
-  // Keep the frozen Ops source intact; only the displayed installation guide
-  // names this build's archive, matching the adapted first-company document.
+  // Keep the imported Ops source intact. Adapt only displayed install/version
+  // and navigation wording to this build's optional workflow entry points.
   const guideVersion = content.help.match(
     /This guide accompanies candidate \*\*([0-9A-Za-z.+-]+)\*\*/,
   )?.[1];
-  const help =
+  const versionedHelp =
     guideVersion && typeof __GITFLASH_VERSION__ === 'string'
       ? content.help.replaceAll(guideVersion, __GITFLASH_VERSION__)
       : content.help;
+  const help = versionedHelp
+    .replaceAll(
+      '**Integrations → Check connections**',
+      '**Tools → Connections → Check connections**',
+    )
+    .replace(
+      'Open **Templates** (or **Explore templates** on the empty workspace), choose **Product Studio (5 seats)**, review the company, responsibilities and reporting lines, then choose **Apply changes**.',
+      'Open **Tools → Agent runs & records → Workflow examples**. Choose **Preview Product Studio** when the example is not configured, review the company, responsibilities and reporting lines, then choose **Apply changes**.',
+    )
+    .replace(
+      'Open **Work → Company jobs**, select your Product Studio, then choose **Set up first job**.',
+      'Select your Product Studio, open **Tools → Agent runs & records → Workflow examples**, then choose **Set up example**.',
+    );
   return {
     id: 'PS-001',
     title: 'Build a stock alert utility',

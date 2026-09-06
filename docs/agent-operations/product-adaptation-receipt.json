@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "kind": "Applied company-management documentation adaptation",
+  "releaseVersion": "0.1.0-alpha.7",
+  "appliedAtUtc": "2026-09-06T17:35:07.663812+00:00",
+  "namingSource": "e1b29fa7a257f3a643742881c99b897c22c3c390",
+  "reviewedPatchSha256": "eaab25141c2d9b4ee6e1c046043b90e668a10c422ac81908d32cf836984fb06f",
+  "originalImportReceipt": "import-receipt.json",
+  "originalIntegrationManifest": "product-studio.integration.json",
+  "brandingReceiptSha256": "1c446fbec0de990573bf565d0c57275593d00175229a45b1a81c2971ec4215cc",
+  "files": [
+    {
+      "path": "docs/agent-operations/README.md",
+      "beforeSha256": "4862f23d5a678030c13a1650e73e4335c40c59492e23debde615a477b93e7102",
+      "reviewedPatchAfterSha256": "8693bfe59ca4831cbb9e4a0a83492cf138581acb2b18ecf3c87aa53d25672ed8",
+      "currentSha256": "8693bfe59ca4831cbb9e4a0a83492cf138581acb2b18ecf3c87aa53d25672ed8",
+      "bytes": 2468,
+      "additionalAdaptation": null
+    },
+    {
+      "path": "docs/agent-operations/company-management.md",
+      "beforeSha256": null,
+      "reviewedPatchAfterSha256": "224638e4b6c288399b13150dbbcd301278ca728714b4526bf0850dd9d9686e17",
+      "currentSha256": "224638e4b6c288399b13150dbbcd301278ca728714b4526bf0850dd9d9686e17",
+      "bytes": 3787,
+      "additionalAdaptation": null
+    },
+    {
+      "path": "docs/agent-operations/members-and-responsibilities.md",
+      "beforeSha256": null,
+      "reviewedPatchAfterSha256": "802d34026351f192bf9946ece53241bff291816aff1d0551237c0924bee08213",
+      "currentSha256": "802d34026351f192bf9946ece53241bff291816aff1d0551237c0924bee08213",
+      "bytes": 3958,
+      "additionalAdaptation": null
+    },
+    {
+      "path": "docs/agent-operations/help/FIRST-COMPANY.md",
+      "beforeSha256": "acbcedcd89655e8786e92c402840764f31ade72d3c9bdf185b472a3888c3c3fa",
+      "reviewedPatchAfterSha256": "e35e9bdf94e8f6fdcd99aac7c69f0f980966316fee8257f8579ae51ae32d6532",
+      "currentSha256": "a565794661423a487d5f379d7876ee0e2c71b8bc91c2cee4d0ecbbf74794d262",
+      "bytes": 1673,
+      "additionalAdaptation": "Updated optional execution anchor to current first-company guide"
+    },
+    {
+      "path": "docs/agent-operations/help/SUPPORT.md",
+      "beforeSha256": "c7380c2ad0a67143c1825ee8137c0002b6f6cd2b850f38b8046831579020552e",
+      "currentSha256": "9a47dd25c34569f18cd40fdd5dfebbd45ba4eea74598f5eb81cc252a4ee9239b",
+      "bytes": 5730,
+      "additionalAdaptation": "Current company-management pointer and actual optional workflow routes; role/authority/oracle unchanged"
+    },
+    {
+      "path": "docs/agent-operations/help/TRIAGE.md",
+      "beforeSha256": "1cc4164735a64222743ab4883b44e526def462cb617f525eba52ab7e866aeeb8",
+      "currentSha256": "3a0b76677ea6b21453dbbf79b9bf55160bba1a4f39d271c93487a98da12bce57",
+      "bytes": 6315,
+      "additionalAdaptation": "Current company-management pointer and actual optional workflow routes; role/authority/oracle unchanged"
+    }
+  ],
+  "preserved": "Original import and branding receipts identify prior transformations. Runtime role prompts, authority, acceptance criteria, oracle and historical outputs are unchanged by this documentation adaptation.",
+  "reapplyAfterImport": "The original import script regenerates help and top-level aliases. Preserve or reapply the current company-management guides after a deliberate re-import. The importer is not claimed to reproduce these later guide bytes.",
+  "supportRouteReceiptSha256": "f3367349ae0aaea021b416a2e4f50462e05d1eed6596df6aefceeb734371d1d7"
+}

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Install VCM locally, import a three-agent example, review configuration changes and preserve your workspace. Alpha 6 technical prerelease documentation."
+      content="Install VCM locally, create your company, add people and AI agents, and manage responsibilities and recorded hours. Alpha 7 documentation."
     />
     <meta name="theme-color" content="#f6f4ef" />
     <title>Developer quickstart — VCM</title>
@@ -36,9 +36,9 @@
       <main class="docs-layout" id="main" tabindex="-1">
         <aside class="docs-nav" aria-label="On this page">
           <a href="#install">Install</a>
-          <a href="#three-agent-example">Three-agent example</a>
+          <a href="#configuration">Create your company</a>
+          <a href="#three-agent-example">Optional example</a>
           <a href="#local-data">Local data</a>
-          <a href="#configuration">Configuration</a>
           <a href="#execution">Execution</a>
           <a href="#hours">Delivery hours</a>
           <a href="#recovery">Export and recovery</a>
@@ -49,17 +49,17 @@
         <article class="docs-content">
           <section class="section" aria-labelledby="docs-title">
             <p class="kicker">Developer quickstart</p>
-            <h1 id="docs-title">Keep your agent company close.</h1>
+            <h1 id="docs-title">Make room for your company.</h1>
             <p><strong>Technical alpha — for developer evaluation</strong></p>
             <p>
-              Tested local features include company and agent management and the Time Tracker.
-              Execution is experimental; the install → configure → execute → useful-result journey
-              remains incomplete.
+              Create a company, add people and AI agents, and keep their responsibilities and
+              reporting clear. The existing Time Tracker records delivery hours separately. Optional
+              execution remains experimental.
             </p>
             <p>
-              Represent one project, inspect its roles and reopen the same organization in your next
-              session. VCM is a local workspace for one operator. It stores the context you enter;
-              it does not synchronize arbitrary chats or shared team accounts.
+              Start with a name and optional purpose, then add only the members you need. VCM is a
+              local workspace for one operator. It stores the context you enter; it does not
+              synchronize arbitrary chats or shared team accounts.
             </p>
           </section>
 
@@ -67,13 +67,13 @@
             <p class="kicker">Local setup</p>
             <h2 id="install-title">Install VCM</h2>
             <p>
-              <strong>Alpha 6 technical prerelease.</strong> The commands below install the
-              published <code>0.1.0-alpha.6</code> archive for local workspace evaluation.
+              <strong>Alpha 7 technical prerelease.</strong> The commands below install the
+              <code>0.1.0-alpha.7</code> archive for local company-management evaluation.
             </p>
             <p>
-              <strong>PS-001 did not complete in Alpha 5.</strong> Intake and one retry each timed
-              out after 300 seconds at <code>ultra</code>. No v2 bundle or owner acceptance exists;
-              the earlier v1 download was rejected. <a href="#execution">Known workflow limits →</a>
+              Plain company setup, membership, responsibilities and the Time Tracker need no
+              provider account or runtime connection.
+              <a href="#configuration">Create your company →</a>
             </p>
             <p>
               Use Node.js <strong>24.14 or later within 24.x, or 26.x</strong> with npm:
@@ -82,7 +82,7 @@
               <code>checksums.txt</code> and <code>release-manifest.json</code>.
             </p>
             <div class="command-panel">
-              <p class="kicker">Terminal · Alpha 6 technical prerelease</p>
+              <p class="kicker">Terminal · Alpha 7 technical prerelease</p>
               <button
                 class="copy-button"
                 type="button"
@@ -96,14 +96,14 @@
                 class="command-block"
                 id="install-command"
                 tabindex="0"
-                aria-label="Install Alpha 6, check its version and start VCM"
-              ><code>npm install --ignore-scripts --prefix ./vcm-preview https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.6/gitflash-0.1.0-alpha.6.tgz
+                aria-label="Install Alpha 7, check its version and start VCM"
+              ><code>npm install --ignore-scripts --prefix ./vcm-preview https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.7/gitflash-0.1.0-alpha.7.tgz
 npm exec --offline --prefix ./vcm-preview -- vcm --version
 npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code></pre>
               <p class="copy-status" role="status" aria-live="polite"></p>
             </div>
             <p>
-              Expected version: <code>0.1.0-alpha.6</code>. The first command downloads the archive;
+              Expected version: <code>0.1.0-alpha.7</code>. The first command downloads the archive;
               subsequent commands use the isolated installation. Open the loopback URL printed by
               VCM. Use the same working directory and data directory when restarting. Add
               <code>--port 4311</code> if port 4310 is occupied, or <code>--no-open</code> to open
@@ -116,7 +116,7 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code><
             </p>
             <p>
               <a
-                href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.6"
+                href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.7"
                 >Versioned release</a
               >
               · <a href="#local-data">Keep the same workspace</a>
@@ -124,7 +124,7 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code><
           </section>
 
           <section class="section" id="three-agent-example" aria-labelledby="example-title">
-            <p class="kicker">A small starting point</p>
+            <p class="kicker">Optional configuration example</p>
             <h2 id="example-title">Try the three-agent example.</h2>
             <p>
               <strong>Patchwork Studio (example)</strong> has one Product department and three peer
@@ -156,7 +156,7 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code><
               </li>
               <li>
                 Choose <strong>Apply changes</strong>, then open
-                <strong>Your corporations → Patchwork Studio (example)</strong>.
+                <strong>Corporations → Patchwork Studio (example)</strong>.
               </li>
               <li>
                 Select each agent and inspect its instructions. Importing does not execute them.
@@ -198,27 +198,37 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company --no-op
           </section>
 
           <section class="section" id="configuration" aria-labelledby="configuration-title">
-            <h2 id="configuration-title">Review a change before saving.</h2>
+            <h2 id="configuration-title">Create a company. Add your team.</h2>
             <ol>
               <li>
-                Open <strong>Your corporations → Set up a corporation</strong>. Use your project
-                name, purpose and current roles.
+                Open <strong>Corporations → Create company</strong>, or
+                <strong>Create your company</strong> in an empty workspace. Enter a company name;
+                purpose is optional.
               </li>
               <li>
-                Start empty or adapt the editable small-team starting point. Add one useful agent
-                with concrete responsibilities and instructions. Departments and reporting lines are
-                optional.
+                Choose <strong>Continue</strong>, inspect the readable review, then
+                <strong>Create company</strong>. <strong>Back</strong> keeps your draft; cancelling
+                saves nothing. Your new company starts empty.
               </li>
               <li>
-                Choose <strong>Review changes → Apply changes</strong>. Cancelling before Apply
-                saves nothing.
+                Choose <strong>Add member</strong>. Enter a name and role and select
+                <strong>Human</strong> or <strong>AI agent</strong>. Add useful responsibilities;
+                departments and reporting are optional. Choose
+                <strong>Review change → Add member</strong>.
               </li>
               <li>
-                Stop and restart with the same data directory. Select an agent, choose
-                <strong>Edit details</strong> and update one responsibility. Review, apply and
-                reload to inspect the saved result.
+                Select the member inside the company. Choose <strong>Edit member</strong>, change a
+                responsibility or manager, and inspect <strong>What will change</strong> before
+                saving. Restart with the same data directory and reopen the saved company.
               </li>
             </ol>
+            <p>
+              Company details, departments and relationships stay in the company workspace.
+              Selecting a department shows its members; editing it is a separate action. Shared
+              members retain one identity, and their review identifies the companies affected.
+              Company membership, reporting and ownership between companies are distinct
+              relationships.
+            </p>
             <p>
               The server validates the complete definition. Unsupported fields, invalid references
               and reporting cycles are refused. If another tab changes the workspace, review the
@@ -233,18 +243,26 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company --no-op
           </section>
 
           <section class="section" id="execution" aria-labelledby="execution-title">
-            <h2 id="execution-title">Organization is separate from execution.</h2>
+            <h2 id="execution-title">Choose execution when you need it.</h2>
             <p>
               A configured agent is a role with instructions, not a running process. A reporting
               line describes responsibility; it does not delegate work automatically. Saving a
               corporation or importing JSON dispatches nothing.
             </p>
             <p>
-              <strong>Work</strong> and <strong>Integrations</strong> are optional, separate paths.
-              Codex execution requires your own installed runtime, authenticated provider access and
-              allowance. Individual tasks return read-only text. The experimental Product Studio
-              workflow is designed for five sequential roles to create and check a Python
-              stock-alert utility from fictional input; it is not an arbitrary workflow engine.
+              An AI member's <strong>Give a task</strong> is optional. Open
+              <strong>Tools → Agent runs &amp; records</strong> for individual records and its
+              <strong>Workflow examples</strong> tab, or <strong>Tools → Connections</strong> for
+              runtime setup. Codex execution requires your own installed runtime, authenticated
+              provider access and allowance. Individual tasks return read-only text. The
+              experimental Product Studio workflow is designed for five sequential roles to create
+              and check a Python stock-alert utility from fictional input; it is not an arbitrary
+              workflow engine.
+            </p>
+            <p>
+              Human members use <strong>Record work</strong> for manual contributions and have no
+              agent execution control. Member activity explicitly covers direct runs; workflow jobs
+              have separate records. An unavailable refresh is shown as unavailable.
             </p>
             <p>
               Current v2 acceptance remains <strong>open</strong> after the two Alpha 5 intake
@@ -270,9 +288,14 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company --no-op
             <h2 id="hours-title">Record delivery hours with a basis.</h2>
             <p>
               When there is work to record, choose <strong>Log time</strong> from the relevant
-              corporation or agent. Check the company, member, date, description and hour basis
-              before saving. Use <strong>Time Tracker</strong> to inspect the weekly ledger and
-              correct an entry; the original remains in history.
+              member. Check the company, member, date, description and hour basis before saving. Use
+              <strong>Time Tracker</strong> to inspect the weekly ledger and correct an entry; the
+              original remains in history.
+            </p>
+            <p>
+              The company's hours summary opens the ledger across all its members. A member's
+              <strong>Log time</strong> keeps that exact company and member selected. Returning to
+              the member leaves its details visible, including on a narrow screen.
             </p>
             <p>
               Delivery hours are booked or estimated human-equivalent effort. They are separate from
@@ -344,13 +367,13 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./restored-company -
               contributions need no provider credentials or private planning access.
             </p>
             <p>
-              Use the source revision recorded in the Alpha 6 release manifest. In that checkout,
+              Use the source revision recorded in the Alpha 7 release manifest. In that checkout,
               install development dependencies and run the checks:
             </p>
             <pre
               class="command-block"
               tabindex="0"
-              aria-label="Check the Alpha 6 source checkout"
+              aria-label="Check the Alpha 7 source checkout"
             ><code>npm ci --ignore-scripts
 npm run check
 npm run format:check
