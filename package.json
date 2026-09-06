@@ -1,13 +1,14 @@
 {
   "name": "gitflash",
-  "version": "0.1.0-alpha.2",
-  "description": "A local workspace for your company of AI agents",
+  "version": "0.1.0-alpha.5",
+  "description": "VCM — Virtual Corporation Manager: a local, open-source workspace for agent organizations",
   "type": "module",
   "license": "MIT",
   "engines": {
-    "node": ">=24.14.0 <25 || >=26"
+    "node": ">=24.14.0 <25 || >=26.0.0 <27"
   },
   "bin": {
+    "vcm": "dist/cli.js",
     "gitflash": "dist/cli.js"
   },
   "files": [
@@ -22,7 +23,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/strobl/gitflash.git"
+    "url": "git+https://github.com/strobl/virtual-corporation-manager.git"
   },
   "scripts": {
     "dev": "vite --host 127.0.0.1",

@@ -1,8 +1,8 @@
-/** Public identity lives in one place. No account or remote service is required. */
+/** Shared terminal and browser identity. Storage and protocol identifiers stay compatible. */
 export const brand = {
-  name: 'GitFlash',
+  name: 'VCM',
   productName: 'Virtual Corporation Manager',
-  tagline: 'Build a company. Put it to work.',
-  accent: '#f4dc42',
-  repository: 'https://github.com/strobl/gitflash',
+  descriptor: 'Virtual Corporation Manager',
+  accent: '#087D6A',
+  repository: 'https://github.com/strobl/virtual-corporation-manager',
 };

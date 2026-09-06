@@ -20,6 +20,33 @@ const privateLogger: Logger = {
   setName() {},
   getLevel: () => 'error' as LogLevel,
 };
+// Escape Slack control characters before disabling formatting so model text remains literal.
+function plainReply(text: string) {
+  let escaped = '';
+  for (const character of text) {
+    const encoded =
+      character === '&'
+        ? '&amp;'
+        : character === '<'
+          ? '&lt;'
+          : character === '>'
+            ? '&gt;'
+            : character;
+    if (escaped.length + encoded.length > 35_000) {
+      escaped += '\n\nFull result is saved in the local app.';
+      break;
+    }
+    escaped += encoded;
+  }
+  return {
+    text: escaped,
+    mrkdwn: false,
+    parse: 'none' as const,
+    link_names: false,
+    unfurl_links: false,
+    unfurl_media: false,
+  };
+}
 interface SlackEventEnvelope {
   event: {
     type?: string;
@@ -239,9 +266,7 @@ export class SlackConnection {
       await this.web?.chat.postMessage({
         channel,
         thread_ts: threadTs,
-        text,
-        unfurl_links: false,
-        unfurl_media: false,
+        ...plainReply(text),
       });
     } catch {
       /* No automatic repost after uncertain delivery. */
@@ -269,9 +294,7 @@ export class SlackConnection {
       const response = await this.web.chat.postMessage({
         channel: origin.channel,
         thread_ts: origin.threadTs,
-        text,
-        unfurl_links: false,
-        unfurl_media: false,
+        ...plainReply(text),
       });
       return response.ok && !!response.ts
         ? { status: 'sent', reference: `slack:${origin.teamId}:${origin.channel}:${response.ts}` }

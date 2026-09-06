@@ -15,7 +15,7 @@ const serverOutput = await bundle({
   format: 'esm',
   packages: 'bundle',
   banner: {
-    js: "import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);",
+    js: "import { createRequire as __gitflashCreateRequire } from 'node:module'; const require = __gitflashCreateRequire(import.meta.url);",
   },
   define: {
     __GITFLASH_VERSION__: JSON.stringify(version),
@@ -37,8 +37,8 @@ await writeFile(
 const [major, minor] = process.versions.node.split('.').map(Number);
 if (process.argv.includes('--version')) {
   console.log(${JSON.stringify(version)});
-} else if (!((major === 24 && minor >= 14) || major >= 26)) {
-  console.error('GitFlash requires Node.js 24.14+ (24.x) or 26+. Current runtime: ' + process.version + '. Install a supported Node.js release and retry.');
+} else if (!((major === 24 && minor >= 14) || major === 26)) {
+  console.error('VCM requires Node.js 24.14+ (24.x) or 26.x. Current runtime: ' + process.version + '. Install a supported Node.js release and retry.');
   process.exitCode = 1;
 } else {
   await import('./runtime.js');

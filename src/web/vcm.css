@@ -1,0 +1,458 @@
+/* Browser-only VCM identity. Existing state colors and operational controls keep their roles. */
+:root {
+  --flash-canvas: #f7f8fa;
+  --flash-surface: #ffffff;
+  --flash-surface-muted: #ffffff;
+  --flash-ink: #182230;
+  --flash-brand: #2857e8;
+  --flash-brand-border: #2048c2;
+  --flash-teal: #2857e8;
+  --flash-muted: #596579;
+  --flash-border: #dde2ea;
+  --flash-soft: #eef1f6;
+  --flash-control: #8993a5;
+  --flash-hover: #f1f4f9;
+  --flash-selected: #eaf0ff;
+  --flash-console-control: #46556c;
+  --flash-console-border: #8993a5;
+  --flash-stage-surface: #f7f8fa;
+  --flash-stage-border: #2857e8;
+  --flash-teal-soft: #eaf0ff;
+  --flash-teal-ink: #244dc9;
+  --shadow-panel: 0 1px 3px rgb(24 34 48 / 5%);
+  --shadow-pop: 0 12px 36px rgb(24 34 48 / 14%);
+}
+
+.vcm-workspace {
+  --flash-brand: var(--brand-accent, #2857e8);
+}
+
+.mobile-brand {
+  display: none;
+}
+
+.vcm-workspace .sidebar {
+  background: #fff;
+}
+
+.vcm-workspace .brand {
+  height: 100px;
+  flex-shrink: 0;
+  padding: 20px 22px 16px;
+}
+
+.vcm-workspace .brand-copy {
+  gap: 7px;
+}
+
+.vcm-workspace .brand-lockup {
+  width: 122px;
+  height: 32px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.vcm-workspace .brand-copy small {
+  font-size: 10.5px;
+  letter-spacing: -0.1px;
+  line-height: 1.5;
+}
+
+.vcm-workspace .brand .local-badge {
+  top: 28px;
+  right: 19px;
+  padding: 0 5px;
+  font-size: 9px;
+  line-height: 19px;
+  text-transform: none;
+  background: var(--flash-canvas);
+}
+
+.vcm-workspace .primary-nav {
+  gap: 5px;
+  padding-top: 0;
+  padding-bottom: 24px;
+}
+
+.vcm-workspace .primary-nav button,
+.vcm-workspace .sidebar-bottom > button {
+  min-height: 42px;
+  font-size: 13px;
+  border-radius: 7px;
+}
+
+.vcm-workspace .primary-nav button.active,
+.vcm-workspace .sidebar-bottom > button.active {
+  background: var(--flash-selected);
+  color: #244dc9;
+  box-shadow: none;
+}
+
+.vcm-workspace .sidebar-label {
+  font-size: 10px;
+  letter-spacing: 0.8px;
+}
+
+.vcm-workspace .sidebar-search {
+  border-color: var(--flash-border);
+  background: var(--flash-canvas);
+  min-height: 35px;
+}
+
+.vcm-workspace .sidebar-search:focus-within {
+  border-color: var(--flash-teal);
+  outline: 2px solid var(--flash-selected);
+}
+
+.vcm-workspace .topbar {
+  background: #fff;
+  min-height: 60px;
+  height: 60px;
+}
+
+.vcm-workspace .breadcrumb > span:first-child {
+  color: var(--flash-ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.vcm-workspace .button.primary {
+  color: #fff;
+  background: var(--flash-teal);
+  border-color: var(--flash-teal);
+}
+
+.vcm-workspace .button.primary:hover:not(:disabled) {
+  background: #2048c2;
+  border-color: #2048c2;
+  color: #fff;
+}
+
+.vcm-workspace .button.primary:disabled {
+  color: var(--flash-muted);
+  background: var(--flash-soft);
+  border-color: var(--flash-border);
+}
+
+.vcm-workspace .workspace-footer {
+  font-size: 10px;
+  background: #fff;
+}
+
+.task-home {
+  width: 100%;
+  max-width: 1056px;
+  margin: 0 auto;
+  padding: clamp(32px, 5vw, 64px) 40px 40px;
+}
+
+.task-home-intro {
+  max-width: 700px;
+  margin-bottom: 30px;
+}
+
+.task-home-intro .eyebrow {
+  color: var(--flash-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.1px;
+  margin-bottom: 10px;
+}
+
+.task-home-intro h1 {
+  color: var(--flash-ink);
+  font-family: var(--console-font-sans);
+  font-size: clamp(29px, 3vw, 39px);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -1.15px;
+  text-wrap: balance;
+}
+
+.task-home-intro > p {
+  max-width: 60ch;
+  margin-top: 12px;
+  color: var(--flash-muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.task-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+button.task-action {
+  display: grid;
+  grid-template-columns: 1fr 20px;
+  grid-template-rows: auto 1fr;
+  align-items: start;
+  gap: 18px 16px;
+  min-width: 0;
+  min-height: 181px;
+  padding: 23px;
+  border: 1px solid var(--flash-border);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(24 34 48 / 3%);
+  color: var(--flash-ink);
+  font: inherit;
+  text-align: left;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+button.task-action:hover {
+  border-color: #8599d0;
+  box-shadow: 0 3px 12px rgb(24 34 48 / 6%);
+}
+
+button.task-action:focus-visible {
+  outline: 3px solid #2857e8;
+  outline-offset: 3px;
+}
+
+.task-action-icon {
+  grid-column: 1;
+  grid-row: 1;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: #eaf0ff;
+  color: #244dc9;
+}
+
+.task-action:nth-child(2) .task-action-icon {
+  background: #e7f4ee;
+  color: #24734e;
+}
+
+.task-action:nth-child(3) .task-action-icon {
+  background: #fff2de;
+  color: #986010;
+}
+
+.task-action:nth-child(4) .task-action-icon {
+  background: #f0ebfc;
+  color: #7551b1;
+}
+
+.task-action-icon > svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.8;
+}
+
+.task-action > svg {
+  grid-column: 2;
+  grid-row: 1;
+  width: 19px;
+  height: 19px;
+  margin-top: 3px;
+  color: var(--flash-muted);
+}
+
+.task-action-copy {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.task-action-copy strong {
+  color: var(--flash-ink);
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: -0.2px;
+}
+
+.task-action-copy > span {
+  color: var(--flash-muted);
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.task-home-context {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  margin-top: 28px;
+  padding: 20px 0;
+  border-top: 1px solid var(--flash-border);
+  border-bottom: 1px solid var(--flash-border);
+  color: var(--flash-muted);
+  font-size: 13px;
+}
+
+.task-home-context > div {
+  min-width: 0;
+}
+
+.task-home-context strong {
+  color: var(--flash-ink);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.task-home-context label {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+.task-home-context select {
+  max-width: 100%;
+  min-height: 38px;
+  padding: 7px 30px 7px 10px;
+  color: var(--flash-ink);
+  background: #fff;
+  border: 1px solid var(--flash-control);
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+.task-home-context .button,
+.task-home-context > .text-button {
+  margin-left: auto;
+}
+
+.task-home-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-top: 18px;
+  color: var(--flash-muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.task-home-note > svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+@media (max-width: 1150px) {
+  .vcm-workspace .brand {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .vcm-workspace .brand .local-badge {
+    right: 15px;
+  }
+
+  .task-home {
+    padding-right: 28px;
+    padding-left: 28px;
+  }
+}
+
+@media (max-width: 760px) {
+  .task-actions {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  button.task-action {
+    grid-template-columns: 42px minmax(0, 1fr) 18px;
+    grid-template-rows: auto;
+    min-height: 110px;
+    align-items: center;
+    padding: 20px;
+    gap: 14px;
+  }
+
+  .task-action-copy {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .task-action > svg {
+    grid-column: 3;
+    margin: 0;
+  }
+}
+
+@media (max-width: 680px) {
+  .mobile-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--flash-ink);
+    font-size: 16px;
+    font-weight: 750;
+  }
+
+  .vcm-workspace .brand {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .vcm-workspace .brand .local-badge {
+    right: 42px;
+  }
+
+  .vcm-workspace .mobile-menu {
+    width: 36px;
+    height: 36px;
+  }
+
+  .task-home {
+    padding: 30px 20px;
+  }
+
+  .task-home-intro {
+    margin-bottom: 24px;
+  }
+
+  .task-home-intro h1 {
+    font-size: 30px;
+    letter-spacing: -0.8px;
+  }
+
+  .task-home-intro > p {
+    font-size: 14px;
+  }
+
+  .task-action-copy strong {
+    font-size: 16px;
+  }
+
+  .task-action-copy > span {
+    font-size: 12px;
+  }
+
+  .task-home-context {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-top: 24px;
+    padding: 18px 0;
+  }
+
+  .task-home-context label,
+  .task-home-context select {
+    width: 100%;
+  }
+
+  .task-home-context .button,
+  .task-home-context > .text-button {
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.task-action {
+    transition: none;
+  }
+}

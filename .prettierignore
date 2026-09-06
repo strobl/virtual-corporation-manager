@@ -4,3 +4,12 @@ THIRD_PARTY_NOTICES.md
 licenses/
 package-lock.json
 docs/evidence/*-output.txt
+# Preserve the supplied native wordmark outlines byte for byte.
+public/gitflash-wordmark.svg
+site/gitflash-wordmark.svg
+site/assets/vcm-lockup.svg
+site/assets/vcm-glyph.svg
+site/assets/vcm-favicon.svg
+
+# Byte-exact reviewed Ops source documents and manifests.
+docs/agent-operations/

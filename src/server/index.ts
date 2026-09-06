@@ -3,15 +3,18 @@ import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { readFile, stat } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import type { DomainCommand, WorkspaceStore } from '../domain/contracts';
+import type { TimeCommand, TimeIngressEntry, TimeIngressResult } from '../time/contracts';
 import { createWorkspaceStore } from '../db/store';
 import { getTemplate, listTemplates } from '../company/templates';
 import { createIntegrationService } from '../adapters/index';
+import { createJobService, type JobServiceOptions } from '../jobs/service';
 
 export interface ServerOptions {
   dataDir: string;
   port?: number;
   webDir: string;
   store?: WorkspaceStore;
+  jobs?: JobServiceOptions;
 }
 class HttpError extends Error {
   constructor(
@@ -83,6 +86,14 @@ export async function startServer(options: ServerOptions) {
     if (!options.store) store.close();
     throw error;
   }
+  let jobs: ReturnType<typeof createJobService>;
+  try {
+    jobs = createJobService(store, options.dataDir, options.jobs);
+  } catch (error) {
+    await integration.close();
+    if (!options.store) store.close();
+    throw error;
+  }
   const token = randomBytes(32).toString('hex');
   let port = options.port ?? 4310;
   const webDir = resolve(options.webDir);
@@ -98,14 +109,14 @@ export async function startServer(options: ServerOptions) {
     try {
       const allowedHosts = [`127.0.0.1:${port}`, `localhost:${port}`];
       if (!req.headers.host || !allowedHosts.includes(req.headers.host))
-        throw new HttpError('INVALID_HOST', 'Use the loopback URL printed by GitFlash.', 403);
+        throw new HttpError('INVALID_HOST', 'Use the loopback URL printed by VCM.', 403);
       if (
         req.headers.origin &&
         !allowedHosts.some((host) => req.headers.origin === `http://${host}`)
       )
         throw new HttpError(
           'INVALID_ORIGIN',
-          'This request did not originate from your local GitFlash console.',
+          'This request did not originate from your local VCM console.',
           403,
         );
       if (req.headers['sec-fetch-site'] === 'cross-site')
@@ -125,7 +136,54 @@ export async function startServer(options: ServerOptions) {
         if (path === '/api/session') return json(res, { token });
         if (path === '/api/health') return json(res, { ok: true, local: true });
         if (path === '/api/state') return json(res, store.snapshot());
+        if (path === '/api/time') return json(res, store.time.snapshot());
+        if (path === '/api/time/catalog') return json(res, store.time.snapshot().catalog);
+        if (path === '/api/time/export') {
+          res.setHeader(
+            'Content-Disposition',
+            'attachment; filename="gitflash-delivery-hours.json"',
+          );
+          return json(res, {
+            format: 'gitflash-delivery-hours',
+            version: 1,
+            ...store.time.snapshot(),
+          });
+        }
         if (path === '/api/templates') return json(res, listTemplates());
+        if (path === '/api/workflows') return json(res, jobs.workflows());
+        if (path === '/api/jobs') return json(res, jobs.list());
+        const jobGet = path.match(
+          /^\/api\/jobs\/([a-zA-Z0-9-]+)(?:\/(export|deliverables|artifacts)(?:\/([a-zA-Z0-9-]+))?)?$/,
+        );
+        if (jobGet) {
+          if (jobGet[2] === 'deliverables') {
+            const bytes = jobs.download(jobGet[1]);
+            res.writeHead(200, {
+              'Content-Type': 'application/zip',
+              'Cache-Control': 'no-store',
+              'Content-Disposition': 'attachment; filename="gitflash-PS-001.zip"',
+            });
+            return res.end(bytes);
+          }
+          if (jobGet[2] === 'export') {
+            res.setHeader(
+              'Content-Disposition',
+              'attachment; filename="gitflash-workflow-evidence.json"',
+            );
+            return json(res, jobs.export(jobGet[1]));
+          }
+          if (jobGet[2] === 'artifacts' && jobGet[3]) {
+            const artifact = jobs.artifact(jobGet[1], jobGet[3]);
+            res.writeHead(200, {
+              'Content-Type': 'application/octet-stream',
+              'Cache-Control': 'no-store',
+              'Content-Disposition': `attachment; filename="${artifact.path.split('/').at(-1)}"`,
+              'X-Content-SHA256': artifact.sha256,
+            });
+            return res.end(artifact.content);
+          }
+          return json(res, jobs.get(jobGet[1]));
+        }
         if (path === '/api/export') {
           res.setHeader('Content-Disposition', 'attachment; filename="gitflash-company.json"');
           return json(res, store.exportDefinition());
@@ -154,12 +212,69 @@ export async function startServer(options: ServerOptions) {
         )
           throw new HttpError(
             'INVALID_SESSION',
-            'Reload the console to reconnect to this GitFlash session.',
+            'Reload the console to reconnect to this VCM session.',
             403,
           );
         if (!req.headers['content-type']?.startsWith('application/json'))
           throw new HttpError('INVALID_CONTENT_TYPE', 'Send application/json.', 415);
         const input = await body(req);
+        if (path === '/api/jobs')
+          return json(
+            res,
+            jobs.start({
+              companyId: requiredString(input.companyId, 'companyId'),
+              workflowId: requiredString(input.workflowId, 'workflowId'),
+              requestId: requiredString(input.requestId, 'requestId'),
+              acceptanceOwner: requiredString(input.acceptanceOwner, 'acceptanceOwner'),
+            }),
+            202,
+          );
+        const jobAction = path.match(/^\/api\/jobs\/([a-zA-Z0-9-]+)\/(cancel|retry|review)$/);
+        if (jobAction) {
+          if (jobAction[2] === 'cancel') return json(res, jobs.cancel(jobAction[1]));
+          if (jobAction[2] === 'retry')
+            return json(res, jobs.retry(jobAction[1], input.requestId), 202);
+          return json(
+            res,
+            jobs.review(jobAction[1], {
+              decision: requiredString(input.decision, 'decision'),
+              note: requiredString(input.note, 'note'),
+            }),
+          );
+        }
+        if (path === '/api/time/mutate') {
+          return json(res, store.time.mutate(input as unknown as TimeCommand, 'manual'));
+        }
+        if (path === '/api/time/ingest') {
+          const entries = 'entries' in input ? input.entries : [input];
+          if (!Array.isArray(entries) || entries.length === 0 || entries.length > 50)
+            throw new HttpError('INVALID_BATCH', 'Provide between 1 and 50 time entries.', 400);
+          const results: TimeIngressResult[] = entries.map((value: unknown, index) => {
+            try {
+              if (!value || typeof value !== 'object' || Array.isArray(value))
+                throw new HttpError('INVALID_INPUT', 'Each time entry must be a JSON object.', 400);
+              const { requestId, ...entry } = value as TimeIngressEntry;
+              const receipt = store.time.mutate(
+                { type: 'entry.create', requestId, input: entry },
+                'agent',
+              );
+              return { index, ok: true, receipt };
+            } catch (error) {
+              const failure = error as { code?: string; message?: string };
+              return {
+                index,
+                ok: false,
+                error: {
+                  code: failure.code ?? 'TIME_WRITE_FAILED',
+                  message: failure.code
+                    ? (failure.message ?? 'The entry could not be recorded.')
+                    : 'The entry could not be recorded.',
+                },
+              };
+            }
+          });
+          return json(res, { results }, results.every((result) => result.ok) ? 201 : 207);
+        }
         if (path === '/api/preview') {
           if (
             !Array.isArray(input.commands) ||
@@ -268,7 +383,7 @@ export async function startServer(options: ServerOptions) {
             code: known ? code : 'INTERNAL_ERROR',
             message: known
               ? e.message
-              : 'GitFlash could not complete this request. Retry or restart the local server.',
+              : 'VCM could not complete this request. Retry or restart the local server.',
           },
         },
         status,
@@ -288,6 +403,7 @@ export async function startServer(options: ServerOptions) {
       });
     });
   } catch (error) {
+    await jobs.close();
     await integration.close();
     store.close();
     throw error;
@@ -297,11 +413,13 @@ export async function startServer(options: ServerOptions) {
     server,
     store,
     integration,
+    jobs,
     url: `http://127.0.0.1:${port}`,
     port,
     close: async () => {
       if (closed) return;
       closed = true;
+      await jobs.close();
       await integration.close();
       await new Promise<void>((resolve, reject) =>
         server.close((error) => (error ? reject(error) : resolve())),

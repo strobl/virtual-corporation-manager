@@ -1,0 +1,64 @@
+{
+  "contentVersion": "1.2.2",
+  "manifestSha256": "092c20d44c9baa48b87b16457c49e48564d2bb38f3c7101ec18a4900dd8643b7",
+  "oracleSha256": "2d7bdda0280b92f3a499aa405bd19ac1871309ee9fb0076e4762725612af527b",
+  "roleIds": [
+    "ao.role.delivery-manager",
+    "ao.role.requirements-analyst",
+    "ao.role.software-builder",
+    "ao.role.quality-reviewer",
+    "ao.role.handoff-editor"
+  ],
+  "fullRolePromptLengths": {
+    "ao.role.delivery-manager": 8181,
+    "ao.role.requirements-analyst": 7056,
+    "ao.role.software-builder": 7214,
+    "ao.role.quality-reviewer": 9565,
+    "ao.role.handoff-editor": 6955
+  },
+  "sourceFiles": [
+    "operating-contract.md",
+    "roles/index.json",
+    "roles/delivery-manager.md",
+    "roles/requirements-analyst.md",
+    "roles/software-builder.md",
+    "roles/quality-reviewer.md",
+    "roles/handoff-editor.md",
+    "roles/research-analyst.md",
+    "roles/source-verifier.md",
+    "roles/content-planner.md",
+    "roles/content-writer.md",
+    "roles/content-editor.md",
+    "roles/operations-analyst.md",
+    "companies/product-studio/company.md",
+    "companies/product-studio/workflows.md",
+    "install/product-studio/job.json",
+    "install/product-studio/brief.md",
+    "install/product-studio/requirements.md",
+    "install/product-studio/input.json",
+    "install/product-studio/expected.json"
+  ],
+  "helpAliases": [
+    {
+      "source": "help/FIRST-COMPANY.md",
+      "sourceSha256": "82a16df494e73bead67c8c5061deb79368fe45e174b42be4d683a59c9c7db633",
+      "destination": "docs/first-company.md",
+      "destinationSha256": "23b36b24743092e32e4e5de8f758328ef729648fc0e42c97ce2dab1fa5428760",
+      "adaptation": "Local links, explicit acceptance owner and full pre-start brief viewer; candidate install/version commands adapted to 0.1.0-alpha.3-local.4; no role, rubric or oracle changes."
+    },
+    {
+      "source": "support/release/SUPPORT.md",
+      "sourceSha256": "bbd2206b1976a87872a302506363eec217ea3789c4c4aec0add3e96a2b905c9f",
+      "destination": "docs/support.md",
+      "destinationSha256": "5433f8c51891605e9e339f1fa64007a85c9054d56e92a4865d83b8bd26cc3061",
+      "adaptation": "Local links, explicit acceptance owner and full pre-start brief viewer; no role, rubric or oracle changes."
+    },
+    {
+      "source": "support/release/TRIAGE.md",
+      "sourceSha256": "e64cec633e7b7b2b01a08df93199f66233f7800bfd545c0f2d2a5b4f61e59a86",
+      "destination": "docs/triage.md",
+      "destinationSha256": "ee3728363d366a9aa94858b9e5a79258389d28e37b3e491665297a216592a3d9",
+      "adaptation": "Local links, explicit acceptance owner and full pre-start brief viewer; no role, rubric or oracle changes."
+    }
+  ]
+}

@@ -3,245 +3,348 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VCM — Your agent company. On your machine.</title>
     <meta
       name="description"
-      content="GitFlash is an open-source local workspace for a company of AI agents. Configure roles, review changes and run explicit tasks with your own optional runtime."
+      content="Organize agents, reporting lines and delivery hours in a local, open-source workspace. VCM — Virtual Corporation Manager."
     />
-    <meta name="theme-color" content="#f4dc42" />
-    <title>GitFlash — Build a company. Put it to work.</title>
-    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#F6F5F1" />
+    <meta property="og:title" content="VCM — Your agent company. On your machine." />
+    <meta
+      property="og:description"
+      content="Organize agents, reporting lines and delivery hours in a local, open-source workspace."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="./assets/vcm-favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css" />
+    <script src="./site.js" defer></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    <div class="page-shell">
-      <header class="site-header">
-        <a class="wordmark" href="./" aria-label="GitFlash home"
-          ><span class="brand-mark" aria-hidden="true">↯</span>GitFlash</a
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="identity" href="./" aria-label="VCM home"
+          ><img src="./assets/vcm-lockup.svg" width="116" height="32" alt="VCM" /><span
+            >Virtual Corporation Manager</span
+          ></a
         >
         <nav aria-label="Main navigation">
-          <a href="https://github.com/strobl/gitflash#readme">Docs</a
-          ><a href="https://github.com/strobl/gitflash">Source ↗</a
-          ><a class="nav-install" href="#install">Install locally ↓</a>
+          <a href="./docs/">Docs</a><a href="#examples">Examples</a
+          ><a class="nav-source" href="https://github.com/strobl/virtual-corporation-manager"
+            >GitHub ↗</a
+          ><a class="button nav-install" href="#install">Install VCM</a>
         </nav>
-      </header>
-      <main id="main" tabindex="-1">
-        <section class="hero" aria-labelledby="hero-title">
-          <div class="hero-copy">
-            <p class="eyebrow">
-              <span class="status-dot" aria-hidden="true"></span>Open source · Technical alpha
-            </p>
-            <h1 id="hero-title">Build a company.<br /><span>Put it to work.</span></h1>
-            <p class="intro">
-              A local workspace for your company of AI agents. Give every role a purpose, review the
-              organization, and turn a specific task into a result you can inspect.
-            </p>
-            <div class="hero-actions">
-              <a class="button primary" href="#install">Start on your computer ↗</a
-              ><a class="text-link" href="#how-it-works">See how it works ↓</a>
-            </div>
-            <p class="hero-note">Free local core. Your files. Your optional runtime.</p>
-          </div>
-          <figure class="org-figure">
-            <div class="figure-bar">
-              <span><span class="little-mark" aria-hidden="true">↯</span> Company workspace</span
-              ><span>Local configuration</span>
-            </div>
-            <div
-              class="org-diagram"
-              role="img"
-              aria-label="Illustrative organization: Product Studio contains Product, Engineering and Quality departments with configured agent roles. A selected engineer has explicit instructions and responsibilities. This is an illustration, not running activity."
-            >
-              <div class="company-node">
-                <span class="node-symbol" aria-hidden="true">P</span>
-                <div>
-                  <span class="node-label">COMPANY</span><strong>Product Studio</strong
-                  ><span class="node-description">Build useful products, together.</span>
-                </div>
-              </div>
-              <div class="org-branches">
-                <div class="department-node">
-                  <span class="node-label">PRODUCT</span><strong>Find the right problem</strong>
-                  <div class="agent-chip"><span>PA</span>Product Analyst</div>
-                </div>
-                <div class="department-node selected">
-                  <span class="node-label">ENGINEERING</span><strong>Make it work</strong>
-                  <div class="agent-chip"><span>RE</span>React Engineer</div>
-                </div>
-                <div class="department-node">
-                  <span class="node-label">QUALITY</span><strong>Check the evidence</strong>
-                  <div class="agent-chip"><span>SR</span>Security Reviewer</div>
-                </div>
-              </div>
-              <div class="role-detail">
-                <div>
-                  <span class="node-label">SELECTED ROLE</span><strong>React Engineer</strong>
-                </div>
-                <p>
-                  Own the interface implementation.<br />Report the changes, checks and remaining
-                  uncertainty.
-                </p>
-                <span class="review-label">✓ Review before applying changes</span>
-              </div>
-            </div>
-            <figcaption>
-              Organization illustration · Configuring roles does not start agents.
-            </figcaption>
-          </figure>
-        </section>
-        <div class="principles" aria-label="Core properties">
-          <span>Runs on localhost</span><span>SQLite on your computer</span
-          ><span>Works offline after install</span><span>MIT licensed</span>
-        </div>
-        <section class="workflow section" id="how-it-works" aria-labelledby="workflow-title">
-          <div class="section-heading">
-            <p class="eyebrow">A company you can understand</p>
-            <h2 id="workflow-title">Structure first.<br />Then a concrete task.</h2>
-            <p>
-              Keep responsibilities, changes and actual work in one place. You choose when an agent
-              starts.
-            </p>
-          </div>
-          <ol class="steps">
-            <li>
-              <span class="step-number">01</span>
-              <div>
-                <h3>Give every role a job.</h3>
-                <p>
-                  Create a company from scratch or preview a template with 20 or 100 differentiated
-                  roles. Inspect departments, managers, instructions and responsibilities before
-                  applying it.
-                </p>
-              </div>
-            </li>
-            <li>
-              <span class="step-number">02</span>
-              <div>
-                <h3>Review the change.</h3>
-                <p>
-                  Navigate the company map, reporting lines and searchable agent list. Configuration
-                  changes have an exact preview, atomic apply and version-aware undo.
-                </p>
-              </div>
-            </li>
-            <li>
-              <span class="step-number">03</span>
-              <div>
-                <h3>Run. Inspect. Accept.</h3>
-                <p>
-                  Connect your optional runtime and submit an explicit task. Review the actual
-                  output, run ID, duration and hash. Accept a result when it meets your standard.
-                </p>
-              </div>
-            </li>
-          </ol>
-        </section>
-        <section class="alpha-section section" aria-labelledby="alpha-title">
-          <div class="section-heading">
-            <p class="eyebrow">Built in the open</p>
-            <h2 id="alpha-title">An alpha with<br />clear boundaries.</h2>
-            <p>
-              The local workspace and optional Codex execution are the first supported journey. No
-              customer or human-pilot validation is claimed.
-            </p>
-            <a
-              class="text-link"
-              href="https://github.com/strobl/gitflash/blob/main/docs/acceptance.md"
-              >Read the acceptance evidence ↗</a
-            >
-          </div>
-          <div class="status-list">
-            <div class="status-row">
-              <div>
-                <h3>Local company workspace</h3>
-                <p>Templates, search, assignments, relationships, import/export and recovery.</p>
-              </div>
-              <span class="status-tag verified">Implemented</span>
-            </div>
-            <div class="status-row">
-              <div>
-                <h3>Optional Codex execution</h3>
-                <p>
-                  A real task produced recorded output. Uses your separately installed,
-                  authenticated Codex CLI.
-                </p>
-              </div>
-              <span class="status-tag verified">Output verified</span>
-            </div>
-            <div class="status-row">
-              <div>
-                <h3>Buzz</h3>
-                <p>Native team import exercised. End-to-end task dispatch is still pending.</p>
-              </div>
-              <span class="status-tag experimental">Experimental</span>
-            </div>
-            <div class="status-row">
-              <div>
-                <h3>Slack</h3>
-                <p>
-                  Optional adapter available. End-to-end delivery and reply validation is still
-                  pending.
-                </p>
-              </div>
-              <span class="status-tag experimental">Experimental</span>
-            </div>
-            <p class="runtime-note">
-              100 configured roles are not 100 running processes. The initial executor runs one task
-              at a time. Optional providers require your own access and may incur costs.
-            </p>
-          </div>
-        </section>
-        <section class="install-section" id="install" aria-labelledby="install-title">
-          <div class="install-heading">
-            <p class="eyebrow">Your next company starts here</p>
-            <h2 id="install-title">Open a terminal.<br />Open your company.</h2>
-            <p>
-              Use Node.js 24.14 or newer in the 24.x line. Install the alpha release, then start
-              GitFlash.
-            </p>
-          </div>
-          <div class="install-panel">
-            <div class="terminal-bar"><span>Terminal</span><span>v0.1.0-alpha.2</span></div>
-            <pre
-              tabindex="0"
-              aria-label="Install and run commands"
-            ><code>npm install --global "https://github.com/strobl/gitflash/releases/download/v0.1.0-alpha.2/gitflash-0.1.0-alpha.2.tgz"
-gitflash</code></pre>
-            <p>
-              The CLI opens a loopback URL in your browser. Your workspace lives in
-              <code>~/.gitflash</code>. Downloading requires a connection; the installed core works
-              offline.
-            </p>
-            <a href="https://github.com/strobl/gitflash/releases/tag/v0.1.0-alpha.2"
-              >Release &amp; download ↗</a
-            >
-          </div>
-        </section>
-        <section class="closing" aria-label="Contribute">
-          <p>Understand the code.<br /><strong>Make the company yours.</strong></p>
+      </div>
+    </header>
+    <main id="main" tabindex="-1">
+      <section class="hero section">
+        <div class="hero-grid">
           <div>
-            <a class="button secondary" href="https://github.com/strobl/gitflash"
-              >Explore the source ↗</a
-            ><a
-              class="text-link"
-              href="https://github.com/strobl/gitflash/blob/main/CONTRIBUTING.md"
-              >Contribute</a
-            >
+            <h1>Your agent company.<br />On your machine.</h1>
+            <p class="intro">
+              Organize agents, reporting lines and delivery hours in a local, open-source workspace.
+            </p>
+            <div class="actions">
+              <a class="button" href="#install">Install VCM</a
+              ><a class="button button-secondary" href="./docs/">Read the docs</a>
+            </div>
+            <p class="kicker hero-label">Local software · MIT licensed</p>
           </div>
-        </section>
-      </main>
-      <footer>
-        <a class="wordmark" href="./"
-          ><span class="brand-mark" aria-hidden="true">↯</span>GitFlash</a
-        >
-        <p>Local by default. Open by design.</p>
+          <div class="command-panel" id="install" tabindex="-1">
+            <div class="panel-header">
+              <h2>Install VCM</h2>
+              <span class="release-label">Alpha 5 release candidate</span>
+            </div>
+            <p class="compact">Node.js 24.14+ in 24.x, or 26.x · npm</p>
+            <div class="command-toolbar">
+              <span>Terminal</span
+              ><button class="copy-button" type="button" data-copy="install-command" hidden>
+                Copy commands
+              </button>
+            </div>
+            <pre
+              class="command-block"
+              id="install-command"
+              tabindex="0"
+              aria-label="Alpha 5 installation commands"
+            ><code>npm install --ignore-scripts --prefix ./vcm-preview https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.5/gitflash-0.1.0-alpha.5.tgz
+npm exec --offline --prefix ./vcm-preview -- vcm --version
+npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code></pre>
+            <p class="copy-status" role="status" aria-live="polite"></p>
+            <p class="compact release-status">
+              Download becomes available after release publication.
+              <a
+                href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.5"
+                >Release details ↗</a
+              >
+            </p>
+            <p class="compact">
+              Open the local URL printed in your terminal.
+              <a href="./docs/#install">Setup and requirements →</a>
+            </p>
+          </div>
+        </div>
+        <figure class="product-proof">
+          <a
+            class="shot-link"
+            href="./assets/patchwork-agent-desktop.jpg"
+            data-viewer
+            data-caption="Patchwork Studio · fictional three-agent example · local candidate"
+            aria-label="Enlarge the Patchwork Studio product screenshot"
+          >
+            <picture
+              ><source
+                media="(max-width: 639px)"
+                srcset="./assets/patchwork-agent-mobile.jpg"
+                width="390"
+                height="844" />
+              <img
+                src="./assets/patchwork-agent-desktop.jpg"
+                width="1280"
+                height="720"
+                alt="VCM showing Builder, Reviewer and Researcher as peer agents in Patchwork Studio. Builder's details list responsibilities and instructions."
+                fetchpriority="high" /></picture
+            ><span class="enlarge-hint">Enlarge ↗</span>
+          </a>
+          <figcaption>
+            Patchwork Studio · fictional three-agent example · local candidate
+          </figcaption>
+          <p class="proof-note">
+            Captured from 0.1.0-alpha.5-local.1. Three peer roles; no executed jobs or booked hours.
+          </p>
+        </figure>
+      </section>
+      <section class="section" id="examples">
+        <p class="kicker">Start small</p>
+        <h2>Keep the organization between sessions.</h2>
+        <p class="section-intro">
+          Name a corporation for your project. Give each agent a role and responsibility. Add
+          reporting lines when your work needs them. Reopen the structure when you return.
+        </p>
+        <div class="role-grid">
+          <article>
+            <span class="role-dept">Product</span>
+            <h3>Builder</h3>
+            <p>Implement the scoped change. Record test commands and results.</p>
+          </article>
+          <article>
+            <span class="role-dept">Product</span>
+            <h3>Reviewer</h3>
+            <p>Compare a proposed change with the brief before it is accepted.</p>
+          </article>
+          <article>
+            <span class="role-dept">Product</span>
+            <h3>Researcher</h3>
+            <p>Trace requirements to sources and record what remains uncertain.</p>
+          </article>
+        </div>
+        <div class="two-column">
+          <div>
+            <h3>One useful agent is enough.</h3>
+            <p>
+              Patchwork Studio is a fictional example for a release-notes tool. The three agents are
+              peers in one Product department. A manager is optional. These roles describe potential
+              work; importing them does not run it.
+            </p>
+          </div>
+          <div>
+            <h3>Import, inspect, then adapt.</h3>
+            <p>
+              Open <strong>Settings → Import a company definition</strong>. Choose
+              <strong>Review import → Apply changes</strong>. Each import creates fresh identities
+              and preserves existing corporations.
+            </p>
+            <a href="./docs/#three-agent-example">Try the three-agent example →</a>
+          </div>
+        </div>
+      </section>
+      <section class="section" id="hours">
+        <p class="kicker">Delivery hours</p>
+        <h2>Keep work records inspectable.</h2>
+        <p class="section-intro">
+          Review delivery hours by agent and date. Each entry keeps its description, reference basis
+          and correction history, so changes remain visible.
+        </p>
+        <figure class="product-proof">
+          <a
+            class="shot-link"
+            href="./assets/northstar-hours-desktop.jpg"
+            data-viewer
+            data-caption="Northstar Studio · illustrative recorded hours · local candidate"
+            aria-label="Enlarge the Northstar Studio Time Tracker screenshot"
+          >
+            <picture
+              ><source
+                media="(max-width: 639px)"
+                srcset="./assets/northstar-hours-mobile.jpg"
+                width="390"
+                height="844" />
+              <img
+                src="./assets/northstar-hours-desktop.jpg"
+                width="1280"
+                height="720"
+                alt="VCM Time Tracker. Desktop shows Northstar's company week totaling 8.0 hours; mobile shows Alex's filtered 2.5 hours from two entries."
+                loading="lazy" /></picture
+            ><span class="enlarge-hint">Enlarge ↗</span>
+          </a>
+          <figcaption>Northstar Studio · illustrative recorded hours · local candidate</figcaption>
+          <p class="proof-note">
+            Captured from 0.1.0-alpha.5-local.1. Desktop: company week, 8.0h. Mobile: Alex filter,
+            2.5h. Illustrative entries.
+          </p>
+        </figure>
+        <p class="section-intro">
+          Booked delivery hours describe human-equivalent effort. They are separate from elapsed
+          model runtime, verified savings, invoices and accepted output. Saving an organization does
+          not create hours.
+        </p>
+        <a href="./docs/#hours">Understand the Time Tracker →</a>
+      </section>
+      <section class="section two-column" id="local">
+        <div>
+          <p class="kicker">A clear model</p>
+          <h2>Structure is not execution.</h2>
+          <dl class="rule-list">
+            <div>
+              <dt>Corporation, department, agent</dt>
+              <dd>A purpose and organization, with roles, responsibilities and instructions.</dd>
+            </div>
+            <div>
+              <dt>Reporting relationships</dt>
+              <dd>Describe responsibility. They do not automatically delegate or run tasks.</dd>
+            </div>
+            <div>
+              <dt>Runtime jobs</dt>
+              <dd>
+                Optional execution with its own runtime setup, platform constraints and provider
+                costs.
+              </dd>
+            </div>
+          </dl>
+          <a href="./docs/#execution">Execution prerequisites →</a>
+        </div>
+        <div>
+          <p class="kicker">On your machine</p>
+          <h2>Review a change. Recover the structure.</h2>
+          <p>
+            Review and apply configuration changes. Undo a mistake, reopen your saved organization
+            and export its definition.
+          </p>
+          <p>
+            A company definition is reusable JSON. A SQLite backup preserves the complete local
+            workspace, including work and time history. One person operates the workspace.
+          </p>
+          <p>
+            Compare this with the roles file you already maintain: is the change easier to inspect
+            and recover?
+          </p>
+          <a href="./docs/#recovery">Data, exports and recovery →</a>
+        </div>
+      </section>
+      <section class="section" id="contribute">
+        <p class="kicker">Open source</p>
+        <h2>Make one useful change.</h2>
+        <p class="section-intro">
+          Report a reproducible issue: the version, steps, expected result and what happened.
+          Improve an example or clarify the setup guide. Keep private data out of reports.
+        </p>
+        <div class="actions">
+          <a class="button button-secondary" href="./docs/#contribute">Contribution guide</a
+          ><a href="https://github.com/strobl/virtual-corporation-manager">Source ↗</a
+          ><a href="https://github.com/strobl/virtual-corporation-manager/issues">Issues ↗</a>
+        </div>
+      </section>
+      <section class="section faq" id="faq">
+        <h2>Questions</h2>
+        <details>
+          <summary>Can my company use VCM for free?</summary>
+          <p>
+            Yes. VCM's complete current core is open source under the MIT License, including
+            commercial use by businesses of any size. You can modify, sell, host and fork the core
+            under MIT, preserving its required notices and applicable third-party licenses. No
+            Enterprise subscription is required.
+          </p>
+          <p>
+            We plan to offer optional new Enterprise modules under separate commercial licenses for
+            additional organizational capabilities. Those modules are not part of the current
+            release. Support and implementation services have their own agreed scope.
+            <a href="./docs/#licensing">Core and Enterprise licensing →</a>
+          </p>
+        </details>
+        <details>
+          <summary>Does VCM need an account or AI provider?</summary>
+          <p>
+            The local organization and Time Tracker need neither. The local core runs on your
+            machine. Optional execution integrations require their own tools and access and may
+            incur provider charges.
+          </p>
+        </details>
+        <details>
+          <summary>What can I install today?</summary>
+          <p>
+            This page prepares the <strong>0.1.0-alpha.5 release candidate</strong>. Its exact
+            archive link becomes available after release publication. The screenshots were captured
+            from the earlier local review candidate, 0.1.0-alpha.5-local.1. Check the
+            <a href="https://github.com/strobl/virtual-corporation-manager/releases"
+              >actual release list</a
+            >
+            for published versions and their requirements.
+          </p>
+        </details>
+        <details>
+          <summary>Is this a shared company workspace?</summary>
+          <p>
+            VCM is for one operator using a local workspace. It is not a shared login service or a
+            supported LAN deployment. A virtual corporation is a software configuration; it does not
+            establish a legal company.
+          </p>
+        </details>
+        <details>
+          <summary>Does it run every configured agent?</summary>
+          <p>
+            Creating an agent configures its role. Reporting lines do not execute work. Actual jobs
+            use separately configured runtimes, with platform-specific restrictions. See the
+            <a href="./docs/#execution">execution guide</a>.
+          </p>
+        </details>
+        <details>
+          <summary>Where is my data?</summary>
+          <p>
+            The default directory is <code>~/.gitflash</code>. The installation example explicitly
+            uses <code>./my-company</code>. Restart from the same directory with the same data path.
+            See <a href="./docs/#local-data">local data and backups</a>.
+          </p>
+        </details>
+      </section>
+      <section class="section closing">
+        <div>
+          <h2>Have an integration question?</h2>
+          <p>
+            Describe your environment and the workflow you want to connect.
+            <a href="mailto:support@gitflash.com">support@gitflash.com</a>
+          </p>
+        </div>
+        <a class="button" href="#install">Install VCM</a>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span>VCM · Virtual Corporation Manager</span>
         <nav aria-label="Project resources">
-          <a href="https://github.com/strobl/gitflash/blob/main/docs/integrations.md"
-            >Integrations</a
-          ><a href="https://github.com/strobl/gitflash/blob/main/SECURITY.md">Security</a
-          ><a href="https://github.com/strobl/gitflash/blob/main/LICENSE">MIT license</a>
+          <a href="./docs/">Docs</a
+          ><a href="https://github.com/strobl/virtual-corporation-manager">Source</a
+          ><a href="https://github.com/strobl/virtual-corporation-manager/blob/main/LICENSE"
+            >MIT license</a
+          ><a href="./imprint/">Operator information</a>
         </nav>
-      </footer>
-    </div>
+      </div>
+    </footer>
+    <dialog class="image-viewer" aria-labelledby="viewer-caption">
+      <div class="viewer-toolbar">
+        <p id="viewer-caption"></p>
+        <button type="button" class="viewer-close">Close <span aria-hidden="true">×</span></button>
+      </div>
+      <img class="viewer-image" alt="" />
+    </dialog>
   </body>
 </html>

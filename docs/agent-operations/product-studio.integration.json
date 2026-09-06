@@ -1,0 +1,291 @@
+{
+  "schemaVersion": 1,
+  "kind": "File-backed content integration handoff; Engineering owns native mapping",
+  "contentVersion": "1.2.2",
+  "companyId": "ao.company.product-studio",
+  "companyTemplateId": "product-studio",
+  "companyTemplateLabel": "Product Studio (5 seats)",
+  "workflowId": "PS-001",
+  "jobDescriptor": "install/product-studio/job.json",
+  "jobFileResolution": "job.files paths resolve beside the installed job.json",
+  "sourcePathResolution": "sources resolve beside this integration manifest; destinations are relative to Engineering chosen content root",
+  "packageManifest": {
+    "source": "package/package-manifest.json",
+    "sha256": "8abe8e7cd0c04b60fdbc2753956babf7b3aaa0cba73cb79412df2f6c88a1380f"
+  },
+  "contentReview": {
+    "source": "evidence/root-regression-review.json",
+    "sha256": "0ce8a45e89377a8400c298b5790b40ba1c8258cd12f7a3680f52aa2dbaacd1a7",
+    "scope": "Original source contract behavior accepted for integration. Frozen stricter oracle result remains 4 PASS, 1 FAIL; no installed acceptance inferred."
+  },
+  "seats": [
+    {
+      "code": "PS-DM",
+      "canonicalSeatId": "ao.seat.product-studio.ops-01",
+      "roleId": "ao.role.delivery-manager",
+      "promptFile": "roles/delivery-manager.md",
+      "rawPromptSource": "roles/index.json",
+      "rawPromptSha256": "9cdd2dbd56dd2908cdb573cc0b549a3327148db3545cbac314b036818f7d3226",
+      "charterDepartment": "Delivery",
+      "reportsTo": null
+    },
+    {
+      "code": "PS-REQ",
+      "canonicalSeatId": "ao.seat.product-studio.product-04",
+      "roleId": "ao.role.requirements-analyst",
+      "promptFile": "roles/requirements-analyst.md",
+      "rawPromptSource": "roles/index.json",
+      "rawPromptSha256": "45b483307f372ddfa32c6ae80f0f47dd5ea1f6fdb6ff8a685326d8883b5a975e",
+      "charterDepartment": "Product",
+      "reportsTo": "PS-DM"
+    },
+    {
+      "code": "PS-BUILD",
+      "canonicalSeatId": "ao.seat.product-studio.frontend-02",
+      "roleId": "ao.role.software-builder",
+      "promptFile": "roles/software-builder.md",
+      "rawPromptSource": "roles/index.json",
+      "rawPromptSha256": "7eceab1a76bb11005f05cba6e93a0c6a5d26ea18eedc52fc5df0d38fc71d65ff",
+      "charterDepartment": "Delivery",
+      "reportsTo": "PS-DM"
+    },
+    {
+      "code": "PS-QA",
+      "canonicalSeatId": "ao.seat.product-studio.quality-01",
+      "roleId": "ao.role.quality-reviewer",
+      "promptFile": "roles/quality-reviewer.md",
+      "rawPromptSource": "roles/index.json",
+      "rawPromptSha256": "9a23e18d81c76f18af6530a41a992d9f115aaf1c34f077a8752cf9655979d6c9",
+      "charterDepartment": "Assurance",
+      "reportsTo": "PS-DM"
+    },
+    {
+      "code": "PS-DOC",
+      "canonicalSeatId": "ao.seat.product-studio.ops-09",
+      "roleId": "ao.role.handoff-editor",
+      "promptFile": "roles/handoff-editor.md",
+      "rawPromptSource": "roles/index.json",
+      "rawPromptSha256": "886173d15c6c03ef60f7d38b9f9bc24705374294b98ac0c7473bf44a258e5353",
+      "charterDepartment": "Delivery",
+      "reportsTo": "PS-DM"
+    }
+  ],
+  "files": [
+    {
+      "source": "package/operating-contract.md",
+      "destination": "operating-contract.md",
+      "purpose": "shared-context",
+      "bytes": 10971,
+      "sha256": "3b93afe2935b263f5f6dfcb4b0928aaa6849221bdcd31a508ae5c677285a4d14"
+    },
+    {
+      "source": "package/roles/index.json",
+      "destination": "roles/index.json",
+      "purpose": "full-raw-role-prompts",
+      "bytes": 85534,
+      "sha256": "12e0e9be3f512fad0d24c6ce35aee2c3f11ead566bde25064c5320cfe39abb86"
+    },
+    {
+      "source": "package/companies/product-studio/company.md",
+      "destination": "companies/product-studio/company.md",
+      "purpose": "company-charter",
+      "bytes": 3127,
+      "sha256": "ea84ef821768b865a8686fd0869084eb9e7609f58b33818bad9482d73fda7263"
+    },
+    {
+      "source": "package/companies/product-studio/workflows.md",
+      "destination": "companies/product-studio/workflows.md",
+      "purpose": "workflow-contract",
+      "bytes": 5474,
+      "sha256": "cdf73170321652784efe78c06228107d5bd41d3feb8a2c063ea99ba4c1dcfa2c"
+    },
+    {
+      "source": "package/roles/delivery-manager.md",
+      "destination": "roles/delivery-manager.md",
+      "purpose": "role-document",
+      "bytes": 11112,
+      "sha256": "b7baf19e312027adee5861d0384b3ee144dbdcc38fbce804c9da14e5a266cfe7"
+    },
+    {
+      "source": "package/roles/requirements-analyst.md",
+      "destination": "roles/requirements-analyst.md",
+      "purpose": "role-document",
+      "bytes": 8862,
+      "sha256": "74da1901e1c1fbc867ef682b27e9645fdf3cfdbe9f509c50ec0d1d7e2d84b15f"
+    },
+    {
+      "source": "package/roles/software-builder.md",
+      "destination": "roles/software-builder.md",
+      "purpose": "role-document",
+      "bytes": 9178,
+      "sha256": "06d247bc05f0131c6baed30b8b9ea344c9fa586d94d4a65cbb59f5dd9e397d57"
+    },
+    {
+      "source": "package/roles/quality-reviewer.md",
+      "destination": "roles/quality-reviewer.md",
+      "purpose": "role-document",
+      "bytes": 13880,
+      "sha256": "d1f520de9299fb8f9d5780932446e5a287e49d27c9a945738543b938c8555564"
+    },
+    {
+      "source": "package/roles/handoff-editor.md",
+      "destination": "roles/handoff-editor.md",
+      "purpose": "role-document",
+      "bytes": 8660,
+      "sha256": "71891a09aaabc25a67be22a7f3c16805c584243cdda9cd1fbc4347688fd9b09a"
+    },
+    {
+      "source": "package/management/templates/job-record.md",
+      "destination": "management/templates/job-record.md",
+      "purpose": "manager-input-format",
+      "bytes": 2628,
+      "sha256": "3e2669e7029956e7649eb2d1e3b755d39efe7a45f425b5005b665c7eb710812f"
+    },
+    {
+      "source": "package/management/templates/status-report.md",
+      "destination": "management/templates/status-report.md",
+      "purpose": "manager-input-format",
+      "bytes": 2244,
+      "sha256": "536ca6e72a5c9633f015b70e6e845ab85d7ff984d4916017e2565b7ef268eb73"
+    },
+    {
+      "source": "package/management/templates/decision-request.md",
+      "destination": "management/templates/decision-request.md",
+      "purpose": "manager-input-format",
+      "bytes": 1604,
+      "sha256": "fba47838522e5602d9d764f67ea9e2a93b2a49a3b48b277180cfe044ea21003d"
+    },
+    {
+      "source": "package/install/product-studio/job.json",
+      "destination": "install/product-studio/job.json",
+      "purpose": "job-input",
+      "bytes": 10395,
+      "sha256": "f36f37053b57b7aa0bd062e9e8780ebe73aa0b518d70e3bbf9de7898014497f0"
+    },
+    {
+      "source": "package/install/product-studio/brief.md",
+      "destination": "install/product-studio/brief.md",
+      "purpose": "job-input",
+      "bytes": 2190,
+      "sha256": "8988242d3016cb213ae3a7c2beeb72692a6f4406bb42caa312f2c2880b885ac2"
+    },
+    {
+      "source": "package/install/product-studio/requirements.md",
+      "destination": "install/product-studio/requirements.md",
+      "purpose": "job-input",
+      "bytes": 1380,
+      "sha256": "e6ce6508d15efcea1f561b81df1b88fb30bd6d2a3f5f1d6341fa1a10d7a8bae5"
+    },
+    {
+      "source": "package/install/product-studio/input.json",
+      "destination": "install/product-studio/input.json",
+      "purpose": "job-input",
+      "bytes": 178,
+      "sha256": "5876f8024b5997a265fac78946e9303a8a1052e75e1d1762aeea335eeec4d77b"
+    },
+    {
+      "source": "package/install/product-studio/expected.json",
+      "destination": "install/product-studio/expected.json",
+      "purpose": "job-input",
+      "bytes": 60,
+      "sha256": "215f55d8454af8b6d3e5e8af2cde598c04c624576b08f520f782377db58c698c"
+    },
+    {
+      "source": "acceptance/ps001-oracle.py",
+      "destination": "acceptance/ps001-oracle.py",
+      "purpose": "independent-enforcement-only",
+      "bytes": 4857,
+      "sha256": "2d7bdda0280b92f3a499aa405bd19ac1871309ee9fb0076e4762725612af527b"
+    },
+    {
+      "source": "help/FIRST-COMPANY.md",
+      "destination": "help/FIRST-COMPANY.md",
+      "purpose": "user-help",
+      "bytes": 6489,
+      "sha256": "82a16df494e73bead67c8c5061deb79368fe45e174b42be4d683a59c9c7db633"
+    },
+    {
+      "source": "help/REHEARSAL-RECORD.md",
+      "destination": "help/REHEARSAL-RECORD.md",
+      "purpose": "blank-observation-form",
+      "bytes": 2919,
+      "sha256": "805c38086034cc663b4db839caee32de943c13f1d22eb2706150d38fa136cc7f"
+    },
+    {
+      "source": "support/release/SUPPORT.md",
+      "destination": "help/SUPPORT.md",
+      "purpose": "support-help",
+      "bytes": 4772,
+      "sha256": "bbd2206b1976a87872a302506363eec217ea3789c4c4aec0add3e96a2b905c9f"
+    },
+    {
+      "source": "support/release/TRIAGE.md",
+      "destination": "help/TRIAGE.md",
+      "purpose": "support-routing",
+      "bytes": 5745,
+      "sha256": "e64cec633e7b7b2b01a08df93199f66233f7800bfd545c0f2d2a5b4f61e59a86"
+    }
+  ],
+  "producerExclusions": [
+    "acceptance/*",
+    "examples/*",
+    "historical-results",
+    "regression/*",
+    "private-workspaces"
+  ],
+  "producerInputs": [
+    "operating-contract.md",
+    "roles/software-builder.md",
+    "companies/product-studio/company.md",
+    "companies/product-studio/workflows.md",
+    "install/product-studio/brief.md",
+    "install/product-studio/requirements.md",
+    "install/product-studio/input.json",
+    "install/product-studio/expected.json"
+  ],
+  "managerInputs": [
+    "management/templates/job-record.md",
+    "management/templates/status-report.md",
+    "management/templates/decision-request.md"
+  ],
+  "nativeArtifactMapping": {
+    "intake": "INTAKE.md with manager job/status/decision fields as applicable",
+    "requirements": "SCOPE.md; supplied requirements.md remains input",
+    "expectedOutputReference": "EXPECTED-REFERENCE.json is the input seed; expected.json is a new producer deliverable",
+    "qualityReview": "QA.json and QA.md plus separately attributed immutable verifier evidence",
+    "delivery": "HANDOFF.md; acceptance remains an explicit separate owner decision",
+    "reproduction": "Retain actual commands, cwd, exit results and candidate hashes in the runtime evidence; a reference to an unexecuted example is insufficient"
+  },
+  "allowedChecks": [
+    {
+      "actor": "producer",
+      "argv": [
+        "<resolved-python>=3.8",
+        "-B",
+        "-m",
+        "unittest",
+        "-v"
+      ],
+      "cwd": "fresh candidate workspace"
+    },
+    {
+      "actor": "independent QA or runtime enforcement, attributed separately",
+      "argv": [
+        "<resolved-python>=3.8",
+        "-B",
+        "<installed-content-root>/acceptance/ps001-oracle.py"
+      ],
+      "cwd": "inspected immutable candidate workspace"
+    }
+  ],
+  "executionRules": {
+    "maxRepairCandidatesAfterInitial": 2,
+    "authority": "User Start PS-001 authorizes specified local initial workflow and at most two corrective candidates. Narrower step/fixture authority wins; ceiling alone grants no action.",
+    "evidenceRequests": "Record actual per-assignment allowance separately; request does not increment repair count.",
+    "reviewerIndependence": "Use a separate executing session/identity; different seat names alone are insufficient.",
+    "severeEvidence": "Stop and preserve; no ordinary repair before actual owner recovery authority.",
+    "humanDecision": "Wait for explicit owner review. Internal simulated acceptance must be labelled and excluded from independent human usefulness.",
+    "timeTracker": "Do not create or change delivery-hour bookings from run duration or result acceptance."
+  },
+  "verificationBoundary": "This manifest describes exact bytes and intended mapping. Installed execution/rehearsal and independent human proof are recorded separately."
+}

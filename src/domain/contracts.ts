@@ -1,3 +1,4 @@
+import type { TimeStore } from '../time/contracts.js';
 /** Shared local contracts. Configuration never implies runtime activation. */
 export type EntityStatus = 'active' | 'archived';
 export interface Company {
@@ -162,6 +163,8 @@ export interface ApplyResult {
   state: WorkspaceState;
   changeId: string;
   replayed: boolean;
+  /** Identities created by this committed change, even if a replay returns newer state. */
+  createdCompanyIds: string[];
 }
 export interface TemplateSummary {
   id: string;
@@ -171,6 +174,7 @@ export interface TemplateSummary {
   departmentCount: number;
 }
 export interface WorkspaceStore {
+  readonly time: TimeStore;
   snapshot(): WorkspaceState;
   preview(commands: DomainCommand[], baseRevision: number, summary?: string): ChangePreview;
   apply(previewId: string): ApplyResult;

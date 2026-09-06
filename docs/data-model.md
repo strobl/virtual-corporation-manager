@@ -1,6 +1,6 @@
 # Company data and change semantics
 
-GitFlash stores the local company and its execution ledger in one SQLite database: `workspace.sqlite` inside the workspace directory. The default directory is `~/.gitflash`; `--data-dir` or `GITFLASH_DATA_DIR` selects another directory. There is no account, hosted database or model requirement for configuring a company.
+GitFlash stores the local company, execution records, workflow artifacts and Time Tracker in one SQLite database: `workspace.sqlite` inside the workspace directory. The default directory is `~/.gitflash`; `--data-dir` or `GITFLASH_DATA_DIR` selects another directory. There is no account, hosted database or model requirement for configuring a company or booking delivery hours.
 
 ## Company structure
 
@@ -33,20 +33,34 @@ The interface returns the newest 200 audit receipts; the database retains the co
 
 ## Templates and portable definitions
 
-The `studio-20` and `studio-100` templates configure a product studio with 10 departments. They contain distinct roles and responsibility instructions, and no work results, fabricated activity or automatic activation.
+The `studio-20` and `studio-100` templates configure a product studio with 10 departments. The smaller `product-studio` template configures five operational seats. The five-seat and 100-agent templates include the role mapping for PS-001; the 20-agent template remains configuration-only. All contain role instructions, with no work results, fabricated activity or automatic activation. Applying a template creates a company; running a job remains a separate explicit action.
 
 A company definition uses its own portable `schemaVersion: 1`. It includes companies, departments, agents, assignments and relationships. Import validates their structure and references, creates fresh IDs, and adds suffixes to conflicting company short codes. Repeated imports create additional companies; they do not overwrite existing ones. Unknown fields, including work history and runtime credential fields, are rejected.
 
-Definition export preserves configuration and assignment/relationship history. It does not contain execution records, work output, audit receipts, pending previews or runtime credentials. Use a SQLite backup to preserve the full workspace.
+Definition export preserves configuration and assignment/relationship history. It does not contain execution records, workflow jobs/artifacts, delivery hours, work output, audit receipts, pending previews or runtime credentials. Use a SQLite backup to preserve the full workspace.
 
 ## Storage implementation
 
-The database currently uses schema version **3**. This is separate from the portable definition schema version.
+The review candidate uses database schema version **5**. This is separate from the portable definition schema version.
 
 - Version 1 creates normalized company, department, agent, assignment, relationship and work tables, plus workspace revision, preview and audit tables.
 - Version 2 adds work-run deduplication and query indexes.
 - Version 3 adds the execution ledger to the same database and records whether each change is eligible for undo.
+- Version 4 adds the delivery-hours ledger, catalog history, timezone and time request receipts.
+- Version 5 adds workflow jobs and captured context, exact artifact bytes and explicit retry receipts.
 
 SQLite foreign keys, unique indexes and transactions complement the domain validator. A migration journal records each schema version, its SQL checksum and application time. A newer unsupported schema is refused, and existing migration checksums must match. Upgrades create a backup before migration; failed migrations roll back their schema and journal changes.
 
 Local files use restricted owner permissions where the operating system supports them. They are ordinary SQLite and text files, not application-encrypted storage. Task artifacts under `runs/` are convenient copies; the execution ledger retains the output needed to view and download completed results after a database restore. See [backup and recovery](recovery.md).
+
+## Delivery hours
+
+Schema 4 adds time entries, captured calculation basis, catalog defaults/overrides, immutable correction/void history, saved IANA timezone and idempotent request receipts. The ledger uses stable company/member IDs and captured names; configuration changes cannot cascade-delete it. Every non-void entry contributes integer tenths to the same weekly and period totals. Booking/correction and catalog writes increment the shared workspace revision and invalidate earlier configuration previews. They are separate from configuration Undo, work acceptance and runtime duration. A time JSON export includes the readable ledger/catalog/history; SQLite backup is the complete restore format. See [Time Tracker](time-tracker.md) for validation and ingress.
+
+## Company workflows
+
+Schema 5 stores a job's request ID, captured company/role/content context, candidate and retry counts, stage history, control outcomes and explicit owner decision. Each artifact row belongs to one job and stage and retains its exact UTF-8 content, SHA-256, byte count and source classification. Model reply text is not converted into artifact files. Runtime-generated files, supplied inputs and independently observed verifier receipts retain separate origins.
+
+The service rejects unsafe paths, links, unsupported files, changed immutable inputs and mismatched observed session receipts. Review-ready or accepted/rejected jobs require a completed five-stage chain with distinct observed sessions, passing criterion records and a successful exact fixed oracle. Restore validates this evidence together with artifact ownership and hashes. Failed attempts remain visible; failure receipts are not rewritten into successful stage evidence. Full SQLite backup restores the workflow and its downloadable files without the original stage directories.
+
+Company configuration changes do not replace the workflow ledger. A workflow captures its identities at start; later role edits do not silently rewrite that evidence. Job completion, QA success, owner review and delivery-hours entries are independent records.

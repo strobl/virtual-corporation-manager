@@ -2,6 +2,37 @@ import type { Agent, WorkspaceState } from '../domain/contracts';
 import type { WorkspaceSnapshot } from '../lib/organization/tree';
 import type { TreeNode } from '../components/ds/DenseTree';
 
+const operationalRoleLabels: Record<string, string> = {
+  'ao.role.delivery-manager': 'Delivery Manager',
+  'ao.role.requirements-analyst': 'Requirements Analyst',
+  'ao.role.software-builder': 'Software Builder',
+  'ao.role.quality-reviewer': 'Quality Reviewer',
+  'ao.role.handoff-editor': 'Handoff Editor',
+};
+
+/** Presentation only. Canonical workflow role keys stay in the stored company model. */
+export function roleLabel(role: string): string {
+  if (operationalRoleLabels[role]) return operationalRoleLabels[role];
+  if (!role.startsWith('ao.role.')) return role;
+  return role
+    .slice('ao.role.'.length)
+    .split(/[-_]+/u)
+    .map((word) => (word ? word[0]!.toUpperCase() + word.slice(1) : ''))
+    .filter(Boolean)
+    .join(' ');
+}
+
+export function agentInitials(name: string): string {
+  const displayName = name.replace(/^PS-[A-Z0-9]+\s*[·:–—-]\s*/iu, '').trim();
+  return displayName
+    .split(/\s+/u)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => Array.from(word)[0])
+    .join('')
+    .toLocaleUpperCase();
+}
+
 export type Selection = {
   kind: 'company' | 'department' | 'agent';
   id: string;
@@ -59,7 +90,7 @@ export function toSnapshot(state: WorkspaceState): WorkspaceSnapshot {
       .map((row) => ({
         id: row.id,
         name: row.name,
-        role: row.role,
+        role: roleLabel(row.role),
         kind: row.kind,
         managerId: row.managerId,
         department: row.departmentId ? (departments.get(row.departmentId) ?? null) : null,
@@ -84,12 +115,14 @@ export function organizationTree(state: WorkspaceState, query = ''): TreeNode[] 
       const agentNodes = (agents: Agent[], parentMatches: boolean): TreeNode[] =>
         agents
           .filter(
-            (agent) => parentMatches || matches(agent.name, agent.role, ...agent.responsibilities),
+            (agent) =>
+              parentMatches ||
+              matches(agent.name, agent.role, roleLabel(agent.role), ...agent.responsibilities),
           )
           .map((agent) => ({
             id: `company:${company.id}/agent:${agent.id}`,
             label: agent.name,
-            searchTerms: [agent.role, ...agent.responsibilities],
+            searchTerms: [agent.role, roleLabel(agent.role), ...agent.responsibilities],
           }));
       const departments = state.departments
         .filter((row) => row.companyId === company.id)

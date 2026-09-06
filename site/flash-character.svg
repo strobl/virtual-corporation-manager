@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="title desc">
+  <title id="title">Flash, the little corporation</title>
+  <desc id="desc">The same compact F in amber and wood. Two eyes sit directly in the upper wooden beam. The figure is the company, with no separate robot head or face plate.</desc>
+  <defs>
+    <clipPath id="corporation-contour">
+      <path d="M16 8H54.6Q56.4 8 55.1 9.3L50 14H54Q56 14 56 16V22Q56 24 54 24H28V30H43Q45 30 45 32V41Q45 43 43 43H28V54Q28 56 26 56H12Q10 56 10 54V14Q10 8 16 8Z"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#corporation-contour)">
+    <path fill="#F4A340" d="M16 8H54.6Q56.4 8 55.1 9.3L50 14H54Q56 14 56 16V22Q56 24 54 24H28V30H43Q45 30 45 32V41Q45 43 43 43H28V54Q28 56 26 56H12Q10 56 10 54V14Q10 8 16 8Z"/>
+    <path fill="#C9A576" d="M0 0H64V24H0Z"/>
+  </g>
+  <g fill="#202824" aria-hidden="true">
+    <ellipse cx="19.5" cy="17" rx="1.7" ry="2"/>
+    <ellipse cx="37" cy="17" rx="1.7" ry="2"/>
+  </g>
+</svg>

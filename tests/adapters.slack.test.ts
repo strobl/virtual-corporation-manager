@@ -147,6 +147,58 @@ describe('Slack contract fixtures (not a live workspace acceptance)', () => {
     );
     await connection.disconnect();
   });
+  it.each(['completed', 'failed'] as const)(
+    'publishes %s results as literal text without activating supplied Slack markup',
+    async (status) => {
+      const connection = new SlackConnection(store, env, vi.fn());
+      await connection.connect();
+      const content =
+        '<!here> <@UOTHER> <#COTHER> <https://example.invalid|masked> https://example.invalid *bold* & &lt;';
+      const run = {
+        id: 'run-literal',
+        agentName: 'Analyst <!channel>',
+        status,
+        output: content,
+        error: content,
+      } as RunInfo;
+      const original = structuredClone(run);
+      expect(
+        await connection.deliver(run, { teamId: 'TTEST', channel: 'CTEST', threadTs: '10.2' }),
+      ).toEqual({ status: 'sent', reference: 'slack:TTEST:CTEST:1.2' });
+      expect(fixtures.posted).toHaveLength(1);
+      const message = fixtures.posted[0] as Record<string, unknown>;
+      expect(message).toMatchObject({
+        channel: 'CTEST',
+        thread_ts: '10.2',
+        mrkdwn: false,
+        parse: 'none',
+        link_names: false,
+        unfurl_links: false,
+        unfurl_media: false,
+      });
+      expect(message.text).toContain('Analyst &lt;!channel&gt;');
+      expect(message.text).toContain(
+        '&lt;!here&gt; &lt;@UOTHER&gt; &lt;#COTHER&gt; &lt;https://example.invalid|masked&gt; https://example.invalid *bold* &amp; &amp;lt;',
+      );
+      expect(message.text).not.toMatch(/[<>]/);
+      expect(run).toEqual(original);
+      await connection.disconnect();
+    },
+  );
+  it('bounds encoded replies without splitting escapes or modifying the complete local result', async () => {
+    const connection = new SlackConnection(store, env, vi.fn());
+    await connection.connect();
+    const output = '&<>'.repeat(10_000);
+    const run = { id: 'run-large', agentName: 'Analyst', status: 'completed', output } as RunInfo;
+    await connection.deliver(run, { teamId: 'TTEST', channel: 'CTEST', threadTs: '10.2' });
+    expect(fixtures.posted).toHaveLength(1);
+    const text = (fixtures.posted[0] as { text: string }).text;
+    expect(text.length).toBeLessThan(40_000);
+    expect(text).toContain('&amp;&lt;&gt;');
+    expect(text).toMatch(/(?:&amp;|&lt;|&gt;)\n\nFull result is saved in the local app\.$/);
+    expect(run.output).toBe(output);
+    await connection.disconnect();
+  });
   it('returns setup guidance for an ambiguous request and delivers a result only to its configured workspace/channel', async () => {
     const queue = vi.fn(async () => ({}) as RunInfo);
     const connection = new SlackConnection(store, env, queue);
@@ -155,6 +207,13 @@ describe('Slack contract fixtures (not a live workspace acceptance)', () => {
     await tick();
     expect(queue).not.toHaveBeenCalled();
     expect(fixtures.posted).toHaveLength(1);
+    expect(fixtures.posted[0]).toMatchObject({
+      mrkdwn: false,
+      parse: 'none',
+      link_names: false,
+      unfurl_links: false,
+      unfurl_media: false,
+    });
     const run = {
       id: 'run-1',
       agentName: 'Analyst',

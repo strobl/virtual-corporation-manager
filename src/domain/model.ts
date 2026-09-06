@@ -14,7 +14,7 @@ import { DomainError, requireDomain as check } from './errors.js';
 import { findActivePath, isValidPercentage } from './graph.js';
 
 type ObjectValue = Record<string, unknown>;
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 5;
 export function emptyState(): WorkspaceState {
   return {
     schemaVersion: SCHEMA_VERSION,

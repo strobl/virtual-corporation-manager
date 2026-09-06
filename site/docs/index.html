@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Install VCM locally, import a three-agent example, review configuration changes and preserve your workspace. Alpha 5 release candidate documentation."
+    />
+    <meta name="theme-color" content="#f6f4ef" />
+    <title>Developer quickstart — VCM</title>
+    <link rel="icon" href="../assets/vcm-favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../styles.css" />
+    <script src="../site.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <div class="page-shell">
+      <header class="site-header">
+        <div class="header-inner">
+          <a class="identity" href="../" aria-label="VCM home"
+            ><img src="../assets/vcm-lockup.svg" alt="VCM" width="116" height="32" /><span
+              >Virtual Corporation Manager</span
+            ></a
+          >
+          <nav aria-label="Main navigation">
+            <a href="../">Overview</a>
+            <a href="./" aria-current="page">Docs</a>
+            <a class="nav-source" href="https://github.com/strobl/virtual-corporation-manager"
+              >GitHub ↗</a
+            >
+            <a class="button nav-install" href="#install">Install VCM</a>
+          </nav>
+        </div>
+      </header>
+      <main class="docs-layout" id="main" tabindex="-1">
+        <aside class="docs-nav" aria-label="On this page">
+          <a href="#install">Install</a>
+          <a href="#three-agent-example">Three-agent example</a>
+          <a href="#local-data">Local data</a>
+          <a href="#configuration">Configuration</a>
+          <a href="#execution">Execution</a>
+          <a href="#hours">Delivery hours</a>
+          <a href="#recovery">Export and recovery</a>
+          <a href="#contribute">Contribute</a>
+          <a href="#licensing">Licensing</a>
+          <a href="#limits">Limits</a>
+        </aside>
+        <article class="docs-content">
+          <section class="section" aria-labelledby="docs-title">
+            <p class="kicker">Developer quickstart</p>
+            <h1 id="docs-title">Keep your agent company close.</h1>
+            <p>
+              Represent one project, inspect its roles and reopen the same organization in your next
+              session. VCM is a local workspace for one operator. It stores the context you enter;
+              it does not synchronize arbitrary chats or shared team accounts.
+            </p>
+          </section>
+
+          <section class="section" id="install" aria-labelledby="install-title">
+            <p class="kicker">Local setup</p>
+            <h2 id="install-title">Install VCM</h2>
+            <p>
+              <strong>Alpha 5 release candidate.</strong> Download becomes available after release
+              publication. The commands below target the intended <code>0.1.0-alpha.5</code> release
+              asset; they do not establish that it is already available.
+            </p>
+            <p>
+              Use Node.js <strong>24.14 or later within 24.x, or 26.x</strong> with npm:
+              <code>&gt;=24.14 &lt;25</code> or <code>&gt;=26 &lt;27</code>. Check the versioned
+              release, source revision and archive checksum before installing. Candidate reviewers
+              should use the exact supplied archive and its matching manifest.
+            </p>
+            <div class="command-panel">
+              <p class="kicker">Terminal · after release publication</p>
+              <button
+                class="copy-button"
+                type="button"
+                data-copy="install-command"
+                aria-label="Copy installation commands"
+                hidden
+              >
+                Copy commands
+              </button>
+              <pre
+                class="command-block"
+                id="install-command"
+                tabindex="0"
+                aria-label="Install Alpha 5, check its version and start VCM"
+              ><code>npm install --ignore-scripts --prefix ./vcm-preview https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.5/gitflash-0.1.0-alpha.5.tgz
+npm exec --offline --prefix ./vcm-preview -- vcm --version
+npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code></pre>
+              <p class="copy-status" role="status" aria-live="polite"></p>
+            </div>
+            <p>
+              Expected version: <code>0.1.0-alpha.5</code>. The first command downloads the archive;
+              subsequent commands use the isolated installation. Open the loopback URL printed by
+              VCM. Use the same working directory and data directory when restarting. Add
+              <code>--port 4311</code> if port 4310 is occupied, or <code>--no-open</code> to open
+              the URL yourself.
+            </p>
+            <p>
+              The package name remains <code>gitflash</code>. <code>vcm</code> is the canonical
+              command; <code>gitflash</code> is a compatible alias for the same executable. No npm
+              package named <code>vcm</code> is required.
+            </p>
+            <p>
+              <a
+                href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.5"
+                >Versioned release</a
+              >
+              · <a href="#local-data">Keep the same workspace</a>
+            </p>
+          </section>
+
+          <section class="section" id="three-agent-example" aria-labelledby="example-title">
+            <p class="kicker">A small starting point</p>
+            <h2 id="example-title">Try the three-agent example.</h2>
+            <p>
+              <strong>Patchwork Studio (example)</strong> has one Product department and three peer
+              agents: Builder, Reviewer and Researcher. Their responsibilities describe a fictional
+              release-notes project. No manager is required. The file contains configuration only,
+              with no executed work, jobs or booked hours.
+            </p>
+            <p>
+              <a
+                class="button button-secondary"
+                href="../assets/three-agent-studio.json"
+                download="three-agent-studio.json"
+                >Download example JSON</a
+              >
+            </p>
+            <p>
+              The same file ships with the installation at
+              <code>vcm-preview/node_modules/gitflash/docs/examples/three-agent-studio.json</code>.
+            </p>
+            <ol>
+              <li>Open <strong>Settings → Import a company definition</strong>.</li>
+              <li>
+                Choose the JSON file, or paste its complete contents into
+                <strong>Definition JSON</strong>.
+              </li>
+              <li>
+                Choose <strong>Review import</strong>. Inspect one corporation, one department and
+                three agents with their responsibilities.
+              </li>
+              <li>
+                Choose <strong>Apply changes</strong>, then open
+                <strong>Your corporations → Patchwork Studio (example)</strong>.
+              </li>
+              <li>
+                Select each agent and inspect its instructions. Importing does not execute them.
+              </li>
+            </ol>
+            <p>
+              Each import creates fresh IDs for companies, departments, agents, assignments and
+              company relationships. Repeating an import adds another corporation with a suffixed
+              short code; it does not update the first. Use the existing corporation's edit controls
+              for changes.
+            </p>
+          </section>
+
+          <section class="section" id="local-data" aria-labelledby="data-title">
+            <h2 id="data-title">Return to the same local workspace.</h2>
+            <p>
+              VCM saves organization, work and time records in local SQLite. The explicit
+              <code>--data-dir</code> flag takes precedence over <code>GITFLASH_DATA_DIR</code>,
+              then the default <code>~/.gitflash</code>. Existing data is not moved automatically.
+              Relative paths resolve from your terminal's working directory; use an absolute path if
+              you start VCM from different directories.
+            </p>
+            <pre
+              class="command-block"
+              tabindex="0"
+              aria-label="Inspect commands and start without opening a browser"
+            ><code>npm exec --offline --prefix ./vcm-preview -- vcm --help
+npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company --no-open</code></pre>
+            <p>
+              Stop with Ctrl+C before maintenance. The server binds to loopback for one local
+              operator. It has no shared accounts or supported LAN, proxy or tunnel hosting. The
+              local core needs no provider account, hosted database, billing or telemetry.
+            </p>
+            <p>
+              To remove this isolated installation, stop VCM and run
+              <code>npm uninstall --prefix ./vcm-preview gitflash</code>. Your workspace directories
+              remain intact.
+            </p>
+          </section>
+
+          <section class="section" id="configuration" aria-labelledby="configuration-title">
+            <h2 id="configuration-title">Review a change before saving.</h2>
+            <ol>
+              <li>
+                Open <strong>Your corporations → Set up a corporation</strong>. Use your project
+                name, purpose and current roles.
+              </li>
+              <li>
+                Start empty or adapt the editable small-team starting point. Add one useful agent
+                with concrete responsibilities and instructions. Departments and reporting lines are
+                optional.
+              </li>
+              <li>
+                Choose <strong>Review changes → Apply changes</strong>. Cancelling before Apply
+                saves nothing.
+              </li>
+              <li>
+                Stop and restart with the same data directory. Select an agent, choose
+                <strong>Edit details</strong> and update one responsibility. Review, apply and
+                reload to inspect the saved result.
+              </li>
+            </ol>
+            <p>
+              The server validates the complete definition. Unsupported fields, invalid references
+              and reporting cycles are refused. If another tab changes the workspace, review the
+              refreshed preview. For an uncertain Apply response, use <strong>Retry save</strong> to
+              resolve the same receipt instead of importing again.
+            </p>
+            <p>
+              <strong>Activity &amp; undo</strong> lets you inspect configuration history and
+              available undo actions. Undo is version-aware; it does not reverse external work or
+              delivery-hour records. Time entries have their own correction history.
+            </p>
+          </section>
+
+          <section class="section" id="execution" aria-labelledby="execution-title">
+            <h2 id="execution-title">Organization is separate from execution.</h2>
+            <p>
+              A configured agent is a role with instructions, not a running process. A reporting
+              line describes responsibility; it does not delegate work automatically. Saving a
+              corporation or importing JSON dispatches nothing.
+            </p>
+            <p>
+              <strong>Work</strong> and <strong>Integrations</strong> are optional, separate paths.
+              Codex execution requires your own installed runtime, authenticated provider access and
+              allowance. Individual tasks return read-only text. The bounded Product Studio workflow
+              uses five sequential roles to create and check a Python stock-alert utility from
+              fictional input; it is not an arbitrary workflow engine.
+            </p>
+            <p>
+              The workflow checker needs a compatible macOS or Linux sandbox. It is unavailable on
+              native Windows, and stock Ubuntu 24.04 with restricted user namespaces is unsupported
+              for that optional route. Buzz task dispatch and Slack round trips remain experimental.
+              No runtime credential belongs in a company definition.
+            </p>
+          </section>
+
+          <section class="section" id="hours" aria-labelledby="hours-title">
+            <h2 id="hours-title">Record delivery hours with a basis.</h2>
+            <p>
+              When there is work to record, choose <strong>Log time</strong> from the relevant
+              corporation or agent. Check the company, member, date, description and hour basis
+              before saving. Use <strong>Time Tracker</strong> to inspect the weekly ledger and
+              correct an entry; the original remains in history.
+            </p>
+            <p>
+              Delivery hours are booked or estimated human-equivalent effort. They are separate from
+              measured runtime, accepted results, invoices and proven savings. Saving an
+              organization or accepting a result does not create hours. No time entry is needed to
+              finish setup. Label synthetic learning entries and keep them in an isolated example
+              workspace.
+            </p>
+          </section>
+
+          <section class="section" id="recovery" aria-labelledby="recovery-title">
+            <h2 id="recovery-title">Choose the right export.</h2>
+            <dl>
+              <dt><strong>Reuse a company structure</strong></dt>
+              <dd>
+                <strong>Settings → Export company definition</strong>, or <code>vcm export</code>,
+                produces portable schema 1 configuration: companies, departments, agents,
+                assignments and relationships. It covers the workspace's configuration, not only the
+                selected company. Import creates fresh IDs and preserves existing companies.
+              </dd>
+              <dt><strong>Inspect booked hours</strong></dt>
+              <dd>
+                <code>vcm time-export</code> produces a ledger, catalog and time-history snapshot.
+                It is not a full restore format.
+              </dd>
+              <dt><strong>Recover the complete workspace</strong></dt>
+              <dd>
+                <code>vcm backup</code> and <code>vcm restore</code> preserve SQLite state,
+                including configuration, work, jobs, artifact bytes, time entries, history and
+                recovery receipts.
+              </dd>
+            </dl>
+            <p>Stop VCM first. Choose new output filenames; existing destinations are refused.</p>
+            <pre
+              class="command-block"
+              tabindex="0"
+              aria-label="Export configuration and hours, then back up and restore a stopped workspace"
+            ><code>npm exec --offline --prefix ./vcm-preview -- vcm export --data-dir ./my-company --output ./company-definition.json
+npm exec --offline --prefix ./vcm-preview -- vcm time-export --data-dir ./my-company --output ./delivery-hours.json
+npm exec --offline --prefix ./vcm-preview -- vcm backup --data-dir ./my-company --output ./company-backup.sqlite
+npm exec --offline --prefix ./vcm-preview -- vcm restore --data-dir ./restored-company --from ./company-backup.sqlite
+npm exec --offline --prefix ./vcm-preview -- vcm doctor --data-dir ./restored-company
+npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./restored-company --no-open</code></pre>
+            <p>
+              Restore replaces the selected workspace; it does not merge later changes. Rehearse
+              into a fresh <code>restored-company</code> directory, then inspect corporation
+              identities and any work or time history. To reuse configuration alone, import the
+              exported JSON into a different empty workspace and expect fresh IDs without copied
+              work or hours.
+            </p>
+            <p>
+              Backups can contain private instructions, task inputs and outputs in plaintext SQLite.
+              Inspect exports before sharing. Provider login stores, credentials and external tool
+              installations are not included. If the workspace is locked, stop its owning process.
+              Never delete SQLite WAL or SHM files to clear a lock.
+            </p>
+          </section>
+
+          <section class="section" id="contribute" aria-labelledby="contribute-title">
+            <h2 id="contribute-title">Contribute a small, inspectable change.</h2>
+            <p>
+              Check
+              <a href="https://github.com/strobl/virtual-corporation-manager/issues"
+                >current issues</a
+              >
+              for overlap, or open a focused issue with the problem, reproduction and expected
+              behavior. Documentation, example improvements and reproducible UI findings are useful
+              starting points. Use temporary workspaces and fictional inputs; local-core
+              contributions need no provider credentials or private planning access.
+            </p>
+            <p>
+              Use the reviewed source revision for the target release. The public default branch may
+              still describe an earlier version during candidate preparation. In a supplied
+              candidate checkout, install development dependencies and run the checks:
+            </p>
+            <pre
+              class="command-block"
+              tabindex="0"
+              aria-label="Check a candidate source checkout"
+            ><code>npm ci --ignore-scripts
+npm run check
+npm run format:check
+npm run test:package</code></pre>
+            <p>
+              Initial checkout and uncached dependencies require network access.
+              <code>npm run check</code> checks types, runs tests and builds the application.
+              <code>npm run test:package</code> installs and exercises a real tarball in a temporary
+              workspace.
+            </p>
+            <p>
+              The installed example also includes a provider-free import, edit, restart, export and
+              recovery check:
+            </p>
+            <pre
+              class="command-block"
+              tabindex="0"
+              aria-label="Verify the installed three-agent example"
+            ><code>node ./vcm-preview/node_modules/gitflash/docs/examples/verify.mjs</code></pre>
+            <p>
+              Report the exact source or archive, VCM version, Node and OS versions, commands and
+              observed results. The maintainer reviews scope and changes before merge, then checks
+              installed release artifacts. There is no guaranteed response time or paid support SLA.
+              Do not attach private databases or credentials to an issue.
+            </p>
+            <p>
+              <a href="https://github.com/strobl/virtual-corporation-manager">Repository</a> ·
+              <a
+                href="https://github.com/strobl/virtual-corporation-manager/blob/main/CONTRIBUTING.md"
+                >Contribution guide</a
+              >
+              ·
+              <a href="https://github.com/strobl/virtual-corporation-manager/security/policy"
+                >Security reporting</a
+              >
+            </p>
+          </section>
+
+          <section class="section" id="licensing" aria-labelledby="licensing-title">
+            <h2 id="licensing-title">MIT core. Optional Enterprise modules.</h2>
+            <p>
+              <strong
+                >VCM's core is open source under the MIT License, including commercial use.</strong
+              >
+              Individuals and businesses of any size can use, modify, distribute, sell, host and
+              fork the core under MIT. Preserve its required copyright and license notices and
+              comply with applicable third-party licenses. No Enterprise subscription or
+              company-size limit applies to the core.
+            </p>
+            <p>
+              The existing corporation and agent model, reporting lines, local execution and
+              integration paths, Time Tracker, history, import/export, SQLite persistence and
+              recovery remain in the MIT core. Our adopted model keeps existing core capabilities
+              and fixes there. Hosting rights under the license do not turn the current loopback
+              server into a supported shared or remote service.
+            </p>
+            <p>
+              We plan to offer distinct, optional new Enterprise modules under separate commercial
+              licenses for additional organizational capabilities. Those modules are not part of the
+              current release. Publicly viewable proprietary source is not the same as open-source
+              licensing. Support and implementation services, when offered, have their own expressly
+              agreed scope.
+            </p>
+            <p>
+              <a href="https://github.com/strobl/virtual-corporation-manager/blob/main/LICENSE"
+                >MIT License</a
+              >
+              ·
+              <a
+                href="https://github.com/strobl/virtual-corporation-manager/blob/main/docs/licensing.md"
+                >Full licensing model in the source</a
+              >
+            </p>
+          </section>
+
+          <section class="section" id="limits" aria-labelledby="limits-title">
+            <h2 id="limits-title">What this alpha does not imply.</h2>
+            <ul>
+              <li>
+                A virtual corporation is project organization, not a legal entity or a running
+                business.
+              </li>
+              <li>
+                Configured roles and reporting lines do not create an autonomous company or
+                synchronize external chats.
+              </li>
+              <li>
+                The CLI supports <code>start</code> (the default), <code>doctor</code>,
+                <code>backup</code>, <code>restore</code>, <code>export</code> and
+                <code>time-export</code>. Import uses the UI. There is no CLI <code>import</code>,
+                <code>init</code>, <code>run</code>, YAML loader or configuration watcher.
+              </li>
+              <li>
+                macOS, Linux and native Windows are local-core targets. Consult observed acceptance
+                for the exact release; a configured CI matrix is not proof of a passing run.
+              </li>
+              <li>
+                A fictional example, automated check or screenshot is not evidence of outside
+                adoption, repeat use or time saved.
+              </li>
+            </ul>
+            <p><a href="../">Back to the overview</a></p>
+          </section>
+        </article>
+      </main>
+      <footer class="site-footer">
+        <div class="footer-inner">
+          <p>VCM <span>Virtual Corporation Manager</span></p>
+          <nav aria-label="Footer navigation">
+            <a href="../">Overview</a><a href="./">Docs</a
+            ><a href="https://github.com/strobl/virtual-corporation-manager">Source</a
+            ><a href="../imprint/">Imprint</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

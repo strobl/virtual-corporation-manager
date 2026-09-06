@@ -1,4 +1,4 @@
-# GitFlash engineering
+# VCM engineering
 
 The source prototype outside this repository is read-only. Never copy its private history, .env, .lovable, Supabase migrations, credentials or customer data.
 

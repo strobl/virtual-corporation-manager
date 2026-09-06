@@ -1,4 +1,5 @@
-import { DatabaseSync, backup as sqliteBackup } from 'node:sqlite';
+import { DatabaseSync } from 'node:sqlite';
+import { backupDatabase } from './backup.js';
 import { createHash, randomUUID } from 'node:crypto';
 import {
   chmodSync,
@@ -26,6 +27,13 @@ import type {
   WorkspaceStore,
 } from '../domain/contracts.js';
 import { DomainError, requireDomain as check } from '../domain/errors.js';
+import { JOB_MIGRATION, validateJobData } from '../jobs/store.js';
+import {
+  createTimeStore,
+  TIME_MIGRATION,
+  seedTimeCatalog,
+  validateTimeData,
+} from '../time/store.js';
 import {
   emptyState,
   executeCommands,
@@ -56,6 +64,8 @@ const MIGRATIONS = [
   `CREATE TABLE integration_runs (id TEXT PRIMARY KEY, request_id TEXT NOT NULL UNIQUE, info TEXT NOT NULL CHECK(json_valid(info)), context TEXT NOT NULL CHECK(json_valid(context)));
    ALTER TABLE changes ADD COLUMN undoable INTEGER NOT NULL DEFAULT 1 CHECK(undoable IN (0,1));
    UPDATE changes SET undoable=0 WHERE action='change.undo' OR json_extract(beforeJson,'$.work') IS NOT json_extract(afterJson,'$.work');`,
+  TIME_MIGRATION,
+  JOB_MIGRATION,
 ];
 function digest(sql: string) {
   return createHash('sha256').update(sql).digest('hex');
@@ -86,7 +96,7 @@ function lockDirectory(dataDir: string): () => void {
       } catch {
         throw new DomainError(
           'WORKSPACE_BUSY',
-          'The workspace lock cannot be read. Confirm no GitFlash server is running before removing workspace.lock.',
+          'The workspace lock cannot be read. Confirm no VCM server is running before removing workspace.lock.',
         );
       }
       if (Number.isSafeInteger(existing.pid) && Number(existing.pid) > 0) {
@@ -105,7 +115,7 @@ function lockDirectory(dataDir: string): () => void {
       }
       throw new DomainError(
         'WORKSPACE_BUSY',
-        'This workspace is already open. Stop its GitFlash server before opening or restoring it.',
+        'This workspace is already open. Stop its VCM server before opening or restoring it.',
       );
     }
   }
@@ -139,7 +149,7 @@ function initialize(db: DatabaseSync, dataDir: string) {
   check(
     currentVersion <= SCHEMA_VERSION,
     'UPGRADE_REQUIRED',
-    `This workspace uses schema ${currentVersion}; this GitFlash supports up to ${SCHEMA_VERSION}. Upgrade GitFlash before opening it.`,
+    `This workspace uses schema ${currentVersion}; this VCM supports up to ${SCHEMA_VERSION}. Upgrade VCM before opening it.`,
   );
   if (currentVersion === 0) {
     const tables = db
@@ -148,7 +158,7 @@ function initialize(db: DatabaseSync, dataDir: string) {
     check(
       tables.length === 0,
       'INVALID_DATABASE',
-      'The selected database is not a recognized GitFlash workspace.',
+      'The selected database is not a recognized VCM workspace.',
     );
   } else {
     check(
@@ -163,7 +173,7 @@ function initialize(db: DatabaseSync, dataDir: string) {
       rows.length === currentVersion &&
         rows.every((r, i) => Number(r.version) === i + 1 && r.checksum === digest(MIGRATIONS[i]!)),
       'INVALID_DATABASE',
-      'Workspace migration journal does not match this release. Preserve the database and use its compatible GitFlash version.',
+      'Workspace migration journal does not match this release. Preserve the database and use its compatible VCM version.',
     );
     validateDatabaseContents(db, currentVersion);
     if (currentVersion < SCHEMA_VERSION) preUpgradeBackup(db, dataDir, currentVersion);
@@ -175,6 +185,7 @@ function initialize(db: DatabaseSync, dataDir: string) {
     );
     for (let i = currentVersion; i < MIGRATIONS.length; i += 1) {
       db.exec(MIGRATIONS[i]!);
+      if (i === 3) seedTimeCatalog(db);
       db.prepare('INSERT INTO schema_migrations VALUES (?,?,?)').run(
         i + 1,
         digest(MIGRATIONS[i]!),
@@ -240,6 +251,8 @@ function readSnapshot(db: DatabaseSync, schemaVersion = SCHEMA_VERSION): Workspa
   return state;
 }
 function validateDatabaseContents(db: DatabaseSync, schemaVersion: number) {
+  if (schemaVersion >= 4) validateTimeData(db);
+  if (schemaVersion >= 5) validateJobData(db);
   check(
     db.prepare('PRAGMA foreign_key_check').all().length === 0,
     'INVALID_DATABASE',
@@ -571,7 +584,7 @@ function verifyBackup(path: string): DatabaseSync {
     check(
       v >= 1 && v <= SCHEMA_VERSION,
       'INVALID_BACKUP',
-      'Backup schema is unsupported. Use the matching or newer GitFlash version.',
+      'Backup schema is unsupported. Use the matching or newer VCM version.',
     );
     const journal = db
       .prepare('SELECT version,checksum FROM schema_migrations ORDER BY version')
@@ -591,7 +604,7 @@ function verifyBackup(path: string): DatabaseSync {
     if (error instanceof DomainError && error.code === 'INVALID_BACKUP') throw error;
     throw new DomainError(
       'INVALID_BACKUP',
-      'The file is not a valid GitFlash workspace backup. Its entity or execution records could not be verified.',
+      'The file is not a valid VCM workspace backup. Its entity or execution records could not be verified.',
     );
   }
 }
@@ -615,7 +628,18 @@ export function createWorkspaceStore(dataDir: string): WorkspaceStore {
   }
   let closed = false;
   const ensureOpen = () => check(!closed, 'STORE_CLOSED', 'This workspace has been closed.');
+  const time = createTimeStore(db, () => readSnapshot(db));
   return {
+    time: {
+      snapshot() {
+        ensureOpen();
+        return time.snapshot();
+      },
+      mutate(command, source) {
+        ensureOpen();
+        return time.mutate(command, source);
+      },
+    },
     snapshot() {
       ensureOpen();
       return readSnapshot(db);
@@ -657,8 +681,23 @@ export function createWorkspaceStore(dataDir: string): WorkspaceStore {
         const preview = db.prepare('SELECT * FROM previews WHERE id=?').get(previewId);
         check(preview, 'NOT_FOUND', 'Preview not found. Create a new preview.');
         const before = readSnapshot(db);
-        if (preview.appliedChangeId)
-          return { state: before, changeId: String(preview.appliedChangeId), replayed: true };
+        if (preview.appliedChangeId) {
+          const change = db
+            .prepare('SELECT beforeJson,afterJson FROM changes WHERE id=?')
+            .get(String(preview.appliedChangeId));
+          check(change, 'INVALID_STATE', 'The saved change receipt could not be found.');
+          const originalBefore = JSON.parse(String(change.beforeJson)) as WorkspaceState;
+          const originalAfter = JSON.parse(String(change.afterJson)) as WorkspaceState;
+          const existingIds = new Set(originalBefore.companies.map((company) => company.id));
+          return {
+            state: before,
+            changeId: String(preview.appliedChangeId),
+            replayed: true,
+            createdCompanyIds: originalAfter.companies
+              .filter((company) => !existingIds.has(company.id))
+              .map((company) => company.id),
+          };
+        }
         assertRevision(Number(preview.baseRevision), before);
         const after = JSON.parse(String(preview.afterJson)) as WorkspaceState;
         after.revision = before.revision + 1;
@@ -679,7 +718,15 @@ export function createWorkspaceStore(dataDir: string): WorkspaceStore {
           changesWork ? 0 : 1,
         );
         db.prepare('UPDATE previews SET appliedChangeId=? WHERE id=?').run(changeId, previewId);
-        return { state: readSnapshot(db), changeId, replayed: false };
+        const existingIds = new Set(before.companies.map((company) => company.id));
+        return {
+          state: readSnapshot(db),
+          changeId,
+          replayed: false,
+          createdCompanyIds: after.companies
+            .filter((company) => !existingIds.has(company.id))
+            .map((company) => company.id),
+        };
       });
     },
     previewUndo(changeId: string, baseRevision: number): UndoPreview {
@@ -738,7 +785,7 @@ export function createWorkspaceStore(dataDir: string): WorkspaceStore {
       const temp = `${destination}.${randomUUID()}.tmp`;
       closeSync(openSync(temp, 'wx', 0o600));
       try {
-        await sqliteBackup(db, temp);
+        await backupDatabase(db, temp);
         const verified = verifyBackup(temp);
         verified.close();
         linkSync(temp, destination);
@@ -770,7 +817,7 @@ export async function restoreWorkspaceBackup(dataDir: string, source: string): P
     const candidate = verifyBackup(source);
     closeSync(openSync(temp, 'wx', 0o600));
     try {
-      await sqliteBackup(candidate, temp);
+      await backupDatabase(candidate, temp);
     } finally {
       candidate.close();
     }
