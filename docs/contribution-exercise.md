@@ -1,8 +1,10 @@
 # Contribution exercise: readable organization counts
 
-This is a completed local code contribution exercise by an internal coding agent for the unpublished `0.1.0-alpha.5-local.1` candidate. The issue below is ready for maintainer review; it has not been posted to GitHub and is not an external contributor's pull request. It uses the repository's shipped example, source and checks. No private planning access, provider account or executed agent work is needed.
+This is a historical record of a completed local code contribution exercise by an internal coding agent for the then-unpublished `0.1.0-alpha.5-local.1` candidate. The issue below was prepared for maintainer review; it was not posted to GitHub as part of this exercise and is not an external contributor's pull request. It used the repository's shipped example, source and checks. No private planning access, provider account or executed agent work was needed.
 
-## Review-ready issue
+The current product version is `0.1.0-alpha.7`; consult its versioned release for source and package evidence. Use the [README installation route](../README.md#install-the-reviewed-archive) and [first-company guide](first-company.md) for its current setup. The reproduction labels and verification results below belong to alpha.5-local.1; they do not establish acceptance of alpha.7. In the current interface, import the example through **Settings → Import a company definition**, open **Corporations → Patchwork Studio (example)**, then use **Tools → Organization tools → Reporting lines** to inspect the organization summary.
+
+## Historical review-ready issue
 
 **Title:** Use singular nouns for one person, agent, team or reporting level
 
@@ -34,7 +36,7 @@ This is a completed local code contribution exercise by an internal coding agent
 
 The fix selects the singular noun when its existing count is exactly `1`; otherwise it selects the plural. It uses the same inline conditional pattern already used for member counts in this component. It does not recompute counts or introduce a formatting dependency.
 
-The following commands ran successfully on macOS arm64 with Node.js 24.19.0:
+The following commands ran successfully for that historical candidate on macOS arm64 with Node.js 24.19.0:
 
 ```sh
 node node_modules/vitest/vitest.mjs run tests/frontend-model.test.ts
@@ -43,7 +45,7 @@ npm run typecheck
 
 All 14 existing frontend-model tests passed. These tests cover organization identity, counts, selection and reporting context; they are not a substitute for inspecting the final text in a browser. No test was added solely to duplicate the wording conditional. The final candidate's browser review and package binding are recorded separately with its acceptance evidence.
 
-For maintainer review, inspect the focused diff:
+The exercise supplied this command for maintainer review of its focused diff; it is retained as historical context, not as a claim that the fix is still pending:
 
 ```sh
 git diff -- src/components/organization/CorporationOrgChart.tsx docs/contribution-exercise.md

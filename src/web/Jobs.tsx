@@ -238,8 +238,8 @@ export function JobsView({
       )}
       {!loading && !loadError && !workflow && (
         <p className="connection-note">
-          No installed workflows are available. Check that the complete <code>gitflash</code>{' '}
-          package is installed.
+          No installed workflows are available. Check that your VCM installation includes its
+          workflow files.
         </p>
       )}
       {!loading && workflow && !scoped.length && (
@@ -539,7 +539,7 @@ function StartJobDialog({
               role uses a separate session. Final acceptance stays with you.
             </p>
             <p className="small">
-              {status?.costNotice?.replaceAll('GitFlash', 'VCM') ||
+              {status?.costNotice ||
                 'VCM is free. Codex uses your own account and provider allowance; usage may incur charges.'}
             </p>
           </div>

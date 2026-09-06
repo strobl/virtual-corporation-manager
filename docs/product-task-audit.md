@@ -1,4 +1,8 @@
-# Corporation management and task capability audit
+# Historical corporation management and task capability audit
+
+**Historical inspection snapshot — 6 September 2026, before the later CompanyConsole adoption.** The body below preserves the findings and proposed intervention from that inspection. Its component table, old navigation paths and words such as “new” or “revised” refer to that stage; they are not the current source map or acceptance evidence for a later package.
+
+For current contributor guidance, use [Architecture for contributors](developer-architecture.md) and [the corporation-management product model](product/corporation-management.md). The current `App` opens companies in `CompanyConsole` and creates an empty company through `QuickCompanySetup`. Humans and AI Agents are first-class members. Corporations and Time Tracker are primary navigation; execution, connections and detailed organization views sit under Tools. These later changes do not turn the historical inspection below into proof of runtime execution or current UI acceptance.
 
 Source inspection: 6 September 2026. This describes implementation, not proof of a live provider run. No agent was executed for this audit.
 

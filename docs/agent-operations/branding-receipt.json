@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "kind": "VCM documentation branding adaptation",
+  "releaseVersion": "0.1.0-alpha.6",
+  "baseRevision": "a4f2ae29775ae8d58f9e09861fb877ccb5b9882a",
+  "originalImportReceipt": "import-receipt.json",
+  "originalIntegrationManifest": "product-studio.integration.json",
+  "scope": "Current shipped human-facing documentation and full role prompt wording. Original imported source hashes, technical package IDs, source provenance, oracle, role authority and acceptance criteria remain unchanged. The original manifest identifies imported source bytes, not these adapted copies.",
+  "transformations": [
+    "Replace human-facing GitFlash product wording with VCM.",
+    "Use canonical repository URLs for support and issue routing.",
+    "Update first-company install examples to alpha.6, vcm-preview, vcm-first-company and the canonical vcm command; update its current template navigation and acceptance reference.",
+    "Use vcm --version in support reporting."
+  ],
+  "files": [
+    {
+      "path": "docs/agent-operations/operating-contract.md",
+      "sourceSha256": "3b93afe2935b263f5f6dfcb4b0928aaa6849221bdcd31a508ae5c677285a4d14",
+      "adaptedSha256": "acab7491fb61cc48b7a2091fa767ce1972857101a9f2332c4696a1078453b930",
+      "sourceBytes": 10971,
+      "adaptedBytes": 10951
+    },
+    {
+      "path": "docs/agent-operations/roles/source-verifier.md",
+      "sourceSha256": "2b73d1ed7e85668bad21e681b14bc50dd77bb07b2714fbd5610baa49cedd495f",
+      "adaptedSha256": "9f6801038a05d20c3f3f0b2cfc35bc76427ff431c14aadb6b150aed2b417df1d",
+      "sourceBytes": 8882,
+      "adaptedBytes": 8877
+    },
+    {
+      "path": "docs/agent-operations/roles/content-writer.md",
+      "sourceSha256": "cdd462e4be8bfa786de9c289fabfdaa0bac1886cfe15ab33cf62f35f9d976b4a",
+      "adaptedSha256": "d8f51f71f9fb29ddb391c5af5e400f919780e0ff653a6522940b88932d028b4c",
+      "sourceBytes": 8774,
+      "adaptedBytes": 8769
+    },
+    {
+      "path": "docs/agent-operations/roles/requirements-analyst.md",
+      "sourceSha256": "74da1901e1c1fbc867ef682b27e9645fdf3cfdbe9f509c50ec0d1d7e2d84b15f",
+      "adaptedSha256": "e4edf106337aa1eff99c126e9b7cdbc141ce802f0b36bc0edcd8da95e64d549c",
+      "sourceBytes": 8862,
+      "adaptedBytes": 8857
+    },
+    {
+      "path": "docs/agent-operations/roles/research-analyst.md",
+      "sourceSha256": "6ce3a88d386bcd90557ce59849f01185e47d06dc02c50fe112a6551cdb33e102",
+      "adaptedSha256": "75af9e6dd61eeffe3704f5c92db060af08dc0bc28cc813ddb69e9d43f6b53b5b",
+      "sourceBytes": 9232,
+      "adaptedBytes": 9227
+    },
+    {
+      "path": "docs/agent-operations/roles/software-builder.md",
+      "sourceSha256": "06d247bc05f0131c6baed30b8b9ea344c9fa586d94d4a65cbb59f5dd9e397d57",
+      "adaptedSha256": "0f848acc6874a39ff132addc8983896cdd5d4ec098eb16e1d5bbe09b0cf12fcd",
+      "sourceBytes": 9178,
+      "adaptedBytes": 9173
+    },
+    {
+      "path": "docs/agent-operations/roles/content-editor.md",
+      "sourceSha256": "512aadf1e9da18bdcd0c4591b7cebefa91477e46e6baa66ab076266787b1730f",
+      "adaptedSha256": "42a2834d300857565db1f6baab8e579faaa0b9413fcab6767c4735b99d542e3e",
+      "sourceBytes": 8870,
+      "adaptedBytes": 8865
+    },
+    {
+      "path": "docs/agent-operations/roles/handoff-editor.md",
+      "sourceSha256": "71891a09aaabc25a67be22a7f3c16805c584243cdda9cd1fbc4347688fd9b09a",
+      "adaptedSha256": "922619bf8ee9672e6cd9cbb1ad81f63798514c910553f49f87537ace8412f93a",
+      "sourceBytes": 8660,
+      "adaptedBytes": 8655
+    },
+    {
+      "path": "docs/agent-operations/roles/content-planner.md",
+      "sourceSha256": "a4058c3ef2a7af674ab57730f6bb1b412351407a4ddac6a0748e57508b105378",
+      "adaptedSha256": "2045aef60417e72551af2b2461685766851d4ce914e5c2baa9e8975dd79bab79",
+      "sourceBytes": 8652,
+      "adaptedBytes": 8647
+    },
+    {
+      "path": "docs/agent-operations/roles/delivery-manager.md",
+      "sourceSha256": "b7baf19e312027adee5861d0384b3ee144dbdcc38fbce804c9da14e5a266cfe7",
+      "adaptedSha256": "217c7abcea273f2117a31cc51a200318954581b04ccd1541d3798a99e4a2a8b9",
+      "sourceBytes": 11112,
+      "adaptedBytes": 11107
+    },
+    {
+      "path": "docs/agent-operations/roles/operations-analyst.md",
+      "sourceSha256": "768c0b1fdcc8cba11f1a31226476a1b57e531ff3c94e0a0385fd9866061ffe0b",
+      "adaptedSha256": "a8d30f0b94f89c03f43bc91f422300bd20c4e7efdab543842be473d521633283",
+      "sourceBytes": 8810,
+      "adaptedBytes": 8805
+    },
+    {
+      "path": "docs/agent-operations/roles/quality-reviewer.md",
+      "sourceSha256": "d1f520de9299fb8f9d5780932446e5a287e49d27c9a945738543b938c8555564",
+      "adaptedSha256": "d9da9e176d1fa1050f0a706f469cdec468a937e22f297b0a61917acb05c71363",
+      "sourceBytes": 13880,
+      "adaptedBytes": 13875
+    },
+    {
+      "path": "docs/agent-operations/roles/index.json",
+      "sourceSha256": "12e0e9be3f512fad0d24c6ce35aee2c3f11ead566bde25064c5320cfe39abb86",
+      "adaptedSha256": "d8d627bb73a0d16c1694fb0d71836a13e2079c378e4597988b1c929a17870b2c",
+      "sourceBytes": 85534,
+      "adaptedBytes": 85479
+    },
+    {
+      "path": "docs/agent-operations/help/FIRST-COMPANY.md",
+      "sourceSha256": "82a16df494e73bead67c8c5061deb79368fe45e174b42be4d683a59c9c7db633",
+      "adaptedSha256": "acbcedcd89655e8786e92c402840764f31ade72d3c9bdf185b472a3888c3c3fa",
+      "sourceBytes": 6489,
+      "adaptedBytes": 6655
+    },
+    {
+      "path": "docs/agent-operations/help/SUPPORT.md",
+      "sourceSha256": "bbd2206b1976a87872a302506363eec217ea3789c4c4aec0add3e96a2b905c9f",
+      "adaptedSha256": "c7380c2ad0a67143c1825ee8137c0002b6f6cd2b850f38b8046831579020552e",
+      "sourceBytes": 4772,
+      "adaptedBytes": 4813
+    },
+    {
+      "path": "docs/agent-operations/help/TRIAGE.md",
+      "sourceSha256": "e64cec633e7b7b2b01a08df93199f66233f7800bfd545c0f2d2a5b4f61e59a86",
+      "adaptedSha256": "1cc4164735a64222743ab4883b44e526def462cb617f525eba52ab7e866aeeb8",
+      "sourceBytes": 5745,
+      "adaptedBytes": 5778
+    }
+  ],
+  "runtimeContent": {
+    "path": "src/jobs/content.generated.json",
+    "sourceSha256": "78441abeda4f044bf26c4c6fc43dc23bcae6163e705a5009d60e54fa5bf87e9e",
+    "adaptedSha256": "f6d75bfb22eec556f859b3814e49a438a5cbd315222e2e98c08e55397e25168d",
+    "sourceManifestSha256": "092c20d44c9baa48b87b16457c49e48564d2bb38f3c7101ec18a4900dd8643b7",
+    "adaptedFullRolePromptLengths": {
+      "ao.role.delivery-manager": 8176,
+      "ao.role.requirements-analyst": 7051,
+      "ao.role.software-builder": 7209,
+      "ao.role.quality-reviewer": 9560,
+      "ao.role.handoff-editor": 6950
+    }
+  },
+  "helpAliases": [
+    {
+      "path": "docs/first-company.md",
+      "adaptedSha256": "cabe21d1ff1059710c5d907c327f06d73bc414ec40a72f4863addf0b890fb958"
+    },
+    {
+      "path": "docs/support.md",
+      "adaptedSha256": "c9903e3eb4e7974c8054a2e6334a9819978811058ff2665216d42292b5320962"
+    },
+    {
+      "path": "docs/triage.md",
+      "adaptedSha256": "9797154b5819b1d653414d996aeb174996f0d9ab53ea3c8a748d795c79f4011c"
+    }
+  ]
+}

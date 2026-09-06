@@ -1,4 +1,4 @@
-// Adapted from strobl/org-manager-console (GitFlash source prototype, 7edae2ad).
+// Adapted from strobl/org-manager-console (source prototype, 7edae2ad).
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 

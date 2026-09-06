@@ -9,7 +9,7 @@ export interface SlackOrigin {
   threadTs: string;
 }
 type Enqueue = (request: RunRequest, origin: SlackOrigin) => Promise<RunInfo>;
-// SDK diagnostics can contain remote response bodies. Report only GitFlash's fixed
+// SDK diagnostics can contain remote response bodies. Report only VCM's fixed
 // connection/delivery states, never provider payloads or tokens in terminal logs.
 const privateLogger: Logger = {
   debug() {},
@@ -203,7 +203,7 @@ export class SlackConnection {
       await this.explain(
         event.channel,
         event.thread_ts ?? event.ts,
-        'Use @GitFlash Agent name: your task. Choose one active role from your local company.',
+        'Use @VCM Agent name: your task. Choose one active role from your local company.',
       );
       return;
     }
@@ -250,7 +250,7 @@ export class SlackConnection {
       await this.explain(
         event.channel,
         event.thread_ts ?? event.ts,
-        'GitFlash could not queue this task. Check the local app for the agent assignment and runtime setup.',
+        'VCM could not queue this task. Check the local app for the agent assignment and runtime setup.',
       );
       return;
     }
@@ -286,8 +286,8 @@ export class SlackConnection {
       return { status: 'failed', reference: null };
     const text =
       run.status === 'completed'
-        ? `${run.agentName} completed GitFlash task ${run.id}.\n\n${run.output.slice(0, 30_000)}${run.output.length > 30_000 ? '\n\nFull result is saved in the local GitFlash app.' : ''}`
-        : `${run.agentName}: GitFlash task ${run.id} failed. ${run.error ?? 'Inspect the task in the local app.'}`;
+        ? `${run.agentName} completed VCM task ${run.id}.\n\n${run.output.slice(0, 30_000)}${run.output.length > 30_000 ? '\n\nFull result is saved in the local VCM app.' : ''}`
+        : `${run.agentName}: VCM task ${run.id} failed. ${run.error ?? 'Inspect the task in the local app.'}`;
     try {
       await this.reserveMessageSlot();
       if (!this.connected || !this.web) return { status: 'pending', reference: null };

@@ -239,26 +239,6 @@ export function EntityEditor({
             }
           />
         </label>
-        {target.kind === 'company' && (
-          <div className="form-row">
-            <label>
-              Short code
-              <input
-                required
-                pattern="[A-Za-z0-9]([A-Za-z0-9_]|-){0,23}"
-                minLength={1}
-                maxLength={24}
-                value={shortCode}
-                onChange={(e) => setShortCode(e.target.value)}
-                placeholder="ACME"
-              />
-            </label>
-            <label>
-              Company color
-              <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
-            </label>
-          </div>
-        )}
         {target.kind === 'agent' && (
           <label>
             Role
@@ -327,6 +307,29 @@ export function EntityEditor({
               placeholder="What does this team exist to do?"
             />
           </label>
+        )}
+        {target.kind === 'company' && (
+          <details className="text-disclosure" open={!target.id}>
+            <summary>Company code &amp; appearance</summary>
+            <div className="form-row">
+              <label>
+                Short code
+                <input
+                  required
+                  pattern="[A-Za-z0-9]([A-Za-z0-9_]|-){0,23}"
+                  minLength={1}
+                  maxLength={24}
+                  value={shortCode}
+                  onChange={(e) => setShortCode(e.target.value)}
+                  placeholder="ACME"
+                />
+              </label>
+              <label>
+                Company color
+                <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
+              </label>
+            </div>
+          </details>
         )}
         {target.kind !== 'company' && (
           <details className="text-disclosure">
@@ -441,6 +444,14 @@ export function PreviewDialog({
   onApply: () => void;
   onRefresh: () => void;
 }) {
+  // Show the authoritative preview's management changes, including its before/after values.
+  const memberChanges = member
+    ? preview.changes
+        .filter((change) =>
+          /^Agent — (?:Name|Role|Responsibilities|Department|Reports to): /.test(change),
+        )
+        .map((change) => change.slice('Agent — '.length))
+    : [];
   const compact = Boolean(company || member);
   const title = company
     ? `${recovery === 'retry' ? 'Confirm' : 'Create'} ${company.name}`
@@ -531,6 +542,18 @@ export function PreviewDialog({
                 )}
               </section>
             ) : null}
+            {memberChanges.length > 0 && (
+              <section aria-label="Member changes">
+                <h3 className="small-heading">
+                  {member?.editing ? 'What will change' : 'Member details'}
+                </h3>
+                <ul className="preserve-lines">
+                  {memberChanges.map((change, index) => (
+                    <li key={index}>{change}</li>
+                  ))}
+                </ul>
+              </section>
+            )}
             <details className="text-disclosure">
               <summary>Review technical details</summary>
               {changes}

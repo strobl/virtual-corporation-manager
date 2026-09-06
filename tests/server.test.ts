@@ -13,7 +13,7 @@ async function setup() {
   cleanup.push(() => rm(dir, { recursive: true, force: true }));
   const webDir = join(dir, 'web');
   await mkdir(webDir);
-  await writeFile(join(webDir, 'index.html'), '<!doctype html><title>GitFlash</title>');
+  await writeFile(join(webDir, 'index.html'), '<!doctype html><title>VCM</title>');
   const app = await startServer({ dataDir: join(dir, 'data'), webDir, port: 0 });
   cleanup.push(() => app.close());
   return { app, dir, webDir };
@@ -107,7 +107,7 @@ describe('loopback product boundary', () => {
     expect(page.status).toBe(200);
     expect(page.headers.get('content-security-policy')).toContain("frame-ancestors 'none'");
     expect(page.headers.get('referrer-policy')).toBe('no-referrer');
-    expect(await page.text()).toContain('GitFlash');
+    expect(await page.text()).toContain('VCM');
     expect((await fetch(app.url, { method: 'PUT' })).status).toBe(405);
   });
 });

@@ -3,16 +3,16 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>VCM — Your agent company. On your machine.</title>
+    <title>VCM — Your company. People and agents together.</title>
     <meta
       name="description"
-      content="Organize agents, reporting lines and delivery hours in a local, open-source workspace. VCM — Virtual Corporation Manager."
+      content="Manage your company, its people and AI agents, responsibilities and recorded hours in a local, open-source workspace."
     />
     <meta name="theme-color" content="#F6F5F1" />
-    <meta property="og:title" content="VCM — Your agent company. On your machine." />
+    <meta property="og:title" content="VCM — Your company. People and agents together." />
     <meta
       property="og:description"
-      content="Organize agents, reporting lines and delivery hours in a local, open-source workspace."
+      content="Manage your company, its people and AI agents, responsibilities and recorded hours in a local, open-source workspace."
     />
     <meta property="og:type" content="website" />
     <link rel="icon" href="./assets/vcm-favicon.svg" type="image/svg+xml" />
@@ -40,15 +40,16 @@
       <section class="hero section">
         <div class="hero-grid">
           <div>
-            <h1>Your agent company.<br />On your machine.</h1>
+            <h1>Your company.<br />People and agents together.</h1>
             <p class="intro">
-              Organize agents, reporting lines and delivery hours in a local, open-source workspace.
+              Give your company a home. Keep its people, AI agents and responsibilities clear, with
+              the full picture saved on your machine.
             </p>
             <p><strong>Technical alpha — for developer evaluation</strong></p>
             <p>
-              Tested local features include company and agent management and the Time Tracker.
-              Execution is experimental; the install → configure → execute → useful-result journey
-              remains incomplete.
+              Create a company, add the team you need, and manage responsibilities and reporting.
+              The Time Tracker keeps recorded work inspectable. Optional agent execution remains
+              experimental.
             </p>
             <div class="actions">
               <a class="button" href="#install">Install VCM</a
@@ -59,13 +60,11 @@
           <div class="command-panel" id="install" tabindex="-1">
             <div class="panel-header">
               <h2>Install VCM</h2>
-              <span class="release-label">Alpha 5 technical prerelease</span>
+              <span class="release-label">Alpha 7 technical prerelease</span>
             </div>
             <p class="compact release-status">
-              <strong>PS-001 did not complete.</strong> Intake and one retry each timed out after
-              300 seconds at <code>ultra</code>. No v2 bundle or owner acceptance exists; the
-              earlier v1 download was rejected.
-              <a href="./docs/#execution">Known workflow limits →</a>
+              Company management and the Time Tracker run locally. No VCM account or AI provider is
+              needed to get started.
             </p>
             <p class="compact">Node.js 24.14+ in 24.x, or 26.x · npm</p>
             <div class="command-toolbar">
@@ -78,15 +77,15 @@
               class="command-block"
               id="install-command"
               tabindex="0"
-              aria-label="Alpha 5 installation commands"
-            ><code>npm install --ignore-scripts --prefix ./vcm-preview https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.5/gitflash-0.1.0-alpha.5.tgz
+              aria-label="Alpha 7 installation commands"
+            ><code>npm install --ignore-scripts --prefix ./vcm-preview https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.7/gitflash-0.1.0-alpha.7.tgz
 npm exec --offline --prefix ./vcm-preview -- vcm --version
 npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code></pre>
             <p class="copy-status" role="status" aria-live="polite"></p>
             <p class="compact release-status">
-              The Alpha 5 technical prerelease is available.
+              Alpha 7 combines simpler company management with the VCM command.
               <a
-                href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.5"
+                href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.7"
                 >Release details ↗</a
               >
             </p>
@@ -99,30 +98,31 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code><
         <figure class="product-proof">
           <a
             class="shot-link"
-            href="./assets/patchwork-agent-desktop.jpg"
+            href="./assets/corporation-desktop.png"
             data-viewer
-            data-caption="Patchwork Studio · fictional three-agent example · local candidate"
-            aria-label="Enlarge the Patchwork Studio product screenshot"
+            data-caption="Linden Studio · fictional company and member data · local product review"
+            aria-label="Enlarge the company and member workspace"
           >
             <picture
               ><source
                 media="(max-width: 639px)"
-                srcset="./assets/patchwork-agent-mobile.jpg"
+                srcset="./assets/corporation-mobile.png"
                 width="390"
                 height="844" />
               <img
-                src="./assets/patchwork-agent-desktop.jpg"
+                src="./assets/corporation-desktop.png"
                 width="1280"
-                height="720"
-                alt="VCM showing Builder, Reviewer and Researcher as peer agents in Patchwork Studio. Builder's details list responsibilities and instructions."
+                height="850"
+                alt="VCM company workspace showing Linden Studio and a member's responsibilities, reporting and company assignments."
                 fetchpriority="high" /></picture
             ><span class="enlarge-hint">Enlarge ↗</span>
           </a>
           <figcaption>
-            Patchwork Studio · fictional three-agent example · local candidate
+            Linden Studio · fictional company and member data · local product review
           </figcaption>
           <p class="proof-note">
-            Captured from 0.1.0-alpha.5-local.1. Three peer roles; no executed jobs or booked hours.
+            Captured from the Alpha 7 local build. Illustrative members and hours; no customer
+            activity. <a href="./assets/corporation-provenance.json">Capture provenance</a>.
           </p>
         </figure>
       </section>
@@ -130,41 +130,39 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code><
         <p class="kicker">Start small</p>
         <h2>Keep the organization between sessions.</h2>
         <p class="section-intro">
-          Name a corporation for your project. Give each agent a role and responsibility. Add
-          reporting lines when your work needs them. Reopen the structure when you return.
+          Start with a company name and optional purpose. Add people and AI agents as members, then
+          give each a clear responsibility. Departments and reporting can grow with your team.
         </p>
         <div class="role-grid">
           <article>
-            <span class="role-dept">Product</span>
-            <h3>Builder</h3>
-            <p>Implement the scoped change. Record test commands and results.</p>
+            <span class="role-dept">Company</span>
+            <h3>A simple starting point</h3>
+            <p>Name your company, review it and save. Add the team when you are ready.</p>
           </article>
           <article>
-            <span class="role-dept">Product</span>
-            <h3>Reviewer</h3>
-            <p>Compare a proposed change with the brief before it is accepted.</p>
+            <span class="role-dept">Members</span>
+            <h3>People and AI agents</h3>
+            <p>Keep roles, responsibilities and reporting together in the company workspace.</p>
           </article>
           <article>
-            <span class="role-dept">Product</span>
-            <h3>Researcher</h3>
-            <p>Trace requirements to sources and record what remains uncertain.</p>
+            <span class="role-dept">Relationships</span>
+            <h3>Understand the structure</h3>
+            <p>Inspect departments, shared members and connections between your companies.</p>
           </article>
         </div>
         <div class="two-column">
           <div>
-            <h3>One useful agent is enough.</h3>
+            <h3>Your team, at its own pace.</h3>
             <p>
-              Patchwork Studio is a fictional example for a release-notes tool. The three agents are
-              peers in one Product department. A manager is optional. These roles describe potential
-              work; importing them does not run it.
+              A company can start empty. Add one person or agent with a useful responsibility,
+              inspect a change before saving, and return to the same company next time.
             </p>
           </div>
           <div>
-            <h3>Import, inspect, then adapt.</h3>
+            <h3>Examples when you need them.</h3>
             <p>
-              Open <strong>Settings → Import a company definition</strong>. Choose
-              <strong>Review import → Apply changes</strong>. Each import creates fresh identities
-              and preserves existing corporations.
+              Optional templates and the fictional three-agent example can help you explore. Review
+              an import before applying it; creating its roles starts no work.
             </p>
             <a href="./docs/#three-agent-example">Try the three-agent example →</a>
           </div>
@@ -174,8 +172,8 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code><
         <p class="kicker">Delivery hours</p>
         <h2>Keep work records inspectable.</h2>
         <p class="section-intro">
-          Review delivery hours by agent and date. Each entry keeps its description, reference basis
-          and correction history, so changes remain visible.
+          Review delivery hours by company, member and date. Each entry keeps its description,
+          reference basis and correction history, so changes remain visible.
         </p>
         <figure class="product-proof">
           <a
@@ -215,11 +213,11 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code><
       <section class="section two-column" id="local">
         <div>
           <p class="kicker">A clear model</p>
-          <h2>Structure is not execution.</h2>
+          <h2>See how your company fits together.</h2>
           <dl class="rule-list">
             <div>
-              <dt>Corporation, department, agent</dt>
-              <dd>A purpose and organization, with roles, responsibilities and instructions.</dd>
+              <dt>Company, department, member</dt>
+              <dd>Manage people and AI agents with roles, responsibilities and working context.</dd>
             </div>
             <div>
               <dt>Reporting relationships</dt>
@@ -294,11 +292,11 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code><
         <details>
           <summary>What can I install today?</summary>
           <p>
-            You can install the <strong>0.1.0-alpha.5 technical prerelease</strong> to evaluate the
-            local workspace. The Product Studio workflow remains incomplete. The screenshots were
-            captured from the earlier local review candidate, 0.1.0-alpha.5-local.1. Check the
+            The <strong>0.1.0-alpha.7 technical prerelease</strong> brings company, human and AI
+            agent management into one workspace. Optional Product Studio execution remains
+            incomplete. Screenshot captions identify their actual source. Check the
             <a
-              href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.5"
+              href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.7"
               >versioned release notes</a
             >
             for the exact archive, requirements and known failures.

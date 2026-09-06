@@ -79,8 +79,15 @@ export function filterConsoleMembers(
   );
 }
 
-export function consoleRuntime(status: IntegrationStatus | null) {
-  if (!status) return { ready: false, label: 'Checking connection' };
+export type ConsoleDataState = 'loading' | 'ready' | 'unavailable';
+
+export function consoleRuntime(
+  status: IntegrationStatus | null,
+  dataState: ConsoleDataState = status ? 'ready' : 'loading',
+) {
+  if (dataState === 'unavailable')
+    return { ready: false, label: 'Connection status unavailable. Refresh to check again' };
+  if (dataState === 'loading' || !status) return { ready: false, label: 'Checking connection' };
   if (status.codex.state === 'ready') return { ready: true, label: 'Codex connected' };
   if (status.buzz.available && status.buzz.state === 'configured')
     return { ready: true, label: 'Buzz connected' };
@@ -94,6 +101,7 @@ export function createCompanyConsoleModel(
   time: TimeSnapshot | null,
   timeError: string | null,
   runs: readonly RunInfo[],
+  runsState: ConsoleDataState = 'ready',
 ) {
   const company =
     state.companies.find((row) => row.id === companyId && row.status === 'active') ?? null;
@@ -151,10 +159,13 @@ export function createCompanyConsoleModel(
     hours,
     from,
     through: ledger?.today ?? null,
-    activity: running
-      ? `${running} ${running === 1 ? 'task running' : 'tasks running'}`
-      : queued
-        ? `${queued} ${queued === 1 ? 'task queued' : 'tasks queued'}`
-        : 'No active task in this company',
+    activity:
+      runsState === 'unavailable'
+        ? 'Direct-run activity unavailable. Refresh to check again.'
+        : runsState === 'loading'
+          ? 'Checking direct-run activity…'
+          : running || queued
+            ? `Direct runs in this company: ${running} running · ${queued} queued`
+            : 'No active direct runs in this company.',
   };
 }

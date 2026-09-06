@@ -763,9 +763,9 @@ export function createWorkspaceStore(dataDir: string): WorkspaceStore {
       const s = readSnapshot(db);
       return {
         schemaVersion: 1,
-        name: s.companies[0]?.name ?? 'GitFlash company',
+        name: s.companies[0]?.name ?? 'VCM company',
         description:
-          'Company configuration exported from GitFlash. Runtime credentials and work outputs are not included.',
+          'Company configuration exported from VCM. Runtime credentials and work outputs are not included.',
         companies: s.companies,
         departments: s.departments,
         agents: s.agents,

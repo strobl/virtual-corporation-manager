@@ -104,7 +104,7 @@ async function pythonExecutable(env: NodeJS.ProcessEnv): Promise<string> {
   }
   return fail(
     'PYTHON_REQUIRED',
-    'Install Python 3.8 or newer and restart GitFlash, or set GITFLASH_PYTHON_PATH to its absolute executable path.',
+    'Install Python 3.8 or newer and restart VCM, or set GITFLASH_PYTHON_PATH to its absolute executable path.',
   );
 }
 
@@ -772,7 +772,7 @@ export function createJobService(
     if (job.status === 'running' || job.status === 'queued') {
       job.status = 'failed';
       job.error =
-        'GitFlash stopped during this job. Evidence is retained; explicitly retry to resume the incomplete stage.';
+        'VCM stopped during this job. Evidence is retained; explicitly retry to resume the incomplete stage.';
       for (const stage of job.stages)
         if (stage.status === 'running') {
           stage.status = 'failed';

@@ -54,6 +54,7 @@ import { CompanyMap } from './CompanyMap';
 import { CorporationWorkspace } from './CorporationWorkspace';
 import { QuickCompanySetup } from './QuickCompanySetup';
 import { CompanyConsole } from './CompanyConsole';
+import type { ConsoleDataState } from './company-console-model';
 import { HumanResultDialog } from './HumanResultDialog';
 import { AgentPlacement } from './AgentPlacement';
 import {
@@ -117,6 +118,8 @@ export function App() {
   const [templates, setTemplates] = useState<TemplateSummary[]>([]);
   const [status, setStatus] = useState<IntegrationStatus | null>(null);
   const [runs, setRuns] = useState<RunInfo[]>([]);
+  const [runsState, setRunsState] = useState<ConsoleDataState>('loading');
+  const [runtimeState, setRuntimeState] = useState<ConsoleDataState>('loading');
   const [jobs, setJobs] = useState<JobInfo[]>([]);
   const [area, setArea] = useState<Area>(() => {
     const saved = new URLSearchParams(location.search).get('area');
@@ -210,8 +213,14 @@ export function App() {
       setError(null);
     } else setError(message(results[0].reason));
     if (results[1].status === 'fulfilled') setTemplates(results[1].value);
-    if (results[2].status === 'fulfilled') setStatus(results[2].value);
-    if (results[3].status === 'fulfilled') setRuns(results[3].value);
+    if (results[2].status === 'fulfilled') {
+      setStatus(results[2].value);
+      setRuntimeState('ready');
+    } else setRuntimeState('unavailable');
+    if (results[3].status === 'fulfilled') {
+      setRuns(results[3].value);
+      setRunsState('ready');
+    } else setRunsState('unavailable');
     if (results[4].status === 'fulfilled') setJobs(results[4].value);
     if (results[5].status === 'fulfilled') {
       setTimeSnapshot(results[5].value);
@@ -333,6 +342,7 @@ export function App() {
       value.kind === 'agent' && !value.companyId && companyId ? { ...value, companyId } : value,
     );
     setShowInspector(value.kind !== 'company');
+    drawerUsed.current = false;
     setNavOpen(false);
   };
   const openAdvanced = (target: AdvancedTarget) => {
@@ -343,6 +353,7 @@ export function App() {
     setModalError(null);
     setSetupAction(null);
     setCorporationSetupOpen(true);
+    drawerUsed.current = false;
     setNavOpen(false);
   };
   const openEditor = (target: EditorTarget) => {
@@ -368,7 +379,6 @@ export function App() {
       setPreview(prepared.preview);
       setSaveRecovery(null);
       setTemplatesOpen(false);
-      setAdvanced(null);
     } catch (cause) {
       setModalError(message(cause));
       if (
@@ -447,6 +457,7 @@ export function App() {
       setStartRequested(false);
       setCorporationSetupOpen(false);
       setEditor(null);
+      setAdvanced(null);
       setRecordMember(null);
       setSetupAction(null);
       setPreview(null);
@@ -525,6 +536,7 @@ export function App() {
       else if (companyWork?.stats.reviewable) setWorkMode('tasks');
     }
     setArea(value);
+    drawerUsed.current = false;
     setNavOpen(false);
   };
   const openCorporation = (id: string) => {
@@ -705,7 +717,7 @@ export function App() {
                 const next = parseSelection(key);
                 if (next) {
                   select(next);
-                  navigate(next.kind === 'department' ? 'organization' : 'corporation');
+                  navigate('corporation');
                 }
               }}
             />
@@ -892,20 +904,29 @@ export function App() {
                   state={state}
                   companyId={companyId}
                   selectedMemberId={selection?.kind === 'agent' ? selection.id : null}
+                  selectedDepartmentId={selection?.kind === 'department' ? selection.id : null}
                   time={timeSnapshot}
                   timeError={timeError}
                   runs={runs}
                   status={status}
+                  runsState={runsState}
+                  runtimeState={runtimeState}
+                  onRefresh={() => void refresh()}
                   onSelectMember={(id) =>
                     select(
                       id ? { kind: 'agent', id, companyId } : { kind: 'company', id: companyId },
                     )
                   }
                   onEditCompany={() => openEditor({ kind: 'company', id: companyId })}
-                  onAddMember={() => openEditor({ kind: 'agent', companyId })}
+                  onAddMember={() =>
+                    openEditor({ kind: 'agent', companyId, departmentId: selectedDepartment?.id })
+                  }
                   onEditMember={(id) => openEditor({ kind: 'agent', id, companyId })}
                   onManageAssignments={(id) => openAdvanced({ kind: 'assignments', agentId: id })}
                   onAddDepartment={() => openEditor({ kind: 'department', companyId })}
+                  onSelectDepartment={(id) =>
+                    select(id ? { kind: 'department', id } : { kind: 'company', id: companyId })
+                  }
                   onEditDepartment={(id) => openEditor({ kind: 'department', id, companyId })}
                   onRelationships={() => openAdvanced({ kind: 'relationships', companyId })}
                   onOpenCompany={openCorporation}
@@ -1696,6 +1717,7 @@ export function App() {
           state={state}
           busy={busy}
           error={modalError}
+          reviewing={Boolean(preview)}
           onClose={() => {
             if (!busy) setAdvanced(null);
           }}
@@ -1724,7 +1746,7 @@ export function App() {
           preview={preview}
           company={companyReview}
           member={memberReview}
-          backToEditor={Boolean(editor || recordMember)}
+          backToEditor={Boolean(editor || recordMember || advanced)}
           busy={busy}
           error={modalError}
           recovery={saveRecovery}

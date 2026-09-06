@@ -22,6 +22,7 @@ import {
   consoleRuntime,
   createCompanyConsoleModel,
   filterConsoleMembers,
+  type ConsoleDataState,
   type ConsoleRelationship,
 } from './company-console-model';
 import './company-console.css';
@@ -30,16 +31,21 @@ export interface CompanyConsoleProps {
   state: WorkspaceState;
   companyId: string;
   selectedMemberId: string | null;
+  selectedDepartmentId?: string | null;
   time: TimeSnapshot | null;
   timeError: string | null;
   runs: RunInfo[];
   status: IntegrationStatus | null;
+  runsState?: ConsoleDataState;
+  runtimeState?: ConsoleDataState;
+  onRefresh: () => void;
   onSelectMember: (id: string | null) => void;
   onEditCompany: () => void;
   onAddMember: () => void;
   onEditMember: (id: string) => void;
   onManageAssignments: (id: string) => void;
   onAddDepartment: () => void;
+  onSelectDepartment: (id: string | null) => void;
   onEditDepartment: (id: string) => void;
   onRelationships: () => void;
   onOpenCompany: (id: string) => void;
@@ -55,21 +61,38 @@ export function CompanyConsole({
   state,
   companyId,
   selectedMemberId,
+  selectedDepartmentId = null,
   time,
   timeError,
   runs,
   status,
+  runsState = 'ready',
+  runtimeState,
   ...actions
 }: CompanyConsoleProps) {
-  const view = createCompanyConsoleModel(state, companyId, selectedMemberId, time, timeError, runs);
+  const view = createCompanyConsoleModel(
+    state,
+    companyId,
+    selectedMemberId,
+    time,
+    timeError,
+    runs,
+    runsState,
+  );
   const [query, setQuery] = useState('');
   const [kind, setKind] = useState<'all' | 'agent' | 'human'>('all');
   const [layout, setLayout] = useState<'members' | 'reporting'>('members');
   const inspector = useRef<HTMLElement>(null);
   const memberButtons = useRef(new Map<string, HTMLButtonElement>());
-  const previousSelection = useRef<{ companyId: string; id: string | null }>({
+  const departmentButtons = useRef(new Map<string, HTMLButtonElement>());
+  const previousSelection = useRef<{
+    companyId: string;
+    id: string | null;
+    departmentId: string | null;
+  }>({
     companyId,
     id: null,
+    departmentId: null,
   });
   useEffect(() => {
     setQuery('');
@@ -77,7 +100,7 @@ export function CompanyConsole({
     setLayout('members');
   }, [companyId]);
   useEffect(() => {
-    if (selectedMemberId && inspector.current) {
+    if ((selectedMemberId || selectedDepartmentId) && inspector.current) {
       inspector.current.focus({ preventScroll: true });
       if (window.matchMedia('(max-width: 960px)').matches)
         inspector.current.scrollIntoView({
@@ -88,9 +111,18 @@ export function CompanyConsole({
         });
     } else if (previousSelection.current.companyId === companyId && previousSelection.current.id) {
       memberButtons.current.get(previousSelection.current.id)?.focus();
+    } else if (
+      previousSelection.current.companyId === companyId &&
+      previousSelection.current.departmentId
+    ) {
+      departmentButtons.current.get(previousSelection.current.departmentId)?.focus();
     }
-    previousSelection.current = { companyId, id: selectedMemberId };
-  }, [selectedMemberId, companyId]);
+    previousSelection.current = {
+      companyId,
+      id: selectedMemberId,
+      departmentId: selectedDepartmentId,
+    };
+  }, [selectedMemberId, selectedDepartmentId, companyId]);
   if (!view.company)
     return (
       <section className="company-console">
@@ -98,10 +130,14 @@ export function CompanyConsole({
       </section>
     );
   const company = view.company;
-  const visible = filterConsoleMembers(view.members, query, kind);
+  const department = view.departments.find((row) => row.id === selectedDepartmentId);
+  const scopedMembers = department
+    ? view.members.filter((row) => row.departmentId === department.id)
+    : view.members;
+  const visible = filterConsoleMembers(scopedMembers, query, kind);
   const visibleIds = new Set(visible.map((member) => member.id));
   const member = view.selected;
-  const runtime = consoleRuntime(status);
+  const runtime = consoleRuntime(status, runtimeState);
   const managerLabel = (id: string | null) => {
     const manager = state.agents.find((row) => row.id === id);
     if (!manager) return id ? 'Former member' : 'Not assigned';
@@ -219,9 +255,89 @@ export function CompanyConsole({
         )}
       </div>
 
-      <div className={`console-body${member ? ' has-member' : ''}`}>
+      <div className={`console-body${member || department ? ' has-member' : ''}`}>
         <div className="console-main">
+          <div className="console-company-details">
+            <section className="console-departments" aria-labelledby="console-departments-title">
+              <div className="console-section-heading">
+                <h2 id="console-departments-title">Departments</h2>
+                <button className="text-button" onClick={actions.onAddDepartment}>
+                  <Plus size={13} /> Add
+                </button>
+              </div>
+              {view.departments.length ? (
+                <ul>
+                  {view.departments.map((department) => {
+                    const memberCount = view.members.filter(
+                      (row) => row.departmentId === department.id,
+                    ).length;
+                    return (
+                      <li key={department.id}>
+                        <button
+                          ref={(node) => {
+                            if (node) departmentButtons.current.set(department.id, node);
+                            else departmentButtons.current.delete(department.id);
+                          }}
+                          aria-label={`View ${department.name} department`}
+                          aria-pressed={selectedDepartmentId === department.id}
+                          onClick={() => actions.onSelectDepartment(department.id)}
+                        >
+                          <span>
+                            <strong>{department.name}</strong>
+                            <small>
+                              {memberCount} {memberCount === 1 ? 'member' : 'members'}
+                              {department.managerId
+                                ? ` · Led by ${managerLabel(department.managerId)}`
+                                : ''}
+                            </small>
+                          </span>
+                          <ChevronRight size={13} aria-hidden="true" />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p>Optional. Keep a small team at company level, or group members by function.</p>
+              )}
+            </section>
+            <section
+              className="console-relationships"
+              aria-labelledby="console-relationships-title"
+            >
+              <div className="console-section-heading">
+                <h2 id="console-relationships-title">Company relationships</h2>
+                <button className="text-button" onClick={actions.onRelationships}>
+                  Manage <ArrowRight size={13} />
+                </button>
+              </div>
+              {relationshipCount ? (
+                <>
+                  {relationshipSection('Owned by', view.relationships.ownedBy, true)}
+                  {relationshipSection('Owns', view.relationships.owns, true)}
+                  {relationshipSection('Collaborates with', view.relationships.collaborates, false)}
+                </>
+              ) : (
+                <p>
+                  No company relationships recorded. Connect this corporation to another company
+                  through ownership or collaboration.
+                </p>
+              )}
+            </section>
+          </div>
+
           <section className="console-members" aria-label="Company members">
+            {department && (
+              <div className="console-section-heading console-department-scope">
+                <h2>
+                  {department.name} · {scopedMembers.length}{' '}
+                  {scopedMembers.length === 1 ? 'member' : 'members'}
+                </h2>
+                <button className="text-button" onClick={() => actions.onSelectDepartment(null)}>
+                  All members
+                </button>
+              </div>
+            )}
             <div className="console-section-heading">
               <div className="console-view-toggle" aria-label="Member view">
                 <button
@@ -267,7 +383,9 @@ export function CompanyConsole({
                 </div>
                 {!visible.length ? (
                   <p className="console-no-results">
-                    No members match.{' '}
+                    {department && !scopedMembers.length
+                      ? 'No members in this department yet.'
+                      : 'No members match.'}{' '}
                     <button
                       className="text-button"
                       onClick={() => {
@@ -399,66 +517,6 @@ export function CompanyConsole({
             )}
           </section>
 
-          <div className="console-company-details">
-            <section className="console-departments" aria-labelledby="console-departments-title">
-              <div className="console-section-heading">
-                <h2 id="console-departments-title">Departments</h2>
-                <button className="text-button" onClick={actions.onAddDepartment}>
-                  <Plus size={13} /> Add
-                </button>
-              </div>
-              {view.departments.length ? (
-                <ul>
-                  {view.departments.map((department) => {
-                    const memberCount = view.members.filter(
-                      (row) => row.departmentId === department.id,
-                    ).length;
-                    return (
-                      <li key={department.id}>
-                        <button onClick={() => actions.onEditDepartment(department.id)}>
-                          <span>
-                            <strong>{department.name}</strong>
-                            <small>
-                              {memberCount} {memberCount === 1 ? 'member' : 'members'}
-                              {department.managerId
-                                ? ` · Led by ${managerLabel(department.managerId)}`
-                                : ''}
-                            </small>
-                          </span>
-                          <Pencil size={13} aria-hidden="true" />
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <p>Optional. Keep a small team at company level, or group members by function.</p>
-              )}
-            </section>
-            <section
-              className="console-relationships"
-              aria-labelledby="console-relationships-title"
-            >
-              <div className="console-section-heading">
-                <h2 id="console-relationships-title">Company relationships</h2>
-                <button className="text-button" onClick={actions.onRelationships}>
-                  Manage <ArrowRight size={13} />
-                </button>
-              </div>
-              {relationshipCount ? (
-                <>
-                  {relationshipSection('Owned by', view.relationships.ownedBy, true)}
-                  {relationshipSection('Owns', view.relationships.owns, true)}
-                  {relationshipSection('Collaborates with', view.relationships.collaborates, false)}
-                </>
-              ) : (
-                <p>
-                  No company relationships recorded. Connect this corporation to another company
-                  through ownership or collaboration.
-                </p>
-              )}
-            </section>
-          </div>
           <footer className="console-recorded-work">
             <div>
               <Clock3 size={15} aria-hidden="true" />
@@ -492,6 +550,56 @@ export function CompanyConsole({
           </footer>
         </div>
 
+        {department && !member && (
+          <aside
+            ref={inspector}
+            tabIndex={-1}
+            className="console-inspector"
+            aria-label={`${department.name} department details`}
+          >
+            <div className="console-inspector-top">
+              <span>Department · {company.name}</span>
+              <button
+                className="console-icon-button"
+                aria-label="Close department details"
+                onClick={() => actions.onSelectDepartment(null)}
+              >
+                <X size={17} />
+              </button>
+            </div>
+            <h2>{department.name}</h2>
+            <button
+              className="button console-edit-member"
+              onClick={() => actions.onEditDepartment(department.id)}
+            >
+              <Pencil size={14} /> Edit department
+            </button>
+            <section className="console-member-section">
+              <h3>Purpose</h3>
+              <p className="console-full-text">
+                {department.description || 'No purpose defined yet.'}
+              </p>
+            </section>
+            <dl className="console-member-facts">
+              <div>
+                <dt>Department lead</dt>
+                <dd>{managerLabel(department.managerId)}</dd>
+              </div>
+              <div>
+                <dt>Members in this company</dt>
+                <dd>{scopedMembers.length}</dd>
+              </div>
+            </dl>
+            <section className="console-member-section">
+              <p>
+                Select a member in the list to inspect their responsibilities and reporting line.
+              </p>
+              <button className="button" onClick={actions.onAddMember}>
+                <Plus size={14} /> Add member
+              </button>
+            </section>
+          </aside>
+        )}
         {member && (
           <aside
             ref={inspector}
@@ -603,6 +711,14 @@ export function CompanyConsole({
               {member.kind === 'agent' ? (
                 <>
                   <p className="console-runtime-state">{view.activity}</p>
+                  <p className="console-runtime-note">
+                    Direct runs only. Workflow activity is separate in work records.
+                  </p>
+                  {(runsState === 'unavailable' || runtimeState === 'unavailable') && (
+                    <button className="text-button" onClick={actions.onRefresh}>
+                      Refresh activity &amp; connection
+                    </button>
+                  )}
                   {view.taskCompany?.id === companyId ? (
                     <>
                       <button

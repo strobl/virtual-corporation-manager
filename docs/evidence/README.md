@@ -1,6 +1,6 @@
 # Actual runtime output
 
-These are real outputs produced by two configured roles through the installed Codex CLI, not seeded demo records. They concern a synthetic GitFlash acceptance company and contain no customer data. They are agent-authored working documents, not independent test certificates or human-pilot feedback.
+These are real outputs produced by two configured roles through the installed Codex CLI, not seeded demo records. They concern a synthetic acceptance company under the product's earlier branding and contain no customer data. They are agent-authored working documents, not independent test certificates or human-pilot feedback. Original output bytes, product names and hashes remain unchanged as historical evidence; current product documentation uses VCM.
 
 | Role            | Run ID                                 | Duration | Output SHA-256                                                     |
 | --------------- | -------------------------------------- | -------- | ------------------------------------------------------------------ |

@@ -63,11 +63,11 @@ The response contains individual `{ index, ok, receipt }` or `{ index, ok, error
 Download `GET /api/time/export` for a versioned JSON ledger/catalog/history export while the server runs. For a stopped workspace:
 
 ```sh
-gitflash time-export --data-dir ./my-company --output ./delivery-hours.json
-gitflash backup --data-dir ./my-company --output ./company-with-time.sqlite
-gitflash restore --data-dir ./restored-company --from ./company-with-time.sqlite
+vcm time-export --data-dir ./my-company --output ./delivery-hours.json
+vcm backup --data-dir ./my-company --output ./company-with-time.sqlite
+vcm restore --data-dir ./restored-company --from ./company-with-time.sqlite
 ```
 
-The JSON time export is an inspectable data artifact, not a full restore format. SQLite backup/restore is the supported complete recovery path and includes time, catalog overrides/history, replay receipts, company configuration and work/run evidence. Existing `gitflash export` remains company configuration only and contains no booked hours.
+The JSON time export is an inspectable data artifact, not a full restore format. SQLite backup/restore is the supported complete recovery path and includes time, catalog overrides/history, replay receipts, company configuration and work/run evidence. Existing `vcm export` remains company configuration only and contains no booked hours.
 
 Schema 4 adds the separate ledger. Opening a supported older workspace creates a pre-upgrade backup, retains its existing IDs/history and starts with no booked time. An older binary cannot open the newer schema; use its pre-upgrade backup for a downgrade. Never overwrite a public release archive with a different local candidate under the same version.

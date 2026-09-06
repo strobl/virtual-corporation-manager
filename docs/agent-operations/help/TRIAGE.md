@@ -1,10 +1,10 @@
-# Product Studio support triage
+# Optional Product Studio support triage
 
-This guide covers the native PS-001 workflow described in [FIRST-COMPANY.md](FIRST-COMPANY.md). Its entry point is **Work → Company jobs → Set up first job → Start job** for the selected Product Studio; candidate files are created by the workflow and delivered through its artifact bundle. The final installed package and button sequence still require verification.
+General onboarding starts with the current [first-company guide](../../first-company.md) and [company/member guidance](../company-management.md). This triage guide covers the optional PS-001 workflow described in [Product Studio](../../product-studio.md). Its secondary route is **Tools → Agent runs & records → Workflow examples** for the selected company: **Set up example** when the required roles exist, or **Preview Product Studio** to review and explicitly create the example company first. A scoped **Run example** opens setup. Only an authorized, explicit **Start job** starts the workflow; configuration or opening setup does not. Retain actual candidate, artifact and QA evidence. The exact candidate's [acceptance record](../../acceptance.md) and workflow guide govern its observed status, including failed or rejected results; these instructions are not a completed execution record.
 
 ## Intake and responsibility
 
-Use [GitFlash Issues](https://github.com/strobl/gitflash/issues) for appropriate public reports and [private vulnerability reporting](https://github.com/strobl/gitflash/security/advisories/new) for suspected vulnerabilities. The included [support guide](SUPPORT.md) defines the minimal redacted report. Public replies require an authorized maintainer.
+Use [VCM Issues](https://github.com/strobl/virtual-corporation-manager/issues) for appropriate public reports and [private vulnerability reporting](https://github.com/strobl/virtual-corporation-manager/security/advisories/new) for suspected vulnerabilities. The included [support guide](SUPPORT.md) defines the minimal redacted report. Public replies require an authorized maintainer.
 
 The repository's administrative maintainer is `strobl`. A named operational receiving person and backup/escalation arrangement for this release have not been confirmed. The functions below describe responsibility; they are not claims of actual GitHub assignment, staffed capacity or an on-call commitment. PMO must confirm the receiver and backup with the maintainer before claiming operational coverage. No paid-support SLA or response deadline is promised.
 

@@ -272,12 +272,36 @@ describe('truthful activity and time', () => {
       { agentId: 'shared', companyId: 'a', status: 'completed' },
     ] as RunInfo[];
     expect(createCompanyConsoleModel(workspace(), 'a', 'shared', null, null, runs).activity).toBe(
-      'No active task in this company',
+      'No active direct runs in this company.',
     );
     runs.push({ agentId: 'shared', companyId: 'a', status: 'running' } as RunInfo);
     expect(createCompanyConsoleModel(workspace(), 'a', 'shared', null, null, runs).activity).toBe(
-      '1 task running',
+      'Direct runs in this company: 1 running · 0 queued',
     );
+  });
+
+  it('suppresses stale or unloaded activity instead of reporting idle or active work', () => {
+    const stale = [{ agentId: 'shared', companyId: 'a', status: 'running' }] as RunInfo[];
+    for (const runs of [[], stale]) {
+      const view = createCompanyConsoleModel(
+        workspace(),
+        'a',
+        'shared',
+        null,
+        null,
+        runs,
+        'unavailable',
+      );
+      expect(view.activity).toBe('Direct-run activity unavailable. Refresh to check again.');
+      expect(view.activity).not.toMatch(/No active|running|queued/);
+    }
+    expect(
+      createCompanyConsoleModel(workspace(), 'a', 'shared', null, null, [], 'loading').activity,
+    ).toBe('Checking direct-run activity…');
+    stale.push({ agentId: 'shared', companyId: 'a', status: 'queued' } as RunInfo);
+    expect(
+      createCompanyConsoleModel(workspace(), 'a', 'shared', null, null, stale, 'ready').activity,
+    ).toBe('Direct runs in this company: 1 running · 1 queued');
   });
 
   it('requires actual runtime readiness', () => {
@@ -289,6 +313,11 @@ describe('truthful activity and time', () => {
     expect(consoleRuntime(status).ready).toBe(false);
     status.buzz.state = 'configured';
     expect(consoleRuntime(status)).toEqual({ ready: true, label: 'Buzz connected' });
+    expect(consoleRuntime(status, 'unavailable')).toEqual({
+      ready: false,
+      label: 'Connection status unavailable. Refresh to check again',
+    });
+    expect(consoleRuntime(status, 'loading').ready).toBe(false);
   });
 });
 
@@ -329,6 +358,8 @@ describe('company console presentation', () => {
         runs: [],
         status: null,
         onSelectMember: noop,
+        onSelectDepartment: noop,
+        onRefresh: noop,
         onEditCompany: noop,
         onAddMember: noop,
         onEditMember: noop,
@@ -365,5 +396,94 @@ describe('company console presentation', () => {
     expect(html).toContain('1 member · Led by Alex');
     expect(html).not.toContain('1 members');
     expect(noop).not.toHaveBeenCalled();
+  });
+});
+
+function renderConsole(
+  state: WorkspaceState,
+  selectedDepartmentId: string | null = null,
+  selectedMemberId: string | null = null,
+) {
+  const noop = () => {};
+  return renderToStaticMarkup(
+    createElement(CompanyConsole, {
+      state,
+      companyId: 'a',
+      selectedMemberId,
+      selectedDepartmentId,
+      time: null,
+      timeError: null,
+      runs: [],
+      status: {
+        codex: { state: 'ready' },
+        buzz: { available: false, state: 'unconfigured' },
+      } as IntegrationStatus,
+      runsState: 'unavailable',
+      runtimeState: 'unavailable',
+      onRefresh: noop,
+      onSelectMember: noop,
+      onEditCompany: noop,
+      onAddMember: noop,
+      onEditMember: noop,
+      onManageAssignments: noop,
+      onAddDepartment: noop,
+      onSelectDepartment: noop,
+      onEditDepartment: noop,
+      onRelationships: noop,
+      onOpenCompany: noop,
+      onRunAgent: noop,
+      onLogTime: noop,
+      onViewTime: noop,
+      onRecordWork: noop,
+      onOpenWork: noop,
+      onIntegrations: noop,
+    }),
+  );
+}
+
+describe('company management access', () => {
+  it('places department and relationship management before all 100 members', () => {
+    const state = workspace();
+    state.agents = Array.from({ length: 100 }, (_, index) => agent(`member-${index}`));
+    state.assignments = state.agents.map((member) => ({
+      id: `${member.id}-a`,
+      agentId: member.id,
+      companyId: 'a',
+      isPrimary: true,
+      startedAt: at,
+      endedAt: null,
+    }));
+    const html = renderConsole(state);
+    expect(html.match(/class="console-member-name"/g)).toHaveLength(100);
+    expect(html.indexOf('id="console-departments-title"')).toBeLessThan(html.indexOf('<table'));
+    expect(html.indexOf('id="console-relationships-title"')).toBeLessThan(html.indexOf('<table'));
+    expect(html).toContain('aria-label="View Strategy department"');
+  });
+
+  it('inspects a department inside its company and exposes a separate editing action', () => {
+    const state = workspace();
+    state.agents.find((row) => row.id === 'local')!.departmentId = 'department-a';
+    state.departments[0].description = 'Set the direction for the company.';
+    const html = renderConsole(state, 'department-a');
+    expect(html).toContain('id="console-company-name">A Studio</h1>');
+    expect(html).toContain('aria-label="Strategy department details"');
+    expect(html).toContain('Set the direction for the company.');
+    expect(html).toContain('Edit department');
+    expect(html).toContain('Department lead</dt><dd>Alex</dd>');
+    expect(html).toContain('All members');
+    expect(html.match(/class="console-member-name"/g)).toHaveLength(1);
+    expect(html).not.toContain('<dialog');
+    expect(renderConsole(state, 'department-b')).not.toContain('department details');
+  });
+
+  it('shows unavailable activity and prevents task creation using stale connection data', () => {
+    const html = renderConsole(workspace(), null, 'local');
+    expect(html).toContain('Direct-run activity unavailable. Refresh to check again.');
+    expect(html).toContain('Direct runs only. Workflow activity is separate in work records.');
+    expect(html).toContain('Connection status unavailable. Refresh to check again');
+    expect(html).toMatch(/<button class="button" disabled="">Give a task/);
+    expect(html).toContain('Refresh activity &amp; connection');
+    expect(html).not.toContain('No active direct runs');
+    expect(html).not.toContain('Codex connected');
   });
 });

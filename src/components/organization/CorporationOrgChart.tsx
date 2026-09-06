@@ -1,4 +1,4 @@
-// Adapted from strobl/org-manager-console (GitFlash source prototype, 7edae2ad).
+// Adapted from strobl/org-manager-console (source prototype, 7edae2ad).
 /**
  * Internal Org Chart — Layer B.
  *

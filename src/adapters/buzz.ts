@@ -51,8 +51,8 @@ export function exportBuzzTeam(state: WorkspaceState, companyId?: string): BuzzT
     format: 'buzz-team-snapshot',
     version: 1,
     team: {
-      name: company?.name ?? 'GitFlash Company',
-      description: company?.description ?? 'Company roles configured in GitFlash.',
+      name: company?.name ?? 'VCM Company',
+      description: company?.description ?? 'Company roles configured in VCM.',
       instructions:
         'Act only on an explicit assigned task. Identify the contributing role, provide useful evidence, and distinguish proposed actions from completed work. Configuration does not imply activation.',
     },
@@ -252,7 +252,7 @@ export async function executeBuzz(
   if (!config || !pubkey)
     throw new IntegrationError(
       'buzz-not-configured',
-      'Configure Buzz CLI access and map this GitFlash agent to a running Buzz identity.',
+      'Configure Buzz CLI access and map this VCM agent to a running Buzz identity.',
     );
   const prompt = [
     `@${input.agent.name}: GitFlash task ${input.run.id}`,
@@ -293,7 +293,7 @@ export async function executeBuzz(
   } catch {
     throw new IntegrationError(
       'delivery-uncertain',
-      'Buzz delivery is uncertain. Check the channel for this task ID before retrying; GitFlash will not resend automatically.',
+      'Buzz delivery is uncertain. Check the channel for this task ID before retrying; VCM will not resend automatically.',
     );
   }
   let acknowledgment: { event_id?: string; accepted?: boolean };
