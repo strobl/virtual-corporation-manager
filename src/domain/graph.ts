@@ -1,4 +1,4 @@
-/** Adapted from the private GitFlash prototype's pure ownership graph rules.
+/** Adapted from the private source prototype's pure ownership graph rules.
  * Only graph traversal and percentage semantics are retained; no hosted state.
  */
 export interface DirectedEdge {

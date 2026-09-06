@@ -32,9 +32,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## GitFlash corporation wordmark
+## Rubik font
 
-The retained lettering outlines derive from Rubik Bold 1.100. The archive also includes the unmodified `dist/web/fonts/Rubik-Bold.ttf` and its SIL Open Font License 1.1 text at `dist/web/fonts/Rubik-OFL-1.1.txt`. Its copyright and license are retained below. The current VCM interface uses system fonts and native SVG assets; the earlier corporation silhouette is an original GitFlash asset.
+The archive includes the unmodified `dist/web/fonts/Rubik-Bold.ttf` and its SIL Open Font License 1.1 text at `dist/web/fonts/Rubik-OFL-1.1.txt`. Its copyright and license are retained below. VCM retains this font for compatible typography alongside system fonts and native SVG assets.
 
 ```text
 Copyright (c) 2015 by Hubert & Fischer. All rights reserved. Hebrew characters (c) 2016 by Meir Sadan.

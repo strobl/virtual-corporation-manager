@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-alpha.6 — branding maintenance, 6 September 2026
+
+- Apply VCM / Virtual Corporation Manager consistently to current product copy, command examples, help, agent prompts and repository links. Use `vcm` as the canonical command.
+- Preserve the package/archive name, compatibility alias, data paths, environment settings and machine-facing identifiers under the [naming contract](docs/branding.md).
+- Record adapted Agent Operations documentation separately from its original imported source hashes. Preserve historical evidence, existing workspace records and the separate FDE website.
+- This change makes no new Product Studio execution or usefulness claim. Alpha.5's failed attempts and evidence remain unchanged. Exact source, checks, archive and public-install verification are tracked in [acceptance](docs/acceptance.md#branding-maintenance-release--6-september-2026).
+
 ## 0.1.0-alpha.5 — release preparation, 5 September 2026
 
 - Target the verified GitHub tarball distribution route for the developer-first VCM product, retaining the `gitflash` package and both `vcm` and `gitflash` commands.
@@ -40,7 +47,7 @@ At preparation on 5 September 2026, alpha.3 is unpublished and public alpha.2 an
 - Include the delivery-hours Time Tracker, 124 reference definitions, manual and reference-based entries, corrections/void history, catalog versions, analytics and time export. Runtime duration and result acceptance never create hours automatically.
 - Include **PS-001: stock alert export**, the bounded Product Studio exercise using synthetic `input.json`. Five sequential roles produce a Python utility, tests, usage instructions and a reviewed file bundle, with fixed independent checking, bounded repairs/retries and an explicit owner decision.
 - Preserve company and work identities, durable session receipts, artifact hashes, historical records, time entries and full SQLite backup/restore. Retain the Node 26 native-backup completion fix and workflow receipt-integrity checks from the earlier candidates.
-- Keep the technical `gitflash` package, CLI, repository, data directory and API identifiers. Web identity is separate; the VCM interface and static fallback instructions do not rename existing records or change the GitFlash FDE site.
+- At this historical revision, keep the existing package, CLI, repository, data-directory and API identifiers. Preserve stored records and the separate FDE website. Later entries record the canonical VCM command and repository.
 - Support the local core and Time Tracker on macOS, Linux and Windows with Node 24.14+ in 24.x or 26.x. Optional company-workflow checking requires a compatible macOS or Linux sandbox; native Windows checking is unavailable. Stock Ubuntu 24.04 with the AppArmor namespace restriction is an explicitly unsupported optional-workflow configuration and refuses execution before provider dispatch without changing host policy.
 - Keep Buzz task dispatch and Slack round trips experimental. No hosted execution, activated VCM domain, human-pilot success, production readiness or 100 concurrent agent processes is claimed.
 

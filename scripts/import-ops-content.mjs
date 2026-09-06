@@ -2,6 +2,7 @@ import { readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
 import { resolve, join, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { format } from 'prettier';
+import { brandOpsText, brandOpsContent } from './vcm-content-branding.mjs';
 
 const [source, expectedManifestHash] = process.argv.slice(2);
 if (!source || !/^[a-f0-9]{64}$/.test(expectedManifestHash ?? ''))
@@ -30,6 +31,24 @@ const stages = Object.fromEntries(
     { title: roles.find((r) => r.id === stage.role).name, role: stage.role, prompt: stage.prompt },
   ]),
 );
+const brandingFiles = new Map();
+async function copyDisplayContent(sourcePath, target, logicalPath) {
+  const original = await readFile(sourcePath);
+  const shouldAdapt =
+    logicalPath === 'operating-contract.md' ||
+    /^roles\/.*\.(md|json)$/.test(logicalPath) ||
+    /^help\/(FIRST-COMPANY|SUPPORT|TRIAGE)\.md$/.test(logicalPath);
+  const adapted = shouldAdapt
+    ? Buffer.from(brandOpsText(original.toString('utf8'), releaseVersion))
+    : original;
+  await writeFile(target, adapted);
+  if (!original.equals(adapted))
+    brandingFiles.set(target, {
+      path: target,
+      sourceSha256: digest(original),
+      adaptedSha256: digest(adapted),
+    });
+}
 const names = {
   'ao.role.delivery-manager': 'PS-DM · Delivery Manager',
   'ao.role.requirements-analyst': 'PS-REQ · Requirements Analyst',
@@ -63,17 +82,20 @@ files['COMPANY.md'] = await read(base + 'companies/product-studio/company.md');
 files['WORKFLOWS.md'] = await read(base + 'companies/product-studio/workflows.md');
 const managerFiles = {};
 for (const path of manifest.managerInputs) managerFiles[path] = await read(base + path);
-const content = {
-  managerFiles,
-  version: job.packageVersion,
-  sha256: expectedManifestHash,
-  rolePrompts,
-  stages,
-  files,
-  oracle: await read('acceptance/ps001-oracle.py'),
-  operatingContract: await read(base + 'operating-contract.md'),
-  help: await read('help/FIRST-COMPANY.md'),
-};
+const content = brandOpsContent(
+  {
+    managerFiles,
+    version: job.packageVersion,
+    sha256: expectedManifestHash,
+    rolePrompts,
+    stages,
+    files,
+    oracle: await read('acceptance/ps001-oracle.py'),
+    operatingContract: await read(base + 'operating-contract.md'),
+    help: await read('help/FIRST-COMPANY.md'),
+  },
+  releaseVersion,
+);
 if (digest(content.oracle) !== '2d7bdda0280b92f3a499aa405bd19ac1871309ee9fb0076e4762725612af527b')
   throw new Error('Independent oracle differs from its approved frozen version.');
 await writeFile('src/jobs/content.generated.json', JSON.stringify(content, null, 2) + '\n');
@@ -89,7 +111,7 @@ const selected = [
 for (const path of selected) {
   const target = join('docs/agent-operations', path);
   await mkdir(dirname(target), { recursive: true });
-  await copyFile(join(root, base, path), target);
+  await copyDisplayContent(join(root, base, path), target, path);
 }
 await mkdir('docs/agent-operations/acceptance', { recursive: true });
 await copyFile(
@@ -103,15 +125,15 @@ await copyFile(
 for (const item of manifest.files) {
   const target = join('docs/agent-operations', item.destination);
   await mkdir(dirname(target), { recursive: true });
-  await copyFile(join(root, item.source), target);
+  await copyDisplayContent(join(root, item.source), target, item.destination);
 }
 const helpAliases = [];
-// Canonical source bytes stay under agent-operations. User-facing aliases adapt
-// links and the observed local UI; the receipt distinguishes both versions.
+// Source manifests retain the imported identity. Shipped prose uses VCM;
+// user-facing aliases additionally adapt links and the observed local UI.
 for (const name of ['FIRST-COMPANY.md', 'SUPPORT.md', 'TRIAGE.md']) {
   const path = manifest.files.find((f) => f.destination === 'help/' + name).source;
   const sourceText = await read(path);
-  let text = sourceText
+  let text = brandOpsText(sourceText, releaseVersion)
     .replaceAll('(SUPPORT.md)', '(support.md)')
     .replaceAll('(TRIAGE.md)', '(triage.md)')
     .replaceAll('(FIRST-COMPANY.md)', '(first-company.md)')
@@ -135,7 +157,7 @@ for (const name of ['FIRST-COMPANY.md', 'SUPPORT.md', 'TRIAGE.md']) {
     destination,
     destinationSha256: digest(text),
     adaptation:
-      'Local links, explicit acceptance owner and full pre-start brief viewer' +
+      'VCM display names and command examples; local links, explicit acceptance owner and full pre-start brief viewer' +
       (name === 'FIRST-COMPANY.md'
         ? `; candidate install/version commands adapted to ${releaseVersion}`
         : '') +
@@ -146,6 +168,9 @@ await writeFile(
   'docs/agent-operations/import-receipt.json',
   JSON.stringify(
     {
+      displayBrand: 'VCM',
+      sourceIdentity:
+        'Manifest and oracle hashes identify the original import; shipped display prose is adapted to VCM.',
       contentVersion: content.version,
       manifestSha256: expectedManifestHash,
       oracleSha256: digest(content.oracle),
@@ -155,6 +180,24 @@ await writeFile(
       ),
       sourceFiles: selected,
       helpAliases,
+    },
+    null,
+    2,
+  ) + '\n',
+);
+await writeFile(
+  'docs/agent-operations/branding-receipt.json',
+  JSON.stringify(
+    {
+      schemaVersion: 1,
+      kind: 'VCM documentation branding adaptation',
+      releaseVersion,
+      sourceManifestSha256: expectedManifestHash,
+      originalImportReceipt: 'import-receipt.json',
+      originalIntegrationManifest: 'product-studio.integration.json',
+      scope:
+        'Original manifest hashes identify imported source bytes. Shipped prose and commands use VCM; compatibility identifiers, role authority and oracle remain unchanged.',
+      files: [...brandingFiles.values()],
     },
     null,
     2,

@@ -1,6 +1,6 @@
 {
   "name": "gitflash",
-  "version": "0.1.0-alpha.5",
+  "version": "0.1.0-alpha.6",
   "description": "VCM — Virtual Corporation Manager: a local, open-source workspace for agent organizations",
   "type": "module",
   "license": "MIT",

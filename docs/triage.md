@@ -1,6 +1,6 @@
 # VCM support triage
 
-This guide covers corporation setup, organization, delivery-hours and optional Product Studio reports. The [first-company guide](first-company.md) begins at **Your corporations → Set up a corporation**, followed by reviewed creation and the real company overview. Record the source/archive identity as well as the `gitflash --version` output; older archives may share the current candidate's version number.
+This guide covers corporation setup, organization, delivery-hours and optional Product Studio reports. The [first-company guide](first-company.md) begins at **Your corporations → Set up a corporation**, followed by reviewed creation and the real company overview. Record the source/archive identity as well as the `vcm --version` output; older archives may share the current candidate's version number.
 
 For the native PS-001 workflow, the separate entry is **Work → Company jobs → Set up first job → Start job** for a Product Studio with the required roles. The acceptance owner and start authority are captured with the job; final acceptance remains a separate decision. Candidate files are created by that workflow and delivered through its artifact bundle. **Preparation status, 5 September 2026:** exact installed-package and rendered successor acceptance remains tracked separately; see [acceptance](acceptance.md).
 

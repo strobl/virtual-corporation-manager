@@ -169,7 +169,7 @@ export function RunDialog({
             : (status?.buzz.message ?? 'Checking Buzz…')}
         </p>
         <p className="muted small">
-          {status?.costNotice?.replaceAll('GitFlash', 'VCM') ||
+          {status?.costNotice ||
             'VCM is free. External runtimes may require an account and incur provider charges.'}
         </p>
         {error && (
@@ -679,7 +679,7 @@ export function IntegrationsView({
         <div>
           <strong>Your local company is always free.</strong>
           <p>
-            {status?.costNotice?.replaceAll('GitFlash', 'VCM') ||
+            {status?.costNotice ||
               'External runtimes and services may require their own accounts, credentials, or paid usage. No connection is required to create and organize your agents.'}
           </p>
         </div>

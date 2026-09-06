@@ -1,6 +1,6 @@
 # VCM system architecture
 
-This is the source map for the current `0.1.0-alpha.5` review candidate. VCM is a local workspace for one operator to configure companies and agents, inspect recorded work and explicitly book delivery hours. Optional execution uses the operator's tools and provider access. The [architecture overview](architecture.md), [contributor model](developer-architecture.md) and [acceptance evidence](acceptance.md) provide the surrounding contracts.
+This is the source map for the current `0.1.0-alpha.6` review candidate. VCM is a local workspace for one operator to configure companies and agents, inspect recorded work and explicitly book delivery hours. Optional execution uses the operator's tools and provider access. The [architecture overview](architecture.md), [contributor model](developer-architecture.md) and [acceptance evidence](acceptance.md) provide the surrounding contracts.
 
 ## Three core containers
 

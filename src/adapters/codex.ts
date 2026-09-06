@@ -106,7 +106,7 @@ export async function executeCodex(
     if (help.code !== 0 || !help.stdout.includes(flag))
       throw new IntegrationError(
         'runtime-version',
-        `Your Codex CLI does not support ${flag}. Upgrade it before running GitFlash tasks.`,
+        `Your Codex CLI does not support ${flag}. Upgrade it before running VCM tasks.`,
       );
   }
   const version = await executeProcess(executable, ['--version'], {

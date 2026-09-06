@@ -20,7 +20,7 @@ export async function writeNotices(inputs) {
     (await readFile('licenses/shadcn-ui.txt', 'utf8')).trim() +
     '\n```\n';
   text +=
-    '\n## GitFlash corporation wordmark\n\nThe retained lettering outlines derive from Rubik Bold 1.100. The archive also includes the unmodified `dist/web/fonts/Rubik-Bold.ttf` and its SIL Open Font License 1.1 text at `dist/web/fonts/Rubik-OFL-1.1.txt`. Its copyright and license are retained below. The current VCM interface uses system fonts and native SVG assets; the earlier corporation silhouette is an original GitFlash asset.\n\n```text\n' +
+    '\n## Rubik font\n\nThe archive includes the unmodified `dist/web/fonts/Rubik-Bold.ttf` and its SIL Open Font License 1.1 text at `dist/web/fonts/Rubik-OFL-1.1.txt`. Its copyright and license are retained below. VCM retains this font for compatible typography alongside system fonts and native SVG assets.\n\n```text\n' +
     (await readFile('licenses/Rubik-OFL-1.1.txt', 'utf8')).trim() +
     '\n```\n';
   text +=
