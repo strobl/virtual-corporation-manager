@@ -87,7 +87,7 @@ export function CompanyConsole({
           block: 'start',
         });
     } else if (previousSelection.current.companyId === companyId && previousSelection.current.id) {
-      memberButtons.current.get(previousSelection.current.id)?.focus({ preventScroll: true });
+      memberButtons.current.get(previousSelection.current.id)?.focus();
     }
     previousSelection.current = { companyId, id: selectedMemberId };
   }, [selectedMemberId, companyId]);
