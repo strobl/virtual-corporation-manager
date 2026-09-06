@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Install VCM locally, import a three-agent example, review configuration changes and preserve your workspace. Alpha 5 release candidate documentation."
+      content="Install VCM locally, import a three-agent example, review configuration changes and preserve your workspace. Alpha 5 technical prerelease documentation."
     />
     <meta name="theme-color" content="#f6f4ef" />
     <title>Developer quickstart — VCM</title>
@@ -61,18 +61,22 @@
             <p class="kicker">Local setup</p>
             <h2 id="install-title">Install VCM</h2>
             <p>
-              <strong>Alpha 5 release candidate.</strong> Download becomes available after release
-              publication. The commands below target the intended <code>0.1.0-alpha.5</code> release
-              asset; they do not establish that it is already available.
+              <strong>Alpha 5 technical prerelease.</strong> The commands below install the
+              published <code>0.1.0-alpha.5</code> archive for local workspace evaluation.
+            </p>
+            <p>
+              <strong>PS-001 did not complete.</strong> Intake and one retry each timed out after
+              300 seconds at <code>ultra</code>. No v2 bundle or owner acceptance exists; the
+              earlier v1 download was rejected. <a href="#execution">Known workflow limits →</a>
             </p>
             <p>
               Use Node.js <strong>24.14 or later within 24.x, or 26.x</strong> with npm:
               <code>&gt;=24.14 &lt;25</code> or <code>&gt;=26 &lt;27</code>. Check the versioned
-              release, source revision and archive checksum before installing. Candidate reviewers
-              should use the exact supplied archive and its matching manifest.
+              release, source revision and archive checksum before installing. The release includes
+              <code>checksums.txt</code> and <code>release-manifest.json</code>.
             </p>
             <div class="command-panel">
-              <p class="kicker">Terminal · after release publication</p>
+              <p class="kicker">Terminal · Alpha 5 technical prerelease</p>
               <button
                 class="copy-button"
                 type="button"
@@ -232,9 +236,20 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company --no-op
             <p>
               <strong>Work</strong> and <strong>Integrations</strong> are optional, separate paths.
               Codex execution requires your own installed runtime, authenticated provider access and
-              allowance. Individual tasks return read-only text. The bounded Product Studio workflow
-              uses five sequential roles to create and check a Python stock-alert utility from
-              fictional input; it is not an arbitrary workflow engine.
+              allowance. Individual tasks return read-only text. The experimental Product Studio
+              workflow is designed for five sequential roles to create and check a Python
+              stock-alert utility from fictional input; it is not an arbitrary workflow engine.
+            </p>
+            <p>
+              Current v2 acceptance remains <strong>open</strong> after the two 300-second intake
+              timeouts at <code>ultra</code>. The earlier v1 run completed five role sessions, but
+              its downloaded ZIP was rejected because <code>EXPECTED-REFERENCE.json</code> was
+              missing. Format 2 includes that reference and supporting files; it has no successful
+              useful-result or owner-acceptance proof. See the
+              <a
+                href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.5"
+                >release notes and evidence limits</a
+              >.
             </p>
             <p>
               The workflow checker needs a compatible macOS or Linux sandbox. It is unavailable on
@@ -322,14 +337,13 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./restored-company -
               contributions need no provider credentials or private planning access.
             </p>
             <p>
-              Use the reviewed source revision for the target release. The public default branch may
-              still describe an earlier version during candidate preparation. In a supplied
-              candidate checkout, install development dependencies and run the checks:
+              Use the source revision recorded in the Alpha 5 release manifest. In that checkout,
+              install development dependencies and run the checks:
             </p>
             <pre
               class="command-block"
               tabindex="0"
-              aria-label="Check a candidate source checkout"
+              aria-label="Check the Alpha 5 source checkout"
             ><code>npm ci --ignore-scripts
 npm run check
 npm run format:check

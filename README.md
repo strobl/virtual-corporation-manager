@@ -6,7 +6,9 @@ VCM is an MIT-licensed local workspace for developers who manage agent roles acr
 
 If your roles currently live in a document, prompts or scripts, try representing one real project in VCM and compare the effort of maintaining it. VCM stores the context you enter; it does not synchronize arbitrary chats or make configured agents execute automatically.
 
-**Release target: `0.1.0-alpha.5`.** At preparation on 5 September 2026, this successor is a release candidate; its final CI, tag and public-download checks are pending. The previously accepted `0.1.0-alpha.5-local.1` and public alpha.2 are distinct artifacts. Public alpha.2 does not contain this interface, the Time Tracker or company file workflows. Check the [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.5) and its source revision and SHA-256 before treating this candidate as publicly available.
+**Available: `0.1.0-alpha.5` technical prerelease.** Evaluate the local workspace using the [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.5), its exact archive and checksum. The earlier local alpha.5-local.1 and public alpha.2 remain distinct artifacts. The release record identifies the reviewed source, successful CI, installation evidence and remaining limits.
+
+**Product Studio PS-001 did not complete:** intake and one retry each timed out after 300 seconds at `ultra`. No v2 delivery bundle or owner acceptance exists. The earlier v1 download was rejected because its expected-reference file was missing. This technical prerelease does not complete the intended useful-result journey. [Observed failures and evidence](docs/acceptance.md#technical-prerelease--6-september-2026)
 
 [Developer quickstart](docs/developer-quickstart.md) · [Three-agent example](docs/examples/README.md) · [Architecture and data](docs/developer-architecture.md) · [Contribute](CONTRIBUTING.md)
 
@@ -18,7 +20,7 @@ _Actual local candidate: Patchwork is a fictional three-agent example with no ex
 
 Use **Node.js 24.14+ in the 24.x line, or Node 26.x**, with npm. The declared local-core targets are macOS, Linux and native Windows; consult the exact release's [OS/Node acceptance](docs/acceptance.md) rather than inferring a passing matrix from these targets. No database compiler, provider account or Python installation is needed for corporation management, the Time Tracker or the example below.
 
-The distribution artifact is [gitflash-0.1.0-alpha.5.tgz](https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.5/gitflash-0.1.0-alpha.5.tgz). That GitHub URL is the intended release asset, not an availability claim before publication. During candidate review, use the exact supplied archive and its matching manifest instead. Download and verify the archive before going offline; no npm registry namespace is required.
+The distribution artifact is [gitflash-0.1.0-alpha.5.tgz](https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.5/gitflash-0.1.0-alpha.5.tgz). Download it and verify it against the release's [checksums.txt](https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.5/checksums.txt) before going offline. The accompanying manifest records the frozen package identity; no npm registry namespace is required.
 
 Run these commands in the directory containing that verified archive. They install into a separate folder and start its `vcm` binary:
 
@@ -32,7 +34,7 @@ Expected version: `0.1.0-alpha.5`. Open the loopback URL printed by the command 
 
 The package name and archive prefix remain `gitflash`; **`vcm` is the canonical command and `gitflash` is its compatibility alias**. Both use the same existing `~/.gitflash` default, `GITFLASH_DATA_DIR` setting and explicit `--data-dir`. There is no automatic move to a new data directory and no claim that the npm name `vcm` is available. Technical export and protocol identifiers retain their compatibility names. GitFlash's separate FDE website is unchanged.
 
-To build the supplied candidate checkout instead:
+To build a source checkout instead:
 
 ```sh
 npm ci --ignore-scripts
@@ -40,7 +42,7 @@ npm run check
 npm pack
 ```
 
-Then use the generated archive with the install commands above. Obtaining source and uncached development dependencies needs network access; the supplied archive and local core work offline. See the [source checkout route](CONTRIBUTING.md#fresh-checkout) for branch and review guidance. The public default branch may still be an older version.
+Then use your generated archive with the install commands above. A build from a later checkout is distinct from the frozen release asset. Obtaining source and uncached development dependencies needs network access; the supplied archive and local core work offline. See the [source checkout route](CONTRIBUTING.md#fresh-checkout) for revision and review guidance.
 
 ## Save a useful organization
 
