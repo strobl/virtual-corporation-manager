@@ -2,7 +2,7 @@
 
 Build a persistent organization for one of your projects, then inspect and change it in a later session. VCM is for a local operator; it does not share a workspace between logged-in teammates or import context automatically from arbitrary IDEs and chats.
 
-This guide targets `0.1.0-alpha.5`. Start with its verified GitHub release archive and matching source/checksum record, or the exact supplied archive while release preparation is pending. Public alpha.2 and the accepted local alpha.5-local.1 are different artifacts. Follow [the README install block](../README.md#install-the-reviewed-archive) for the intended versioned GitHub download and current availability boundary; these commands assume the same `./vcm-preview` installation and working directory.
+This guide targets the published `0.1.0-alpha.5` technical prerelease. Start with its verified GitHub release archive and matching source/checksum record. Public alpha.2 and the accepted local alpha.5-local.1 are different artifacts. Follow [the README install block](../README.md#install-the-reviewed-archive); these commands assume the same `./vcm-preview` installation and working directory. Product Studio's actual useful-result acceptance remains open after two intake timeouts; see the [release evidence and limits](acceptance.md#technical-prerelease--6-september-2026).
 
 ## Start and keep the same workspace
 

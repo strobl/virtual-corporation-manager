@@ -1,5 +1,15 @@
 # VCM acceptance record
 
+## Technical prerelease — 6 September 2026
+
+[VCM 0.1.0-alpha.5](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.5) was published as a technical prerelease at 13:54 UTC. Reviewed source `78076495821f095a523c9c6230d350892e64b4d9` was merged through [PR #4](https://github.com/strobl/virtual-corporation-manager/pull/4). The release tag points to merge `2b75b160b427ee5a16bea6efb29104600270a370`, with the identical tree `c0660d97482ea8151c95d3570619ceaf7d82c912`. Its unchanged archive contains 79 files, 790,854 bytes, SHA-256 `9a85a8595e98bd5f59374327577e71ace040b49203149153489fc514c33e3f62`.
+
+The source push and PR CI passed 17/17 jobs each; [merge CI](https://github.com/strobl/virtual-corporation-manager/actions/runs/34037265723) also passed 17/17. The final local check passed 300 tests with three explicit optional sandbox skips. A fresh public source clone reproduced the archive byte for byte and passed its offline local-core installation and recovery checks. See the release's `release-manifest.json` and `SOURCE-PROOF-SUMMARY.md` for the direct public-download/install record, platform distinctions, privacy/license review and retained browser-asset continuity.
+
+**Actual v2 useful-result acceptance remains open.** The initial PS-001 intake and one explicit retry each timed out at 300 seconds with `ultra` reasoning. No v2 bundle or owner acceptance exists. The earlier v1 ZIP remains rejected for its missing `EXPECTED-REFERENCE.json`. The current package preserves both failed/rejected workspaces through restart and restore without provider replay or automatic time entries; recovery does not establish useful delivery. Fresh native output/file/owner-action checks, live Buzz/Slack results and human pilots remain open.
+
+This later documentation update does not rebuild or replace the release archive. Preparation snapshots below retain their original dates and scope; the versioned release record supersedes their pending publication status.
+
 ## Integration checkpoint — 6 September 2026
 
 The retained A7 candidate (`a7c42e6`) completed PS-001 through five distinct actual Codex sessions. Its format-1 download was **rejected by the assigned technical release integrator**: the extracted test suite ran 13 tests, with 12 passing and one missing-`EXPECTED-REFERENCE.json` error. Stage-local QA success did not make that ZIP independently runnable. This was a synthetic engineering exercise, not an external human pilot.

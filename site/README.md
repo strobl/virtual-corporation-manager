@@ -10,15 +10,17 @@ Serve `site/` using any static HTTP server. Directory routes are `./`, `./docs/`
 
 Check the homepage and Docs install blocks, command-copy success/failure feedback, local example download, FAQ, responsive screenshots, image viewer Close/Escape/Tab/focus return, legal links and narrow-width overflow. Without JavaScript, all document and source links still work and product images open as ordinary image links. Clipboard failures give an honest manual-copy instruction.
 
-## Alpha 5 candidate and release handoff
+## Alpha 5 technical prerelease handoff
 
-This source is prepared for `0.1.0-alpha.5`. It remains an **Alpha 5 release candidate** until Engineering verifies the published release and downloadable archive. The exact future target is:
+This site accompanies the **0.1.0-alpha.5 technical prerelease**. Apply the published-availability copy only after Engineering verifies the actual release, public archive download and displayed installation commands. The exact release asset is:
 
 `https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.5/gitflash-0.1.0-alpha.5.tgz`
 
 The displayed command installs into `./vcm-preview` without lifecycle scripts, checks `vcm --version`, and starts with explicit `./my-company` data. Requires Node.js `>=24.14.0 <25 || >=26.0.0 <27` and npm. The download needs network access; installed local core operation does not. The package name remains `gitflash`; `vcm` is canonical and `gitflash` a compatibility alias. No public npm namespace is assumed.
 
-Before deployment, the release owner must verify the exact source, tag, archive digest and download; execute the displayed commands against that archive; then reconcile the candidate label, download-availability text and version FAQ in `index.html` and `docs/index.html` with the actual result. Source preparation and local browser checks do not establish release publication. The CMO does not publish or commit this assignment.
+The application archive remains bound to source `78076495821f095a523c9c6230d350892e64b4d9`, SHA-256 `9a85a8595e98bd5f59374327577e71ace040b49203149153489fc514c33e3f62` (790,854 bytes; 79 files). This site update changes copy only and does not rebuild the archive. Release publication and Pages deployment require their own observed results; source preparation does not establish either.
+
+The homepage and Docs install sections prominently disclose both actual PS-001 intake timeouts: the initial attempt and one retry each failed after 300 seconds at `ultra`. No v2 delivery bundle or owner acceptance exists. The prior v1 download remains rejected for its missing expected-reference file; the current v2 acceptance and useful-result journey remain open. The execution guide links the versioned release evidence. No further provider attempt or reasoning change is authorized by this copy update.
 
 ## Product evidence and limits
 
