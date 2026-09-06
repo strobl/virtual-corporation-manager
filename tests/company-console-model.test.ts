@@ -295,9 +295,33 @@ describe('truthful activity and time', () => {
 describe('company console presentation', () => {
   it('keeps the company visible while inspecting a shared member and leaves time logging accessible', () => {
     const noop = vi.fn();
+    const state = workspace();
+    state.agents.find((row) => row.id === 'local')!.departmentId = 'department-a';
+    state.relationships = [
+      {
+        id: 'parent',
+        fromCompanyId: 'b',
+        toCompanyId: 'a',
+        kind: 'ownership',
+        percentage: null,
+        description: '',
+        startedAt: at,
+        endedAt: null,
+      },
+      {
+        id: 'child',
+        fromCompanyId: 'a',
+        toCompanyId: 'c',
+        kind: 'ownership',
+        percentage: 42.125,
+        description: '',
+        startedAt: at,
+        endedAt: null,
+      },
+    ];
     const html = renderToStaticMarkup(
       createElement(CompanyConsole, {
-        state: workspace(),
+        state,
         companyId: 'a',
         selectedMemberId: 'shared',
         time: time([entry('one')]),
@@ -329,6 +353,17 @@ describe('company console presentation', () => {
     expect(html).toContain('Time Tracker');
     expect(html).toContain('Log time');
     expect(html).toContain('8.0h');
+    const ownership = html.match(
+      /aria-label="Company ownership at a glance">([\s\S]*?)<\/div>/,
+    )?.[1];
+    expect(ownership).toContain('Owned by');
+    expect(ownership).toContain('B Studio');
+    expect(ownership).toContain('Not specified');
+    expect(ownership).toContain('Owns 1 company');
+    expect(html.indexOf('Company ownership at a glance')).toBeLessThan(html.indexOf('<table'));
+    expect(html).toContain('42.125%');
+    expect(html).toContain('1 member · Led by Alex');
+    expect(html).not.toContain('1 members');
     expect(noop).not.toHaveBeenCalled();
   });
 });

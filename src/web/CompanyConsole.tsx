@@ -149,6 +149,7 @@ export function CompanyConsole({
     (count, rows) => count + rows.length,
     0,
   );
+  const ownedCompanyCount = new Set(view.relationships.owns.map((row) => row.company.id)).size;
   return (
     <section className="company-console" aria-labelledby="console-company-name">
       <header className="console-heading">
@@ -184,17 +185,38 @@ export function CompanyConsole({
           <Pencil size={12} /> Edit company
         </button>
       </div>
-      <div className="console-company-summary" aria-label="Company composition">
-        <span>
-          <strong>{view.counts.agents}</strong> {view.counts.agents === 1 ? 'agent' : 'agents'}
-        </span>
-        <span>
-          <strong>{view.counts.humans}</strong> {view.counts.humans === 1 ? 'human' : 'humans'}
-        </span>
-        <span>
-          <strong>{view.counts.departments}</strong>{' '}
-          {view.counts.departments === 1 ? 'department' : 'departments'}
-        </span>
+      <div className="console-company-context">
+        <div className="console-company-summary" aria-label="Company composition">
+          <span>
+            <strong>{view.counts.agents}</strong> {view.counts.agents === 1 ? 'agent' : 'agents'}
+          </span>
+          <span>
+            <strong>{view.counts.humans}</strong> {view.counts.humans === 1 ? 'human' : 'humans'}
+          </span>
+          <span>
+            <strong>{view.counts.departments}</strong>{' '}
+            {view.counts.departments === 1 ? 'department' : 'departments'}
+          </span>
+        </div>
+        {(view.relationships.ownedBy.length > 0 || ownedCompanyCount > 0) && (
+          <div className="console-ownership-context" aria-label="Company ownership at a glance">
+            {view.relationships.ownedBy.map(({ relationship, company: owner, percentage }) => (
+              <span key={relationship.id}>
+                Owned by{' '}
+                <button className="text-button" onClick={() => actions.onOpenCompany(owner.id)}>
+                  {owner.name}
+                </button>{' '}
+                · {percentage}
+              </span>
+            ))}
+            {ownedCompanyCount > 0 && (
+              <button className="text-button" onClick={actions.onRelationships}>
+                Owns {ownedCompanyCount} {ownedCompanyCount === 1 ? 'company' : 'companies'}
+                <ArrowRight size={12} />
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <div className={`console-body${member ? ' has-member' : ''}`}>
@@ -387,26 +409,27 @@ export function CompanyConsole({
               </div>
               {view.departments.length ? (
                 <ul>
-                  {view.departments.map((department) => (
-                    <li key={department.id}>
-                      <button onClick={() => actions.onEditDepartment(department.id)}>
-                        <span>
-                          <strong>{department.name}</strong>
-                          <small>
-                            {
-                              view.members.filter((row) => row.departmentId === department.id)
-                                .length
-                            }{' '}
-                            members
-                            {department.managerId
-                              ? ` · Led by ${managerLabel(department.managerId)}`
-                              : ''}
-                          </small>
-                        </span>
-                        <Pencil size={13} aria-hidden="true" />
-                      </button>
-                    </li>
-                  ))}
+                  {view.departments.map((department) => {
+                    const memberCount = view.members.filter(
+                      (row) => row.departmentId === department.id,
+                    ).length;
+                    return (
+                      <li key={department.id}>
+                        <button onClick={() => actions.onEditDepartment(department.id)}>
+                          <span>
+                            <strong>{department.name}</strong>
+                            <small>
+                              {memberCount} {memberCount === 1 ? 'member' : 'members'}
+                              {department.managerId
+                                ? ` · Led by ${managerLabel(department.managerId)}`
+                                : ''}
+                            </small>
+                          </span>
+                          <Pencil size={13} aria-hidden="true" />
+                        </button>
+                      </li>
+                    );
+                  })}
                 </ul>
               ) : (
                 <p>Optional. Keep a small team at company level, or group members by function.</p>

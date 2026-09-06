@@ -109,10 +109,17 @@
   overflow-wrap: anywhere;
   line-height: 1.7;
 }
+.console-company-context {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 12px 0 16px;
+}
 .console-company-summary {
   justify-content: flex-start;
   gap: 0;
-  margin: 17px 0 26px;
+  margin: 0;
   font-size: 13px;
   color: var(--company-muted);
 }
@@ -124,6 +131,30 @@
 .console-company-summary strong {
   font-weight: 500;
   color: var(--company-ink);
+}
+.console-ownership-context {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 12px;
+  color: var(--company-muted);
+}
+.console-ownership-context > span {
+  overflow-wrap: anywhere;
+}
+.company-console .console-ownership-context .text-button {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  font-size: 12px;
+  text-align: left;
+  vertical-align: baseline;
+}
+.console-ownership-context > .text-button > svg {
+  display: inline;
+  vertical-align: middle;
+  margin-left: 4px;
 }
 .console-body {
   display: grid;
@@ -260,7 +291,7 @@
   width: 19%;
 }
 .console-member-table td {
-  padding: 14px 12px;
+  padding: 10px 12px;
   border-top: 1px solid var(--company-line);
   color: var(--company-muted);
   vertical-align: middle;
@@ -288,9 +319,9 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  min-height: 69px;
+  min-height: 60px;
   border: 0;
-  padding: 13px 12px;
+  padding: 10px 12px;
   color: var(--company-ink);
   background: none;
   text-align: left;
@@ -826,7 +857,6 @@
     font-size: 13px;
   }
   .console-company-summary {
-    margin-bottom: 22px;
     font-size: 11px;
   }
   .console-company-summary > span + span {
