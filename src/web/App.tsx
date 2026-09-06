@@ -13,7 +13,6 @@ import {
   GitBranch,
   Layers3,
   LayoutGrid,
-  House,
   List,
   Menu,
   Pencil,
@@ -53,7 +52,9 @@ import {
 import { Dialog, EntityEditor, PreviewDialog, type EditorTarget } from './Dialogs';
 import { CompanyMap } from './CompanyMap';
 import { CorporationWorkspace } from './CorporationWorkspace';
-import { CorporationSetup } from './CorporationSetup';
+import { QuickCompanySetup } from './QuickCompanySetup';
+import { CompanyConsole } from './CompanyConsole';
+import { HumanResultDialog } from './HumanResultDialog';
 import { AgentPlacement } from './AgentPlacement';
 import {
   applyRecovery,
@@ -91,22 +92,18 @@ type Area =
   | 'settings';
 type View = 'map' | 'reporting' | 'list';
 const AREA_NAMES: Record<Area, string> = {
-  home: 'Your corporations',
-  corporation: 'Company overview',
-  organization: 'Organization',
-  work: 'Work',
+  home: 'Corporations',
+  corporation: 'Corporation',
+  organization: 'Organization tools',
+  work: 'Agent runs & records',
   time: 'Time Tracker',
-  integrations: 'Integrations',
+  integrations: 'Connections',
   activity: 'Activity',
   settings: 'Settings',
 };
 const AREAS = [
   { id: 'home', icon: Building2 },
-  { id: 'corporation', icon: House },
-  { id: 'organization', icon: GitBranch },
   { id: 'time', icon: Clock3 },
-  { id: 'work', icon: Activity },
-  { id: 'integrations', icon: PlugZap },
 ] as const;
 const message = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Please try again.';
@@ -142,7 +139,7 @@ export function App() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [area]);
   const [workScope, setWorkScope] = useState<'company' | 'all'>('company');
-  const [workMode, setWorkMode] = useState<'jobs' | 'tasks'>('jobs');
+  const [workMode, setWorkMode] = useState<'jobs' | 'tasks'>('tasks');
   const [startRequested, setStartRequested] = useState(false);
   const [setupAction, setSetupAction] = useState<'task' | 'time' | null>(null);
   const [view, setView] = useState<View>('map');
@@ -158,6 +155,9 @@ export function App() {
   const [undoPreview, setUndoPreview] = useState<UndoPreview | null>(null);
   const [pending, setPending] = useState<PendingChange | null>(resumingApply?.change ?? null);
   const [runAgent, setRunAgent] = useState<Agent | null>(null);
+  const [recordMember, setRecordMember] = useState<{ agent: Agent; companyId: string } | null>(
+    null,
+  );
   const [initialRunId, setInitialRunId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -285,6 +285,45 @@ export function App() {
     (companyWork?.stats.reviewable ?? 0) +
     companyJobs.filter((job) => job.status === 'waiting_owner').length;
   const runCompany = state && runAgent ? getRunTargetCompany(state, runAgent.id) : null;
+  const previewCommand =
+    pending?.kind === 'commands' && pending.commands.length === 1 ? pending.commands[0] : null;
+  const companyReview =
+    corporationSetupOpen && previewCommand?.type === 'definition.import'
+      ? {
+          name: previewCommand.definition.companies[0]?.name ?? previewCommand.definition.name,
+          purpose: previewCommand.definition.companies[0]?.description ?? '',
+        }
+      : undefined;
+  const editedReviewMember =
+    previewCommand?.type === 'agent.update'
+      ? state?.agents.find((row) => row.id === previewCommand.id)
+      : undefined;
+  const memberReview =
+    previewCommand?.type === 'agent.create'
+      ? {
+          name: previewCommand.input.name,
+          role: previewCommand.input.role,
+          kind: previewCommand.input.kind,
+          companyNames: [
+            state?.companies.find((row) => row.id === previewCommand.companyId)?.name ??
+              'Selected company',
+          ],
+          editing: false,
+        }
+      : previewCommand?.type === 'agent.update' && editedReviewMember
+        ? {
+            name: previewCommand.input.name ?? editedReviewMember.name,
+            role: previewCommand.input.role ?? editedReviewMember.role,
+            kind: editedReviewMember.kind,
+            companyNames: (state?.assignments ?? [])
+              .filter((row) => row.agentId === editedReviewMember.id && !row.endedAt)
+              .map((row) => state?.companies.find((item) => item.id === row.companyId))
+              .filter((row) => row?.status === 'active')
+              .map((row) => `${row!.name} (${row!.shortCode})`),
+            editing: true,
+          }
+        : undefined;
+
   const tree = useMemo(() => (state ? organizationTree(state, query) : []), [state, query]);
   const snapshot = useMemo(() => (state ? toSnapshot(state) : null), [state]);
   const select = (value: Selection) => {
@@ -328,12 +367,18 @@ export function App() {
       previewCompanyIds.current = new Set(prepared.baseState.companies.map((row) => row.id));
       setPreview(prepared.preview);
       setSaveRecovery(null);
-      setEditor(null);
       setTemplatesOpen(false);
       setAdvanced(null);
     } catch (cause) {
       setModalError(message(cause));
-      if (!editor && !preview && !templatesOpen && !advanced && !corporationSetupOpen)
+      if (
+        !editor &&
+        !preview &&
+        !templatesOpen &&
+        !advanced &&
+        !corporationSetupOpen &&
+        !recordMember
+      )
         setError(message(cause));
     } finally {
       setBusy(false);
@@ -382,10 +427,27 @@ export function App() {
         setShowInspector(false);
         setWorkScope('company');
         setArea('corporation');
+      } else if (
+        area === 'corporation' &&
+        pending?.kind === 'commands' &&
+        pending.commands.some((item) => item.type === 'agent.create')
+      ) {
+        const createdMember = result.state.agents.find(
+          (row) => !state?.agents.some((before) => before.id === row.id),
+        );
+        const memberCompany = result.state.assignments.find(
+          (row) => row.agentId === createdMember?.id && !row.endedAt && row.isPrimary,
+        );
+        if (createdMember && memberCompany) {
+          setSelection({ kind: 'agent', id: createdMember.id, companyId: memberCompany.companyId });
+          setArea('corporation');
+        }
       }
       setSaveRecovery(null);
       setStartRequested(false);
       setCorporationSetupOpen(false);
+      setEditor(null);
+      setRecordMember(null);
       setSetupAction(null);
       setPreview(null);
       setPending(null);
@@ -468,8 +530,12 @@ export function App() {
   const openCorporation = (id: string) => {
     select({ kind: 'company', id });
     navigate('corporation');
+    const workspace = document.getElementById('main');
+    workspace?.focus({ preventScroll: true });
+    workspace?.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   };
-  const logTime = () => {
+  const logTime = (memberId?: string) => {
     if (!companyId) {
       createCorporation();
       return;
@@ -478,7 +544,7 @@ export function App() {
     setBookingRequest({
       id: ++bookingSequence.current,
       companyId,
-      agentId: selectedAgent?.id ?? null,
+      agentId: memberId ?? selectedAgent?.id ?? null,
     });
   };
   const reviewCorporation = (definition: CompanyDefinition) =>
@@ -494,7 +560,7 @@ export function App() {
       return;
     }
     select({ kind: 'agent', id, companyId: originCompanyId });
-    setArea('organization');
+    setArea('corporation');
   };
   const openCompanyContext = (id: string) => {
     if (!state?.companies.some((row) => row.id === id && row.status === 'active')) {
@@ -503,7 +569,7 @@ export function App() {
     }
     select({ kind: 'company', id });
     setShowInspector(true);
-    setArea('organization');
+    setArea('corporation');
   };
 
   return (
@@ -564,33 +630,23 @@ export function App() {
           <span className="local-badge">local</span>
         </a>
         <nav className="primary-nav" aria-label="Primary">
-          {AREAS.filter(({ id }) => companyId || !['corporation', 'organization'].includes(id)).map(
-            ({ id, icon: Icon }) => (
-              <button
-                className={`${area === id ? 'active' : ''}${id === 'work' ? ' secondary-nav-start' : ''}`}
-                aria-current={area === id ? 'page' : undefined}
-                onClick={() => navigate(id)}
-                key={id}
-              >
-                <Icon size={17} />
-                {AREA_NAMES[id]}
-                {id === 'work' && companyReviewCount > 0 && (
-                  <span
-                    className="activity-count"
-                    aria-label={`${companyReviewCount} results need your review in ${company?.name ?? 'this company'}`}
-                  >
-                    {companyReviewCount}
-                  </span>
-                )}
-              </button>
-            ),
-          )}
+          {AREAS.map(({ id, icon: Icon }) => (
+            <button
+              className={area === id ? 'active' : ''}
+              aria-current={area === id ? 'page' : undefined}
+              onClick={() => navigate(id)}
+              key={id}
+            >
+              <Icon size={17} />
+              {AREA_NAMES[id]}
+            </button>
+          ))}
         </nav>
         <div className="sidebar-label">
           <span>YOUR COMPANIES</span>
           <button
             className="icon-button"
-            aria-label="Set up a corporation"
+            aria-label="Create corporation"
             onClick={createCorporation}
           >
             <Plus size={16} />
@@ -601,7 +657,7 @@ export function App() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Find a team or agent…"
+            placeholder="Find a company or member…"
             aria-label="Search organization"
           />
           {query && (
@@ -611,7 +667,33 @@ export function App() {
           )}
         </label>
         <div className="organization-navigation">
-          {tree.length ? (
+          {!query ? (
+            <ul className="company-navigation-list">
+              {activeCompanies.map((row) => (
+                <li key={row.id}>
+                  <button
+                    className={companyId === row.id && area !== 'home' ? 'active' : ''}
+                    aria-current={
+                      companyId === row.id && area === 'corporation' ? 'page' : undefined
+                    }
+                    onClick={() => openCorporation(row.id)}
+                  >
+                    <span
+                      className="company-nav-avatar"
+                      style={{ borderColor: row.color }}
+                      aria-hidden="true"
+                    >
+                      {row.shortCode.slice(0, 2)}
+                    </span>
+                    <span>{row.name}</span>
+                  </button>
+                </li>
+              ))}
+              {!activeCompanies.length && (
+                <li className="sidebar-empty">Your corporations will appear here.</li>
+              )}
+            </ul>
+          ) : tree.length ? (
             <DenseTree
               label="Company organization"
               nodes={tree}
@@ -623,7 +705,7 @@ export function App() {
                 const next = parseSelection(key);
                 if (next) {
                   select(next);
-                  navigate(next.kind === 'company' ? 'corporation' : 'organization');
+                  navigate(next.kind === 'department' ? 'organization' : 'corporation');
                 }
               }}
             />
@@ -636,6 +718,32 @@ export function App() {
           )}
         </div>
         <div className="sidebar-bottom">
+          <details
+            className="company-utilities"
+            open={['work', 'integrations', 'organization'].includes(area) || undefined}
+          >
+            <summary>Tools</summary>
+            <button onClick={() => navigate('work')} className={area === 'work' ? 'active' : ''}>
+              <Play size={16} /> Agent runs & records
+              {companyReviewCount > 0 && (
+                <span className="activity-count">{companyReviewCount}</span>
+              )}
+            </button>
+            <button
+              onClick={() => navigate('integrations')}
+              className={area === 'integrations' ? 'active' : ''}
+            >
+              <PlugZap size={16} /> Connections
+            </button>
+            {companyId && (
+              <button
+                onClick={() => navigate('organization')}
+                className={area === 'organization' ? 'active' : ''}
+              >
+                <GitBranch size={16} /> Organization tools
+              </button>
+            )}
+          </details>
           <button
             onClick={() => navigate('activity')}
             className={area === 'activity' ? 'active' : ''}
@@ -743,7 +851,7 @@ export function App() {
             </div>
           ) : (
             <>
-              {(area === 'home' || area === 'corporation') && (
+              {(area === 'home' || (area === 'corporation' && !companyId)) && (
                 <CorporationWorkspace
                   mode={area === 'home' ? 'index' : 'company'}
                   state={state}
@@ -774,8 +882,50 @@ export function App() {
                       setShowInspector(true);
                     }
                   }}
-                  onLogTime={logTime}
+                  onLogTime={() => logTime()}
                   onViewTime={() => navigate('time')}
+                />
+              )}
+              {area === 'corporation' && companyId && (
+                <CompanyConsole
+                  key={companyId}
+                  state={state}
+                  companyId={companyId}
+                  selectedMemberId={selection?.kind === 'agent' ? selection.id : null}
+                  time={timeSnapshot}
+                  timeError={timeError}
+                  runs={runs}
+                  status={status}
+                  onSelectMember={(id) =>
+                    select(
+                      id ? { kind: 'agent', id, companyId } : { kind: 'company', id: companyId },
+                    )
+                  }
+                  onEditCompany={() => openEditor({ kind: 'company', id: companyId })}
+                  onAddMember={() => openEditor({ kind: 'agent', companyId })}
+                  onEditMember={(id) => openEditor({ kind: 'agent', id, companyId })}
+                  onManageAssignments={(id) => openAdvanced({ kind: 'assignments', agentId: id })}
+                  onAddDepartment={() => openEditor({ kind: 'department', companyId })}
+                  onEditDepartment={(id) => openEditor({ kind: 'department', id, companyId })}
+                  onRelationships={() => openAdvanced({ kind: 'relationships', companyId })}
+                  onOpenCompany={openCorporation}
+                  onRunAgent={(id) => {
+                    const member = state.agents.find(
+                      (row) => row.id === id && row.kind === 'agent',
+                    );
+                    if (member) setRunAgent(member);
+                  }}
+                  onLogTime={(id?: string) => logTime(id)}
+                  onRecordWork={(id) => {
+                    setModalError(null);
+                    const member = state.agents.find(
+                      (row) => row.id === id && row.kind === 'human',
+                    );
+                    setRecordMember(member ? { agent: member, companyId } : null);
+                  }}
+                  onOpenWork={() => navigate('work')}
+                  onViewTime={() => navigate('time')}
+                  onIntegrations={() => navigate('integrations')}
                 />
               )}
               {area === 'organization' && (
@@ -1000,7 +1150,7 @@ export function App() {
                                 <Pencil size={12} />
                                 Edit details
                               </button>
-                              <button className="button small-button" onClick={logTime}>
+                              <button className="button small-button" onClick={() => logTime()}>
                                 <Plus size={13} /> Log time
                               </button>
                               <button
@@ -1039,24 +1189,26 @@ export function App() {
                                       'Add working context and constraints to guide this agent.'}
                                   </p>
                                 </section>
-                                <section className="inspector-section run-cta">
-                                  <h3>Put this agent to work</h3>
-                                  <p>Run a specific task and review its result.</p>
-                                  <button
-                                    className="button primary"
-                                    onClick={() => setRunAgent(selectedAgent)}
-                                  >
-                                    <Play size={14} />
-                                    Run a task
-                                  </button>
-                                  <button
-                                    className="text-button"
-                                    onClick={() => navigate('integrations')}
-                                  >
-                                    Runtime connections
-                                    <ArrowUpRight size={12} />
-                                  </button>
-                                </section>
+                                {selectedAgent.kind === 'agent' && (
+                                  <section className="inspector-section run-cta">
+                                    <h3>Agent execution</h3>
+                                    <p>Run a specific task and review its result.</p>
+                                    <button
+                                      className="button primary"
+                                      onClick={() => setRunAgent(selectedAgent)}
+                                    >
+                                      <Play size={14} />
+                                      Run a task
+                                    </button>
+                                    <button
+                                      className="text-button"
+                                      onClick={() => navigate('integrations')}
+                                    >
+                                      Runtime connections
+                                      <ArrowUpRight size={12} />
+                                    </button>
+                                  </section>
+                                )}
                                 <section className="inspector-section">
                                   <button
                                     className="text-button danger"
@@ -1223,14 +1375,14 @@ export function App() {
               {area === 'work' && (
                 <>
                   <nav className="work-mode-nav" aria-label="Work views">
-                    <button aria-pressed={workMode === 'jobs'} onClick={() => setWorkMode('jobs')}>
-                      Company jobs
-                    </button>
                     <button
                       aria-pressed={workMode === 'tasks'}
                       onClick={() => setWorkMode('tasks')}
                     >
-                      Individual tasks
+                      Agent runs & records
+                    </button>
+                    <button aria-pressed={workMode === 'jobs'} onClick={() => setWorkMode('jobs')}>
+                      Workflow examples
                     </button>
                   </nav>
                   {workMode === 'jobs' ? (
@@ -1521,7 +1673,7 @@ export function App() {
         </div>
       )}
       {corporationSetupOpen && (
-        <CorporationSetup
+        <QuickCompanySetup
           busy={busy}
           error={modalError}
           reviewing={Boolean(preview)}
@@ -1554,6 +1706,7 @@ export function App() {
           state={state}
           busy={busy}
           error={modalError}
+          reviewing={Boolean(preview)}
           onClose={() => {
             if (!busy) {
               setEditor(null);
@@ -1566,6 +1719,9 @@ export function App() {
       {preview && (
         <PreviewDialog
           preview={preview}
+          company={companyReview}
+          member={memberReview}
+          backToEditor={Boolean(editor || recordMember)}
           busy={busy}
           error={modalError}
           recovery={saveRecovery}
@@ -1574,7 +1730,6 @@ export function App() {
               setPreview(null);
               setSaveRecovery(null);
               clearSaveReceipt();
-              setCorporationSetupOpen(false);
               setPending(null);
               setModalError(null);
               setSetupAction(null);
@@ -1753,6 +1908,19 @@ export function App() {
             )}
           </div>
         </Dialog>
+      )}
+      {recordMember && (
+        <HumanResultDialog
+          agent={recordMember.agent}
+          companyId={recordMember.companyId}
+          reviewing={Boolean(preview)}
+          busy={busy}
+          error={modalError}
+          onClose={() => {
+            if (!busy) setRecordMember(null);
+          }}
+          onSubmit={command}
+        />
       )}
       {runAgent && (
         <RunDialog

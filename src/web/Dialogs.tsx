@@ -419,6 +419,7 @@ export function PreviewDialog({
   recovery = null,
   company,
   member,
+  backToEditor = false,
   onClose,
   onApply,
   onRefresh,
@@ -427,6 +428,7 @@ export function PreviewDialog({
   busy: boolean;
   error: string | null;
   recovery?: 'retry' | 'refresh' | null;
+  backToEditor?: boolean;
   company?: { name: string; purpose: string };
   member?: {
     name: string;
@@ -555,7 +557,7 @@ export function PreviewDialog({
         )}
         <footer className="dialog-actions">
           <button className="button" disabled={busy || recovery === 'retry'} onClick={onClose}>
-            {compact ? 'Back' : 'Discard draft'}
+            {compact || backToEditor ? 'Back' : 'Discard draft'}
           </button>
           <button
             className="button primary"

@@ -980,3 +980,91 @@
     font-size: 20px;
   }
 }
+
+/* Corporation management: the company is the destination, tools are secondary. */
+.company-navigation-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0;
+}
+.company-navigation-list > li > button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 8px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  border-radius: 7px;
+  color: var(--flash-ink);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.company-navigation-list > li > button > span:last-child {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.company-navigation-list > li > button:hover {
+  background: var(--flash-hover);
+}
+.company-navigation-list > li > button.active {
+  background: var(--flash-selected);
+  font-weight: 600;
+}
+.company-nav-avatar {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  flex-shrink: 0;
+  border: 1px solid;
+  border-radius: 7px;
+  background: white;
+  font-size: 10px;
+}
+.company-utilities {
+  color: var(--flash-muted);
+}
+.company-utilities > summary {
+  padding: 9px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.company-utilities > button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  width: 100%;
+  text-align: left;
+  font-size: 12px;
+}
+.company-utilities > button:hover,
+.company-utilities > button.active {
+  background: var(--flash-selected);
+  color: var(--flash-ink);
+}
+.corporation-app .company-picker-row {
+  grid-template-columns: 46px minmax(0, 1fr) 80px 20px;
+}
+.quick-company-setup {
+  max-width: 600px;
+}
+.quick-company-setup .quick-company-team-choice {
+  padding: 16px;
+  border: 1px solid var(--flash-border);
+  border-radius: 8px;
+  background: var(--flash-surface-muted);
+}
+@media (max-width: 600px) {
+  .corporation-app .company-picker-row {
+    grid-template-columns: 38px minmax(0, 1fr) 20px;
+  }
+  .company-picker-row > .corporation-row-stat {
+    display: none;
+  }
+}
