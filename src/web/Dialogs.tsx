@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { X, ArrowRight, Check, Undo2 } from 'lucide-react';
-import type { ChangePreview, DomainCommand, WorkspaceState } from '../domain/contracts';
+import type { Agent, ChangePreview, DomainCommand, WorkspaceState } from '../domain/contracts';
 import type { Selection } from './model';
 import { companyAgents } from './model';
 import { textExcerpt } from './TextDisclosure';
@@ -75,6 +75,7 @@ export function EntityEditor({
   state,
   busy,
   error,
+  reviewing = false,
   onClose,
   onSubmit,
 }: {
@@ -82,6 +83,7 @@ export function EntityEditor({
   state: WorkspaceState;
   busy: boolean;
   error: string | null;
+  reviewing?: boolean;
   onClose: () => void;
   onSubmit: (commands: DomainCommand[], summary: string) => Promise<void>;
 }) {
@@ -105,6 +107,7 @@ export function EntityEditor({
   );
   const [color, setColor] = useState(company?.color || '#d4b62e');
   const [role, setRole] = useState(agent?.role ?? '');
+  const [memberKind, setMemberKind] = useState<Agent['kind']>(agent?.kind ?? 'agent');
   const [responsibilities, setResponsibilities] = useState(
     agent?.responsibilities.join('\n') ?? '',
   );
@@ -134,8 +137,12 @@ export function EntityEditor({
   const visibleManagers = filterAgentOptions(managerOptions, managerQuery, managerId);
   const selectedManager = managerOptions.find((row) => row.id === managerId);
   const editingCompanyIds = agent ? agentCompanyIds(state, agent.id) : [companyId];
+  const isMember = target.kind === 'agent';
+  const isHuman = isMember && memberKind === 'human';
+  const entityLabel = isMember ? 'team member' : target.kind;
   const submit = async (event: FormEvent) => {
     event.preventDefault();
+    if (busy) return;
     let command: DomainCommand;
     if (target.kind === 'company') {
       const input = {
@@ -173,21 +180,25 @@ export function EntityEditor({
         : {
             type: 'agent.create',
             companyId,
-            input: { ...input, kind: 'agent' },
+            input: { ...input, kind: memberKind },
           };
     }
-    await onSubmit([command], `${target.id ? 'Update' : 'Create'} ${target.kind}: ${name.trim()}`);
+    await onSubmit([command], `${target.id ? 'Update' : 'Create'} ${entityLabel}: ${name.trim()}`);
   };
+  if (reviewing) return null;
   return (
-    <Dialog title={`${target.id ? 'Edit' : 'Create'} ${target.kind}`} onClose={onClose}>
+    <Dialog
+      title={`${target.id ? 'Edit' : 'Create'} ${entityLabel}`}
+      onClose={onClose}
+      closeDisabled={busy}
+    >
       <form onSubmit={submit} className="dialog-body editor-form">
         <p className="muted">
           {target.kind === 'company'
             ? 'Give your company an identity and a clear purpose.'
             : target.kind === 'department'
               ? 'Bring related responsibilities together.'
-              : 'Define what this agent owns and how it should work.'}{' '}
-          You will review before saving.
+              : 'Start with a name and what this teammate owns. You can add more detail later.'}
         </p>
         {target.kind === 'agent' && (
           <p className="muted">
@@ -222,7 +233,9 @@ export function EntityEditor({
                 ? 'Acme Studio'
                 : target.kind === 'department'
                   ? 'Engineering'
-                  : 'Product engineer'
+                  : isHuman
+                    ? 'Alex Morgan'
+                    : 'Product engineer'
             }
           />
         </label>
@@ -254,95 +267,131 @@ export function EntityEditor({
               maxLength={120}
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              placeholder="Turns product requirements into working software"
+              placeholder="Product engineer, researcher, operations lead…"
             />
           </label>
         )}
-        <label>
-          {target.kind === 'agent' ? 'Instructions' : 'Purpose'}
-          <textarea
-            rows={3}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder={
-              target.kind === 'agent'
-                ? 'Working context, constraints, and expected outputs…'
-                : 'What does this team exist to do?'
-            }
-          />
-        </label>
-        {target.kind === 'agent' && (
-          <>
-            <label>
-              Responsibilities <span className="muted">One per line</span>
-              <textarea
-                rows={3}
-                value={responsibilities}
-                onChange={(e) => setResponsibilities(e.target.value)}
-                placeholder={
-                  'Implement reviewed changes\nWrite meaningful tests\nDocument decisions'
-                }
-              />
-            </label>
-            <label>
-              Department
-              <select value={departmentId} onChange={(e) => setDepartmentId(e.target.value)}>
-                <option value="">Company level</option>
-                {state.departments
-                  .filter((row) => departmentCompanyIds.has(row.companyId))
-                  .map((row) => (
-                    <option key={row.id} value={row.id}>
-                      {departmentCompanyIds.size > 1
-                        ? `${companyContextLabel(state, row.companyId)} / `
-                        : ''}
-                      {row.name}
-                    </option>
-                  ))}
-              </select>
-            </label>
-          </>
+        {isMember && !target.id && (
+          <label>
+            Member type
+            <select
+              value={memberKind}
+              onChange={(event) => setMemberKind(event.target.value as Agent['kind'])}
+            >
+              <option value="agent">AI agent</option>
+              <option value="human">Human</option>
+            </select>
+            <span className="muted small">
+              {isHuman
+                ? 'Add a person alongside your AI agents.'
+                : 'Add an AI teammate with a clear role and responsibilities.'}
+            </span>
+          </label>
+        )}
+        {isMember && target.id && (
+          <p className="muted small">{isHuman ? 'Human teammate' : 'AI agent'}</p>
+        )}
+        {isMember ? (
+          <details className="text-disclosure">
+            <summary>
+              {isHuman ? 'Working context & responsibilities' : 'Instructions & responsibilities'}
+            </summary>
+            <div className="editor-form">
+              <label>
+                {isHuman ? 'Working context' : 'Instructions'}
+                <textarea
+                  rows={3}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Working context, constraints, and expected outputs…"
+                />
+              </label>
+              <label>
+                Responsibilities <span className="muted">One per line</span>
+                <textarea
+                  rows={3}
+                  value={responsibilities}
+                  onChange={(e) => setResponsibilities(e.target.value)}
+                  placeholder={'Implement reviewed changes\nReview results\nDocument decisions'}
+                />
+              </label>
+            </div>
+          </details>
+        ) : (
+          <label>
+            Purpose
+            <textarea
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="What does this team exist to do?"
+            />
+          </label>
         )}
         {target.kind !== 'company' && (
-          <>
-            <label>
-              {target.kind === 'department' ? 'Find a department lead' : 'Find a manager'}
-              <input
-                type="search"
-                value={managerQuery}
-                placeholder="Name, role, company or department"
-                onChange={(event) => setManagerQuery(event.target.value)}
-              />
-            </label>
-            <label>
-              {target.kind === 'department' ? 'Department lead' : 'Reports to'}
-              <select value={managerId} onChange={(e) => setManagerId(e.target.value)}>
-                <option value="">No manager</option>
-                {visibleManagers.map((row) => (
-                  <option key={row.id} value={row.id}>
-                    {row.label}
-                    {managerQuery.trim() &&
-                    row.id === managerId &&
-                    !matchingManagers.some((match) => match.id === row.id)
-                      ? ' (current selection)'
-                      : ''}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {selectedManager && <p className="muted small">Selected: {selectedManager.label}</p>}
-            {managerQuery.trim() && (
-              <p className="muted small" role="status">
-                {matchingManagers.length} matching{' '}
-                {matchingManagers.length === 1 ? 'agent' : 'agents'}. Your current selection stays
-                available.
-              </p>
-            )}
-            {target.kind === 'agent' && (
-              <p className="muted small">
-                The reporting line applies across this agent’s company assignments.
-              </p>
-            )}
-          </>
+          <details className="text-disclosure">
+            <summary>{isMember ? 'Department & reporting line' : 'Department lead'}</summary>
+            <div className="editor-form">
+              {isMember && (
+                <label>
+                  Department
+                  <select value={departmentId} onChange={(e) => setDepartmentId(e.target.value)}>
+                    <option value="">Company level</option>
+                    {state.departments
+                      .filter((row) => departmentCompanyIds.has(row.companyId))
+                      .map((row) => (
+                        <option key={row.id} value={row.id}>
+                          {departmentCompanyIds.size > 1
+                            ? `${companyContextLabel(state, row.companyId)} / `
+                            : ''}
+                          {row.name}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+              )}
+              <label>
+                {target.kind === 'department' ? 'Find a department lead' : 'Find a manager'}
+                <input
+                  type="search"
+                  value={managerQuery}
+                  placeholder="Name, role, company or department"
+                  onChange={(event) => setManagerQuery(event.target.value)}
+                />
+              </label>
+              <label>
+                {target.kind === 'department' ? 'Department lead' : 'Reports to'}
+                <select value={managerId} onChange={(e) => setManagerId(e.target.value)}>
+                  <option value="">No manager</option>
+                  {visibleManagers.map((row) => (
+                    <option key={row.id} value={row.id}>
+                      {row.label}
+                      {managerQuery.trim() &&
+                      row.id === managerId &&
+                      !matchingManagers.some((match) => match.id === row.id)
+                        ? ' (current selection)'
+                        : ''}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {selectedManager && <p className="muted small">Selected: {selectedManager.label}</p>}
+              {managerQuery.trim() && (
+                <p className="muted small" role="status">
+                  {matchingManagers.length} matching{' '}
+                  {matchingManagers.length === 1 ? 'teammate' : 'teammates'}. Your current selection
+                  stays available.
+                </p>
+              )}
+              {target.kind === 'agent' && (
+                <p className="muted small">
+                  {isHuman
+                    ? 'The reporting line applies across this person’s company assignments.'
+                    : 'The reporting line applies across this agent’s company assignments.'}
+                </p>
+              )}
+            </div>
+          </details>
         )}
         {error && (
           <p className="error-box" role="alert">
@@ -350,7 +399,7 @@ export function EntityEditor({
           </p>
         )}
         <footer className="dialog-actions">
-          <button type="button" className="button" onClick={onClose}>
+          <button type="button" className="button" onClick={onClose} disabled={busy}>
             Cancel
           </button>
           <button type="submit" className="button primary" disabled={busy}>
@@ -368,6 +417,9 @@ export function PreviewDialog({
   busy,
   error,
   recovery = null,
+  company,
+  member,
+  backToEditor = false,
   onClose,
   onApply,
   onRefresh,
@@ -376,14 +428,56 @@ export function PreviewDialog({
   busy: boolean;
   error: string | null;
   recovery?: 'retry' | 'refresh' | null;
+  backToEditor?: boolean;
+  company?: { name: string; purpose: string };
+  member?: {
+    name: string;
+    role: string;
+    kind: 'agent' | 'human';
+    companyNames: string[];
+    editing: boolean;
+  };
   onClose: () => void;
   onApply: () => void;
   onRefresh: () => void;
 }) {
+  const compact = Boolean(company || member);
+  const title = company
+    ? `${recovery === 'retry' ? 'Confirm' : 'Create'} ${company.name}`
+    : member
+      ? `${recovery === 'retry' ? 'Confirm' : member.editing ? 'Save' : 'Add'} ${member.name}`
+      : 'Review your changes';
+  const changes = (
+    <ol className="preview-list">
+      {preview.changes.map((change, index) => (
+        <li key={index}>
+          <span className="change-number">{index + 1}</span>
+          {change.length > 500 ? (
+            <div className="preview-change">
+              <p>{textExcerpt(change, 400)}</p>
+              <details className="text-disclosure">
+                <summary>Read full change</summary>
+                <pre
+                  className="full-text"
+                  tabIndex={0}
+                  role="region"
+                  aria-label={`Full change ${index + 1}`}
+                >
+                  {change}
+                </pre>
+              </details>
+            </div>
+          ) : (
+            change
+          )}
+        </li>
+      ))}
+    </ol>
+  );
   return (
     <Dialog
-      title="Review your changes"
-      wide
+      title={title}
+      wide={!compact}
       onClose={onClose}
       closeDisabled={busy || recovery === 'retry'}
     >
@@ -392,10 +486,14 @@ export function PreviewDialog({
           <span />{' '}
           {recovery === 'retry' ? 'Save confirmation pending' : 'Draft · Nothing has been saved'}
         </div>
-        <h3 className="preview-title">{preview.summary}</h3>
+        {!compact && <h3 className="preview-title">{preview.summary}</h3>}
         <p className="muted">
           {recovery === 'retry' ? (
             'The save response was interrupted. These changes may already be saved. Retry this same save to confirm its result before creating another draft.'
+          ) : company ? (
+            'Your company starts with an empty team. Add agents, people and their responsibilities next.'
+          ) : member ? (
+            `${member.kind === 'agent' ? 'AI agent' : 'Human'} · ${member.role}`
           ) : (
             <>
               Review {preview.changes.length} items below. Everything is saved together when you
@@ -403,35 +501,50 @@ export function PreviewDialog({
             </>
           )}
         </p>
-        <ol className="preview-list">
-          {preview.changes.map((change, index) => (
-            <li key={index}>
-              <span className="change-number">{index + 1}</span>
-              {change.length > 500 ? (
-                <div className="preview-change">
-                  <p>{textExcerpt(change, 400)}</p>
-                  <details className="text-disclosure">
-                    <summary>Read full change</summary>
-                    <pre
-                      className="full-text"
-                      tabIndex={0}
-                      role="region"
-                      aria-label={`Full change ${index + 1}`}
-                    >
-                      {change}
-                    </pre>
-                  </details>
-                </div>
-              ) : (
-                change
-              )}
-            </li>
-          ))}
-        </ol>
-        <p className="preview-note">
-          <Undo2 size={15} /> Configuration changes can be undone while safe. Executed and accepted
-          work is kept as evidence.
-        </p>
+        {compact ? (
+          <>
+            {company?.purpose.trim() && (
+              <section>
+                <h3 className="small-heading">Purpose</h3>
+                <p className="preserve-lines">{company.purpose}</p>
+              </section>
+            )}
+            {company ? (
+              <p className="muted small">Stored on this computer. You can edit it at any time.</p>
+            ) : member ? (
+              <section>
+                {recovery === 'retry' && (
+                  <p>
+                    {member.kind === 'agent' ? 'AI agent' : 'Human'} · {member.role}
+                  </p>
+                )}
+                <h3 className="small-heading">
+                  {member.companyNames.length === 1 ? 'Company' : 'Companies'}
+                </h3>
+                <ul>
+                  {member.companyNames.map((name, index) => (
+                    <li key={index}>{name}</li>
+                  ))}
+                </ul>
+                {member.editing && member.companyNames.length > 1 && (
+                  <p className="muted small">These changes apply across all listed companies.</p>
+                )}
+              </section>
+            ) : null}
+            <details className="text-disclosure">
+              <summary>Review technical details</summary>
+              {changes}
+            </details>
+          </>
+        ) : (
+          <>
+            {changes}
+            <p className="preview-note">
+              <Undo2 size={15} /> Configuration changes can be undone while safe. Executed and
+              accepted work is kept as evidence.
+            </p>
+          </>
+        )}
         {error && (
           <div className="error-box" role="alert">
             <p>{error}</p>
@@ -444,7 +557,7 @@ export function PreviewDialog({
         )}
         <footer className="dialog-actions">
           <button className="button" disabled={busy || recovery === 'retry'} onClick={onClose}>
-            Discard draft
+            {compact || backToEditor ? 'Back' : 'Discard draft'}
           </button>
           <button
             className="button primary"
@@ -455,10 +568,20 @@ export function PreviewDialog({
             {busy
               ? recovery === 'retry'
                 ? 'Confirming…'
-                : 'Applying…'
+                : company
+                  ? 'Creating…'
+                  : member
+                    ? 'Saving…'
+                    : 'Applying…'
               : recovery === 'retry'
                 ? 'Retry save'
-                : 'Apply changes'}
+                : company
+                  ? 'Create company'
+                  : member
+                    ? member.editing
+                      ? 'Save member'
+                      : 'Add member'
+                    : 'Apply changes'}
           </button>
         </footer>
       </div>
