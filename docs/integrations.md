@@ -2,7 +2,7 @@
 
 Company creation, human/AI membership, responsibilities, reporting, relationships, local storage and Time Tracker work without accounts or network access. Running an AI task or company workflow is a separate, explicit action. VCM's current local core is MIT licensed; your selected runtime can consume an existing subscription allowance or paid API usage. VCM does not purchase credits, provision paid inference or start tasks in the background on launch.
 
-This guide describes **`0.1.0-alpha.7` corporation management**. The primary [company-management loop](product/corporation-management.md) requires no runtime connection or executed task. Open **Tools → Connections** for optional runtime setup. **Tools → Agent runs & records** holds individual output and manual contributions, with **Workflow examples** as a separate tab. Historical alpha.5/alpha.6, platform and live integration evidence retains its original identity in [acceptance](acceptance.md); the versioned release manifest records the current source and package checks.
+This guide describes **`0.1.0-alpha.8` corporation management**. The primary [company-management loop](product/corporation-management.md) requires no runtime connection or executed task. Open **Tools → Connections** for optional runtime setup. **Tools → Agent runs & records** holds individual output and manual contributions, with **Workflow examples** as a separate tab. Historical alpha.5/alpha.6, platform and live integration evidence retains its original identity in [acceptance](acceptance.md); the versioned release manifest records the current source and package checks.
 
 ## Codex CLI
 

@@ -242,7 +242,7 @@ export function WorkView({
     const url = URL.createObjectURL(new Blob([value.output], { type: 'text/plain;charset=utf-8' }));
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = `gitflash-${value.id}.txt`;
+    anchor.download = `vcm-${value.id}.txt`;
     anchor.click();
     URL.revokeObjectURL(url);
   };

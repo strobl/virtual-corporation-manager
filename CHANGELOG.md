@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0-alpha.8 — VCM distribution filenames
+
+- Use `vcm-<version>.tgz` for the visible GitHub archive and `vcm-*` for user-facing company, time, workflow and work-result downloads.
+- Keep the installed npm package, `node_modules/gitflash`, `gitflash` compatibility command, existing data settings, export formats and wire identifiers unchanged.
+- Preserve Alpha 7 product behavior and evidence; this release only removes the former product name from visible filenames.
+
 ## 0.1.0-alpha.7 — corporation management
 
 - Make the company the main workspace: people and AI agents, responsibilities, reporting, membership and company relationships stay in one context.
@@ -7,6 +13,7 @@
 - Put agent runs, workflow examples and connections under secondary tools. Humans can record a contribution without agent execution controls.
 - Preserve Time Tracker behavior and data. Company totals open all company members, member booking stays scoped, and mobile member navigation retains visible focus.
 - Carry forward the complete VCM naming and compatibility changes from alpha.6. Existing runtime, integration and external-usefulness limitations remain open.
+- Use the visible `vcm-0.1.0-alpha.7.tgz` filename for the GitHub download while retaining the internal `gitflash` npm package and compatibility command.
 
 ## 0.1.0-alpha.6 — branding maintenance, 6 September 2026
 

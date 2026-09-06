@@ -12,7 +12,7 @@ The file configures these roles. It contains no executed work, accepted result, 
 
 ## Import and inspect
 
-Use the `0.1.0-alpha.7` archive through the [README installation route](../../README.md#install-the-reviewed-archive). The versioned release manifest binds the archive; alpha.5 and alpha.6 package evidence is historical. Follow [the quickstart](../developer-quickstart.md), then open **Settings → Import a company definition**. Select the JSON file or paste its full contents, choose **Review import**, inspect the changes and choose **Apply changes**. Open **Corporations → Patchwork Studio (example)**.
+Use the `0.1.0-alpha.8` archive through the [README installation route](../../README.md#install-the-reviewed-archive). The versioned release manifest binds the archive; alpha.5 and alpha.6 package evidence is historical. Follow [the quickstart](../developer-quickstart.md), then open **Settings → Import a company definition**. Select the JSON file or paste its full contents, choose **Review import**, inspect the changes and choose **Apply changes**. Open **Corporations → Patchwork Studio (example)**.
 
 Select a member to inspect its role, instructions and responsibilities. Choose **Edit member**, make a focused change, then **Review change → Save member**. The company overview also supports **Add member** for an **AI agent** or **Human**; this shipped fixture contains only the three agents listed above. Saving a member does not execute work or book time.
 

@@ -289,7 +289,9 @@ describe('workflow HTTP boundary and downloads', () => {
     expect(response.headers.get('x-content-sha256')).toBe(artifact.sha256);
     expect(sha256(await response.text())).toBe(artifact.sha256);
     const exported = await fetch(`${f.app.url}/api/jobs/${job.id}/export`);
-    expect(exported.headers.get('content-disposition')).toContain('attachment;');
+    expect(exported.headers.get('content-disposition')).toContain(
+      'attachment; filename="vcm-workflow-evidence.json"',
+    );
     const body = await exported.json();
     expect(body.job).toEqual(job);
     expect(body.artifacts.find((a: { id: string }) => a.id === artifact.id).sha256).toBe(
@@ -298,7 +300,9 @@ describe('workflow HTTP boundary and downloads', () => {
     const bundled = await fetch(`${f.app.url}/api/jobs/${job.id}/deliverables`);
     expect(bundled.status).toBe(200);
     expect(bundled.headers.get('content-type')).toBe('application/zip');
-    expect(bundled.headers.get('content-disposition')).toContain('attachment;');
+    expect(bundled.headers.get('content-disposition')).toContain(
+      'attachment; filename="vcm-PS-001.zip"',
+    );
     const zip = Buffer.from(await bundled.arrayBuffer());
     expect(zip.subarray(0, 4)).toEqual(Buffer.from([0x50, 0x4b, 0x03, 0x04]));
     // Read the stored ZIP entries rather than finding names inside provenance.

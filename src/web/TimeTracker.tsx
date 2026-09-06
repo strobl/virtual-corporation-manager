@@ -1876,7 +1876,7 @@ export function TimezoneSettings({
           </button>
         </form>
       )}
-      <a className="button" href="/api/time/export" download="gitflash-time-ledger.json">
+      <a className="button" href="/api/time/export" download="vcm-time-ledger.json">
         <Download size={14} /> Export time ledger & catalog
       </a>
     </section>

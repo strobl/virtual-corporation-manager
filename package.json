@@ -1,6 +1,6 @@
 {
   "name": "gitflash",
-  "version": "0.1.0-alpha.7",
+  "version": "0.1.0-alpha.8",
   "description": "VCM — Virtual Corporation Manager: manage companies, people, AI agents and recorded hours locally",
   "type": "module",
   "license": "MIT",
@@ -28,6 +28,7 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "node scripts/build.mjs",
+    "pack:release": "node scripts/pack-release.mjs",
     "start": "node dist/cli.js",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",

@@ -10,7 +10,7 @@ Create a company, add the people and agents who belong to it, and keep their res
 
 The local core manages companies, human and AI members, and the existing Time Tracker. Optional execution remains experimental. Consult the versioned [acceptance record](docs/acceptance.md) for observed checks and remaining limits.
 
-**`0.1.0-alpha.7` corporation-management technical prerelease.** This guide describes the simplified company workspace, with humans and agents together and execution under secondary tools. The [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.7) identifies its archive, source revision, checksum and verification. Alpha.6 branding maintenance, alpha.5 and earlier local candidates retain their own artifacts and evidence.
+**`0.1.0-alpha.8` distribution-name maintenance release.** This guide uses the VCM-named archive for the simplified company workspace. The [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.8) identifies its archive, source revision, checksum and verification. Alpha.7, Alpha.6, alpha.5 and earlier candidates retain their own artifacts and evidence.
 
 [Developer quickstart](docs/developer-quickstart.md) · [Three-agent example](docs/examples/README.md) · [Architecture and data](docs/developer-architecture.md) · [Contribute](CONTRIBUTING.md)
 
@@ -22,17 +22,17 @@ _Fictional company and member data in the company-management workspace. The [cap
 
 Use **Node.js 24.14+ in the 24.x line, or Node 26.x**, with npm. The declared local-core targets are macOS, Linux and native Windows; consult the exact release's [OS/Node acceptance](docs/acceptance.md) rather than inferring a passing matrix from these targets. No database compiler, provider account or Python installation is needed for corporation management, the Time Tracker or the example below.
 
-Download `gitflash-0.1.0-alpha.7.tgz` from the [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.7) and verify its SHA-256 against the attached `checksums.txt` and `release-manifest.json` before going offline. Keep those records with the source revision. Distribution uses the GitHub archive; no npm registry namespace is required. You can also build this checkout with the source commands below.
+Download `vcm-0.1.0-alpha.8.tgz` from the [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.8) and verify its SHA-256 against the attached `checksums.txt` and `release-manifest.json` before going offline. Keep those records with the source revision. The installed npm package remains `gitflash` for compatibility; the visible distribution archive uses the VCM filename. No npm registry namespace is required. You can also build this checkout with the source commands below.
 
 Run these commands in the directory containing that verified archive. They install into a separate folder and start its `vcm` binary:
 
 ```sh
-npm install --offline --ignore-scripts --prefix ./vcm-preview ./gitflash-0.1.0-alpha.7.tgz
+npm install --offline --ignore-scripts --prefix ./vcm-preview ./vcm-0.1.0-alpha.8.tgz
 npm exec --offline --prefix ./vcm-preview -- vcm --version
 npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company
 ```
 
-Expected version: `0.1.0-alpha.7`. Open the loopback URL printed by the command if the browser does not open. Use the same working directory and `--data-dir` when restarting. Add `--port 4311` if 4310 is occupied, or `--no-open` to open the URL yourself.
+Expected version: `0.1.0-alpha.8`. Open the loopback URL printed by the command if the browser does not open. Use the same working directory and `--data-dir` when restarting. Add `--port 4311` if 4310 is occupied, or `--no-open` to open the URL yourself.
 
 **Run VCM with `vcm`.** Existing installations keep their workspace and settings. The archive retains its established package name for compatibility; see the [naming and compatibility contract](docs/branding.md).
 
@@ -41,7 +41,7 @@ To build a source checkout instead:
 ```sh
 npm ci --ignore-scripts
 npm run check
-npm pack
+npm run pack:release
 ```
 
 Then use your generated archive with the install commands above. A build from a later checkout is distinct from the frozen release asset. Obtaining source and uncached development dependencies needs network access; the supplied archive and local core work offline. See the [source checkout route](CONTRIBUTING.md#fresh-checkout) for revision and review guidance.
