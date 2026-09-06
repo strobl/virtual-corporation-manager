@@ -9,6 +9,7 @@ export function HumanResultDialog({
   companyId,
   busy,
   error,
+  reviewing = false,
   onClose,
   onSubmit,
 }: {
@@ -16,6 +17,7 @@ export function HumanResultDialog({
   companyId: string;
   busy: boolean;
   error: string | null;
+  reviewing?: boolean;
   onClose: () => void;
   onSubmit: (commands: DomainCommand[], summary: string) => Promise<void>;
 }) {
@@ -67,6 +69,7 @@ export function HumanResultDialog({
       setSubmitting(false);
     }
   };
+  if (reviewing) return null;
   return (
     <Dialog title={`Record ${agent.name}’s result`} onClose={onClose} closeDisabled={saving}>
       <form className="dialog-body editor-form" onSubmit={submit}>

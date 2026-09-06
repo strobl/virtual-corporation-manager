@@ -75,6 +75,7 @@ export function EntityEditor({
   state,
   busy,
   error,
+  reviewing = false,
   onClose,
   onSubmit,
 }: {
@@ -82,6 +83,7 @@ export function EntityEditor({
   state: WorkspaceState;
   busy: boolean;
   error: string | null;
+  reviewing?: boolean;
   onClose: () => void;
   onSubmit: (commands: DomainCommand[], summary: string) => Promise<void>;
 }) {
@@ -183,6 +185,7 @@ export function EntityEditor({
     }
     await onSubmit([command], `${target.id ? 'Update' : 'Create'} ${entityLabel}: ${name.trim()}`);
   };
+  if (reviewing) return null;
   return (
     <Dialog
       title={`${target.id ? 'Edit' : 'Create'} ${entityLabel}`}
@@ -414,6 +417,8 @@ export function PreviewDialog({
   busy,
   error,
   recovery = null,
+  company,
+  member,
   onClose,
   onApply,
   onRefresh,
@@ -422,14 +427,55 @@ export function PreviewDialog({
   busy: boolean;
   error: string | null;
   recovery?: 'retry' | 'refresh' | null;
+  company?: { name: string; purpose: string };
+  member?: {
+    name: string;
+    role: string;
+    kind: 'agent' | 'human';
+    companyNames: string[];
+    editing: boolean;
+  };
   onClose: () => void;
   onApply: () => void;
   onRefresh: () => void;
 }) {
+  const compact = Boolean(company || member);
+  const title = company
+    ? `${recovery === 'retry' ? 'Confirm' : 'Create'} ${company.name}`
+    : member
+      ? `${recovery === 'retry' ? 'Confirm' : member.editing ? 'Save' : 'Add'} ${member.name}`
+      : 'Review your changes';
+  const changes = (
+    <ol className="preview-list">
+      {preview.changes.map((change, index) => (
+        <li key={index}>
+          <span className="change-number">{index + 1}</span>
+          {change.length > 500 ? (
+            <div className="preview-change">
+              <p>{textExcerpt(change, 400)}</p>
+              <details className="text-disclosure">
+                <summary>Read full change</summary>
+                <pre
+                  className="full-text"
+                  tabIndex={0}
+                  role="region"
+                  aria-label={`Full change ${index + 1}`}
+                >
+                  {change}
+                </pre>
+              </details>
+            </div>
+          ) : (
+            change
+          )}
+        </li>
+      ))}
+    </ol>
+  );
   return (
     <Dialog
-      title="Review your changes"
-      wide
+      title={title}
+      wide={!compact}
       onClose={onClose}
       closeDisabled={busy || recovery === 'retry'}
     >
@@ -438,10 +484,14 @@ export function PreviewDialog({
           <span />{' '}
           {recovery === 'retry' ? 'Save confirmation pending' : 'Draft · Nothing has been saved'}
         </div>
-        <h3 className="preview-title">{preview.summary}</h3>
+        {!compact && <h3 className="preview-title">{preview.summary}</h3>}
         <p className="muted">
           {recovery === 'retry' ? (
             'The save response was interrupted. These changes may already be saved. Retry this same save to confirm its result before creating another draft.'
+          ) : company ? (
+            'Your company starts with an empty team. Add agents, people and their responsibilities next.'
+          ) : member ? (
+            `${member.kind === 'agent' ? 'AI agent' : 'Human'} · ${member.role}`
           ) : (
             <>
               Review {preview.changes.length} items below. Everything is saved together when you
@@ -449,35 +499,50 @@ export function PreviewDialog({
             </>
           )}
         </p>
-        <ol className="preview-list">
-          {preview.changes.map((change, index) => (
-            <li key={index}>
-              <span className="change-number">{index + 1}</span>
-              {change.length > 500 ? (
-                <div className="preview-change">
-                  <p>{textExcerpt(change, 400)}</p>
-                  <details className="text-disclosure">
-                    <summary>Read full change</summary>
-                    <pre
-                      className="full-text"
-                      tabIndex={0}
-                      role="region"
-                      aria-label={`Full change ${index + 1}`}
-                    >
-                      {change}
-                    </pre>
-                  </details>
-                </div>
-              ) : (
-                change
-              )}
-            </li>
-          ))}
-        </ol>
-        <p className="preview-note">
-          <Undo2 size={15} /> Configuration changes can be undone while safe. Executed and accepted
-          work is kept as evidence.
-        </p>
+        {compact ? (
+          <>
+            {company?.purpose.trim() && (
+              <section>
+                <h3 className="small-heading">Purpose</h3>
+                <p className="preserve-lines">{company.purpose}</p>
+              </section>
+            )}
+            {company ? (
+              <p className="muted small">Stored on this computer. You can edit it at any time.</p>
+            ) : member ? (
+              <section>
+                {recovery === 'retry' && (
+                  <p>
+                    {member.kind === 'agent' ? 'AI agent' : 'Human'} · {member.role}
+                  </p>
+                )}
+                <h3 className="small-heading">
+                  {member.companyNames.length === 1 ? 'Company' : 'Companies'}
+                </h3>
+                <ul>
+                  {member.companyNames.map((name, index) => (
+                    <li key={index}>{name}</li>
+                  ))}
+                </ul>
+                {member.editing && member.companyNames.length > 1 && (
+                  <p className="muted small">These changes apply across all listed companies.</p>
+                )}
+              </section>
+            ) : null}
+            <details className="text-disclosure">
+              <summary>Review technical details</summary>
+              {changes}
+            </details>
+          </>
+        ) : (
+          <>
+            {changes}
+            <p className="preview-note">
+              <Undo2 size={15} /> Configuration changes can be undone while safe. Executed and
+              accepted work is kept as evidence.
+            </p>
+          </>
+        )}
         {error && (
           <div className="error-box" role="alert">
             <p>{error}</p>
@@ -490,7 +555,7 @@ export function PreviewDialog({
         )}
         <footer className="dialog-actions">
           <button className="button" disabled={busy || recovery === 'retry'} onClick={onClose}>
-            Discard draft
+            {compact ? 'Back' : 'Discard draft'}
           </button>
           <button
             className="button primary"
@@ -501,10 +566,20 @@ export function PreviewDialog({
             {busy
               ? recovery === 'retry'
                 ? 'Confirming…'
-                : 'Applying…'
+                : company
+                  ? 'Creating…'
+                  : member
+                    ? 'Saving…'
+                    : 'Applying…'
               : recovery === 'retry'
                 ? 'Retry save'
-                : 'Apply changes'}
+                : company
+                  ? 'Create company'
+                  : member
+                    ? member.editing
+                      ? 'Save member'
+                      : 'Add member'
+                    : 'Apply changes'}
           </button>
         </footer>
       </div>
