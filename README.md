@@ -6,6 +6,10 @@ VCM is an MIT-licensed local workspace for developers who manage agent roles acr
 
 If your roles currently live in a document, prompts or scripts, try representing one real project in VCM and compare the effort of maintaining it. VCM stores the context you enter; it does not synchronize arbitrary chats or make configured agents execute automatically.
 
+**Technical alpha — for developer evaluation**
+
+Tested local features include company and agent management and the Time Tracker. Execution is experimental; the install → configure → execute → useful-result journey remains incomplete.
+
 **Available: `0.1.0-alpha.5` technical prerelease.** Evaluate the local workspace using the [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.5), its exact archive and checksum. The earlier local alpha.5-local.1 and public alpha.2 remain distinct artifacts. The release record identifies the reviewed source, successful CI, installation evidence and remaining limits.
 
 **Product Studio PS-001 did not complete:** intake and one retry each timed out after 300 seconds at `ultra`. No v2 delivery bundle or owner acceptance exists. The earlier v1 download was rejected because its expected-reference file was missing. This technical prerelease does not complete the intended useful-result journey. [Observed failures and evidence](docs/acceptance.md#technical-prerelease--6-september-2026)
