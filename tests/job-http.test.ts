@@ -318,6 +318,9 @@ describe('workflow HTTP boundary and downloads', () => {
       'input.json',
       'brief.md',
       'requirements.md',
+      'EXPECTED-REFERENCE.json',
+      'COMPANY.md',
+      'WORKFLOWS.md',
       'INTAKE.md',
       'SCOPE.md',
       'stock_alert.py',
@@ -329,16 +332,27 @@ describe('workflow HTTP boundary and downloads', () => {
       'HANDOFF.md',
       'oracle-result.json',
       'PROVENANCE.json',
+      'BUNDLE-README.md',
     ])
       expect(entries.has(filename)).toBe(true);
-    expect(entries.size).toBe(14);
+    expect(entries.size).toBe(33);
+    expect(entries.get('EXPECTED-REFERENCE.json')?.toString()).toBe(
+      studioContent.files['expected.json'],
+    );
+    expect(entries.has('WORKFLOW-EXECUTION.json')).toBe(false);
+    expect(entries.has('STAGE.json')).toBe(false);
+    expect(entries.has('prompt.txt')).toBe(false);
+    for (const stage of job.stages) {
+      const path = `STAGE-EVIDENCE/${stage.kind}/${stage.id}/WORKFLOW-EXECUTION.json`;
+      expect(JSON.parse(entries.get(path)!.toString()).sessionId).toBe(stage.sessionId);
+    }
     expect(entries.get('brief.md')?.toString()).toBe(studioContent.files['brief.md']);
     expect(entries.get('requirements.md')?.toString()).toBe(studioContent.files['requirements.md']);
     for (const name of ['INTAKE.md', 'SCOPE.md', 'stock_alert.py']) {
       const captured = body.artifacts.find((a: { path: string }) => a.path === name);
       expect(sha256(entries.get(name)!.toString())).toBe(captured.sha256);
     }
-    expect(job.bundle).toMatchObject({ version: 1, sha256: sha256(zip), bytes: zip.length });
+    expect(job.bundle).toMatchObject({ version: 2, sha256: sha256(zip), bytes: zip.length });
     expect(entries.get('PROVENANCE.json')?.toString()).toBe(job.bundle!.provenance);
     const reviewed = await f.post(`/api/jobs/${job.id}/review`, {
       decision: 'accepted',

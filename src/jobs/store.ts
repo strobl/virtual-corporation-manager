@@ -8,7 +8,9 @@ import {
   safeArtifactPath,
   type JobArtifact,
   type JobInfo,
+  type JobStage,
 } from './contracts.js';
+import type { Files } from './files.js';
 import { filesZip } from './zip.js';
 export { safeArtifactPath } from './contracts.js';
 
@@ -18,14 +20,145 @@ CREATE INDEX workflow_artifacts_job ON workflow_artifacts(job_id);
 CREATE TABLE workflow_requests (request_id TEXT PRIMARY KEY, job_id TEXT NOT NULL REFERENCES workflow_jobs(id), action TEXT NOT NULL);`;
 
 export const sha256 = (value: string | Buffer) => createHash('sha256').update(value).digest('hex');
+
+/** Stage bookkeeping stays in provenance/evidence, outside the runnable file set. */
+const stageMetadata = (path: string) =>
+  /^(?:STAGE\.json|WORKFLOW-CONTEXT\.json|WORKFLOW-EXECUTION\.json|prompt\.txt|oracle-result\.json|ps001-oracle\.py|REPAIR-NOTES\.md)$/i.test(
+    path,
+  );
+
+/** Merge portable artifact paths without silently overwriting another role's bytes. */
+export function mergeWorkflowFiles(...groups: Files[]): Files {
+  const files: Files = {};
+  const paths = new Map<string, string>();
+  for (const group of groups)
+    for (const [path, text] of Object.entries(group)) {
+      if (
+        !safeArtifactPath(path) ||
+        typeof text !== 'string' ||
+        path
+          .split('/')
+          .some(
+            (part) =>
+              part.endsWith('.') || /^(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)/i.test(part),
+          )
+      )
+        throw new DomainError(
+          'INVALID_ARTIFACT',
+          'A workflow file is missing or has an unsafe or nonportable path.',
+        );
+      // safeArtifactPath already limits names to ASCII. Case aliases and file/
+      // directory prefix collisions cannot be extracted consistently on all hosts.
+      const portable = path.toLowerCase();
+      for (const [existing, original] of paths)
+        if (
+          (existing === portable && (original !== path || files[original] !== text)) ||
+          existing.startsWith(`${portable}/`) ||
+          portable.startsWith(`${existing}/`)
+        )
+          throw new DomainError(
+            'INVALID_ARTIFACT',
+            `Workflow files conflict at ${original} and ${path}. Preserve the stage evidence.`,
+          );
+      paths.set(portable, path);
+      files[path] = text;
+    }
+  return files;
+}
+
+/** Actual outputs from one completed candidate stage, including its support files. */
+export function workflowStageOutputFiles(db: DatabaseSync, jobId: string, stage: JobStage): Files {
+  const groups = db
+    .prepare(
+      'SELECT path,content,source FROM workflow_artifacts WHERE job_id=? AND stage_id=? ORDER BY rowid',
+    )
+    .all(jobId, stage.id)
+    .filter((artifact) => {
+      const path = String(artifact.path);
+      if (/^(?:PROVENANCE\.json$|BUNDLE-README\.md$|STAGE-EVIDENCE(?:\/|$))/i.test(path))
+        throw new DomainError('INVALID_ARTIFACT', 'Workflow output uses a reserved bundle path.');
+      return artifact.source !== 'verifier' && !stageMetadata(path);
+    })
+    .map((artifact) => ({ [String(artifact.path)]: String(artifact.content) }));
+  return mergeWorkflowFiles(...groups);
+}
+
+export function assertStageInputFiles(stage: JobStage, files: Files): void {
+  for (const [path, text] of Object.entries(files))
+    if (stage.inputHashes[path] !== sha256(text))
+      throw new DomainError(
+        'EVIDENCE_CHANGED',
+        `The completed ${stage.kind} stage did not receive the captured ${path}. Preserve this job and start a new reviewed candidate.`,
+      );
+}
+
 /** Reconstruct the exact ZIP from captured bytes, never from disposable run directories. */
 export function workflowBundleBytes(
   db: DatabaseSync,
   job: JobInfo,
   provenance = job.bundle?.provenance ?? JSON.stringify(job, null, 2),
+  version: 1 | 2 = job.bundle?.version ?? 1,
 ): Buffer {
+  if (version !== 1 && version !== 2)
+    throw new DomainError('INVALID_DATABASE', 'The reviewed bundle version is unsupported.');
   const row = db.prepare('SELECT context FROM workflow_jobs WHERE id=?').get(job.id);
   const pinned = JSON.parse(String(row?.context)).content.files;
+  if (version === 2) {
+    try {
+      const { ['expected.json']: reference, ...inputs } = pinned;
+      let files = mergeWorkflowFiles(inputs, { 'EXPECTED-REFERENCE.json': reference });
+      const evidence: Files[] = [];
+      for (const kind of JOB_STAGE_ORDER) {
+        const stage = completedJobStage(job, kind);
+        if (!stage) throw new Error('The reviewed stage is missing.');
+        if (kind === 'qa' || kind === 'handoff') assertStageInputFiles(stage, files);
+        const outputs = workflowStageOutputFiles(db, job.id, stage);
+        for (const path of JOB_REQUIRED_OUTPUTS[kind])
+          if (typeof outputs[path] !== 'string') throw new Error('A reviewed output is missing.');
+        files = mergeWorkflowFiles(files, outputs);
+        if (kind === 'qa') {
+          const oracle = db
+            .prepare(
+              "SELECT content FROM workflow_artifacts WHERE job_id=? AND stage_id=? AND path='oracle-result.json' AND source='verifier'",
+            )
+            .get(job.id, stage.id);
+          if (!oracle) throw new Error('The reviewed oracle is missing.');
+          files = mergeWorkflowFiles(files, { 'oracle-result.json': String(oracle.content) });
+        }
+        const stageEvidence = db
+          .prepare(
+            'SELECT path,content,source FROM workflow_artifacts WHERE job_id=? AND stage_id=? ORDER BY rowid',
+          )
+          .all(job.id, stage.id)
+          .filter(
+            (artifact) => artifact.source === 'verifier' || stageMetadata(String(artifact.path)),
+          )
+          .map((artifact) => ({
+            [`STAGE-EVIDENCE/${kind}/${stage.id}/${String(artifact.path)}`]: String(
+              artifact.content,
+            ),
+          }));
+        evidence.push(...stageEvidence);
+      }
+      return filesZip(
+        mergeWorkflowFiles(files, ...evidence, {
+          'PROVENANCE.json': provenance,
+          'BUNDLE-README.md':
+            '# Reviewed workflow bundle, format 2\n\n' +
+            'Product files and supporting files keep their original relative paths. ' +
+            'EXPECTED-REFERENCE.json is the pinned expected-output input; expected.json is the producer output.\n\n' +
+            'Captured stage receipts, readiness records and prompts are under STAGE-EVIDENCE/<stage-kind>/<stage-id>/. ' +
+            'These are historical stage evidence, not product modules or a single shared runtime identity. ' +
+            'Stage-local receipt paths in original agent documents refer to that stage directory; ' +
+            'the original documents and their hashes are unchanged. PROVENANCE.json identifies each stage and artifact.\n',
+        }),
+      );
+    } catch {
+      throw new DomainError('INVALID_DATABASE', 'The complete reviewed bundle is inconsistent.');
+    }
+  }
+  // Preserve v1 order and selection byte for byte, including unsealed historical
+  // downloads. A new seal must never reinterpret an earlier owner's archive.
   const files: Record<string, string> = Object.fromEntries(
     ['input.json', 'brief.md', 'requirements.md'].map((path) => [path, pinned[path]]),
   );
@@ -197,7 +330,7 @@ export function validateJobData(db: DatabaseSync): void {
         const bundle = job.bundle;
         if (
           !bundle ||
-          bundle.version !== 1 ||
+          ![1, 2].includes(bundle.version) ||
           typeof bundle.provenance !== 'string' ||
           !/^[a-f0-9]{64}$/.test(bundle.sha256) ||
           !Number.isSafeInteger(bundle.bytes) ||

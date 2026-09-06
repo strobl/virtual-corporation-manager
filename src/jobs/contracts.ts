@@ -83,7 +83,7 @@ export interface JobInfo {
   stages: JobStage[];
   error: string | null;
   /** Absent on historical jobs; never backfill a historical owner's decision. */
-  bundle?: { version: 1; provenance: string; sha256: string; bytes: number };
+  bundle?: { version: 1 | 2; provenance: string; sha256: string; bytes: number };
   ownerReview: {
     decision: 'accepted' | 'rejected';
     note: string;

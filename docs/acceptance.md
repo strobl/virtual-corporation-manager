@@ -1,5 +1,13 @@
 # VCM acceptance record
 
+## Integration checkpoint — 6 September 2026
+
+The retained A7 candidate (`a7c42e6`) completed PS-001 through five distinct actual Codex sessions. Its format-1 download was **rejected by the assigned technical release integrator**: the extracted test suite ran 13 tests, with 12 passing and one missing-`EXPECTED-REFERENCE.json` error. Stage-local QA success did not make that ZIP independently runnable. This was a synthetic engineering exercise, not an external human pilot.
+
+Full backup/restore preserved the exact rejected ZIP, its bound rejection, captured artifacts and request/retry records without provider replay or new Time Tracker entries. Recovery success establishes preservation of the rejected result; it does not change the owner decision or establish useful delivery.
+
+The format-2 correction includes the pinned reference and complete supporting files while preserving existing format-1 bytes. At this checkpoint, **final-source CI, a new exact-installed provider run and downloaded-file owner review, and public release/download verification remain pending**. Format 2 is not accepted by this preparation note. The final public release manifest will carry the finalized source, CI, package, owner/recovery and public-install evidence. Package documentation remains a dated preparation snapshot; the archive's own identity is recorded beside it, avoiding recursive source/hash edits. Historical records below retain their original scope and dates.
+
 ## Alpha.5 release preparation — 5 September 2026
 
 This checkout targets **0.1.0-alpha.5**, schema **5**, following the accepted developer-first local candidate. The source and tarball receive new identities after release integration. At this snapshot, the final-source remote matrix, immutable tag and independent public-download verification are **pending**. A local test, a configured workflow or the older runtime's green CI does not close those checks.

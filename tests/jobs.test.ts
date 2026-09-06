@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { copyFileSync, mkdtempSync, rmSync } from 'node:fs';
-import { readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
@@ -10,7 +11,7 @@ import { createJobService, type JobServiceOptions } from '../src/jobs/service.js
 import type { StudioContent } from '../src/jobs/content.js';
 import type { JobInfo, StageId } from '../src/jobs/contracts.js';
 import { captureFiles, type Files } from '../src/jobs/files.js';
-import { sha256 } from '../src/jobs/store.js';
+import { mergeWorkflowFiles, sha256, workflowBundleBytes } from '../src/jobs/store.js';
 import type {
   WorkflowCodexInput,
   WorkflowCodexResult,
@@ -65,6 +66,7 @@ interface Call {
   files: Files;
 }
 interface FixtureOptions {
+  python?: string;
   execute?: (
     call: Call,
     result: WorkflowCodexResult,
@@ -91,7 +93,7 @@ async function executionReceipt(input: WorkflowCodexInput, result: WorkflowCodex
   );
   input.onSession?.(identity);
 }
-function success(): WorkflowCodexResult {
+function success(python = process.execPath): WorkflowCodexResult {
   const timestamp = new Date().toISOString();
   return {
     status: 'completed',
@@ -104,7 +106,7 @@ function success(): WorkflowCodexResult {
     commands: [
       {
         id: randomUUID(),
-        command: `'${process.execPath}' -B -m unittest -v`,
+        command: `'${python}' -B -m unittest -v`,
         status: 'completed',
         exitCode: 0,
         output: 'Observed local test output.',
@@ -209,7 +211,7 @@ function fixture(options: FixtureOptions = {}) {
           }),
         );
     }
-    const initial = success();
+    const initial = success(options.python);
     const result = (await options.execute?.(call, initial, calls.length - 1)) ?? initial;
     if (options.writeReceipt !== false) await executionReceipt(input, result);
     await options.afterReceipt?.(call, result);
@@ -233,7 +235,7 @@ function fixture(options: FixtureOptions = {}) {
     content,
     execute,
     check,
-    python: process.execPath,
+    python: options.python ?? process.execPath,
   });
   let serviceClosed = false;
   cleanups.push(async () => {
@@ -300,7 +302,204 @@ async function settled(service: ReturnType<typeof createJobService>, id: string)
   return service.get(id);
 }
 
+function zipFiles(zip: Buffer): Files {
+  const files: Files = {};
+  for (let offset = 0; zip.readUInt32LE(offset) === 0x04034b50;) {
+    expect(zip.readUInt16LE(offset + 8)).toBe(0);
+    const size = zip.readUInt32LE(offset + 18);
+    const nameLength = zip.readUInt16LE(offset + 26);
+    const extraLength = zip.readUInt16LE(offset + 28);
+    const name = zip.subarray(offset + 30, offset + 30 + nameLength).toString();
+    const start = offset + 30 + nameLength + extraLength;
+    expect(files).not.toHaveProperty(name);
+    files[name] = zip.subarray(start, start + size).toString();
+    offset = start + size;
+  }
+  return files;
+}
+
+// Python is optional for the local core. When present, this is a real standard-
+// library extraction/import test of synthetic output, without any provider call.
+const bundleTestPython = (
+  process.platform === 'win32' ? ['python', 'python3'] : ['python3', 'python']
+)
+  .map((command) =>
+    spawnSync(
+      command,
+      ['-c', 'import sys; assert sys.version_info >= (3,8); print(sys.executable)'],
+      {
+        encoding: 'utf8',
+        timeout: 3000,
+      },
+    ),
+  )
+  .find((result) => result.status === 0)
+  ?.stdout.trim();
+
 describe('Product Studio job orchestration', () => {
+  it.skipIf(!bundleTestPython)(
+    'runs the producer tests from the extracted v2 ZIP with pinned reference and nested support files',
+    async () => {
+      const python = bundleTestPython!;
+      const support = {
+        'support/quantity.py':
+          'def quantity(product):\n    return product["reorder_point"] - product["stock"]\n',
+        'WORKFLOW-helper.py': 'def sku(product):\n    return product["sku"]\n',
+        'WORKFLOW-USAGE.md': 'WORKFLOW-helper.py is producer support, not a runtime receipt.\n',
+        'reproduction.md': 'Run python3 -B -m unittest -v; the helper is support/quantity.py.\n',
+      };
+      const testEnvironment = { ...process.env, PYTHONPATH: '', PYTHONNOUSERSITE: '1' };
+      const f = fixture({
+        python,
+        execute: async (call, result) => {
+          if (call.kind === 'build') {
+            await mkdir(join(call.input.directory, 'support'));
+            for (const [path, text] of Object.entries(support))
+              await writeFile(join(call.input.directory, path), text);
+            await writeFile(
+              join(call.input.directory, 'stock_alert.py'),
+              'import importlib.util\nfrom pathlib import Path\nfrom support.quantity import quantity\n\nspec = importlib.util.spec_from_file_location("workflow_helper", Path(__file__).with_name("WORKFLOW-helper.py"))\nhelper = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(helper)\n\ndef reorder_items(products):\n    return [{"sku": helper.sku(p), "quantity": quantity(p)} for p in products]\n',
+            );
+            await writeFile(
+              join(call.input.directory, 'test_stock_alert.py'),
+              'import json\nimport unittest\nfrom pathlib import Path\nfrom stock_alert import reorder_items\n\nROOT = Path(__file__).resolve().parent\nclass DownloadTests(unittest.TestCase):\n    def test_pinned_reference_and_imported_helper(self):\n        reference = json.loads((ROOT / "EXPECTED-REFERENCE.json").read_text())\n        source = json.loads((ROOT / "input.json").read_text())\n        candidate = json.loads((ROOT / "expected.json").read_text())\n        self.assertEqual(reorder_items(source), reference)\n        self.assertEqual(candidate, reference)\n',
+            );
+          }
+          if (call.kind === 'qa' || call.kind === 'handoff') {
+            for (const [path, text] of Object.entries(support)) expect(call.files[path]).toBe(text);
+            expect(call.files['EXPECTED-REFERENCE.json']).toBe(content.files['expected.json']);
+            expect(call.files).not.toHaveProperty('STAGE.json');
+            expect(call.files).not.toHaveProperty('prompt.txt');
+          }
+          if (call.kind === 'qa') {
+            const checked = spawnSync(python, ['-B', '-m', 'unittest', '-v'], {
+              cwd: call.input.directory,
+              env: testEnvironment,
+              encoding: 'utf8',
+              timeout: 5000,
+            });
+            expect(checked.status, checked.stderr).toBe(0);
+            await writeFile(
+              join(call.input.directory, 'qa-details.md'),
+              'Checked the complete producer file set.\n',
+            );
+            return {
+              ...result,
+              commands: [{ ...result.commands[0]!, output: checked.stdout + checked.stderr }],
+            };
+          }
+          if (call.kind === 'handoff') {
+            expect(call.files['qa-details.md']).toBe('Checked the complete producer file set.\n');
+            await writeFile(
+              join(call.input.directory, 'delivery.md'),
+              'See reproduction.md and qa-details.md.\n',
+            );
+          }
+          return result;
+        },
+      });
+      const job = await settled(f.service, f.start().id);
+      expect(job.status).toBe('waiting_owner');
+      expect(job.bundle?.version).toBe(2);
+      expect(f.checks[0]!['support/quantity.py']).toBe(support['support/quantity.py']);
+      expect(f.checks[0]!['EXPECTED-REFERENCE.json']).toBe(content.files['expected.json']);
+      const bytes = f.service.download(job.id);
+      const files = zipFiles(bytes);
+      expect(files['EXPECTED-REFERENCE.json']).toBe(content.files['expected.json']);
+      expect(files['delivery.md']).toContain('reproduction.md');
+      expect(files['reproduction.md']).toBe(support['reproduction.md']);
+      expect(files['WORKFLOW-helper.py']).toBe(support['WORKFLOW-helper.py']);
+      expect(files['WORKFLOW-USAGE.md']).toBe(support['WORKFLOW-USAGE.md']);
+      expect(files['qa-details.md']).toContain('complete producer');
+      for (const stage of job.stages) {
+        const receipt = JSON.parse(
+          files[`STAGE-EVIDENCE/${stage.kind}/${stage.id}/WORKFLOW-EXECUTION.json`]!,
+        );
+        expect(receipt.sessionId).toBe(stage.sessionId);
+      }
+      expect(files).not.toHaveProperty('WORKFLOW-EXECUTION.json');
+      expect(files).not.toHaveProperty('STAGE.json');
+      const extracted = directory('gitflash-extracted-bundle-');
+      const archive = join(directory('gitflash-bundle-archive-'), 'reviewed.zip');
+      await writeFile(archive, bytes);
+      const extract = spawnSync(
+        python,
+        [
+          '-B',
+          '-c',
+          'import sys, zipfile\nwith zipfile.ZipFile(sys.argv[1]) as archive:\n    assert archive.testzip() is None\n    archive.extractall(sys.argv[2])',
+          archive,
+          extracted,
+        ],
+        { env: testEnvironment, encoding: 'utf8', timeout: 5000 },
+      );
+      expect(extract.status, extract.stderr).toBe(0);
+      const tested = spawnSync(python, ['-B', '-m', 'unittest', '-v'], {
+        cwd: extracted,
+        env: testEnvironment,
+        encoding: 'utf8',
+        timeout: 5000,
+      });
+      expect(tested.status, tested.stderr).toBe(0);
+      expect(tested.stderr).toContain('test_pinned_reference_and_imported_helper');
+      expect(tested.stderr).toContain('Ran 1 test');
+      expect(f.service.get(job.id).ownerReview).toBeNull();
+    },
+  );
+
+  it('keeps the pinned reference distinct when producer expected.json has different bytes', async () => {
+    const f = fixture({
+      execute: async (call) => {
+        if (call.kind === 'build')
+          await writeFile(join(call.input.directory, 'expected.json'), '[]');
+      },
+    });
+    const job = await settled(f.service, f.start().id);
+    expect(job.status).toBe('waiting_owner');
+    const files = zipFiles(f.service.download(job.id));
+    expect(files['EXPECTED-REFERENCE.json']).toBe(content.files['expected.json']);
+    expect(files['expected.json']).toBe('[]');
+  });
+
+  it.each([
+    [{ 'notes.md': 'one' }, { 'notes.md': 'two' }],
+    [{ 'Helper.py': 'same' }, { 'helper.py': 'same' }],
+    [{ 'helper.py': 'file' }, { 'helper.py/data.json': '{}' }],
+    [{ '../escape.md': 'unsafe' }, {}],
+    [{ 'AUX.py': 'reserved Windows device' }, {}],
+    [{ 'nul.py': 'reserved Windows device' }, {}],
+    [{ 'support/CoM1.fixture.json': '{}' }, {}],
+    [{ 'LPT9/data.json': '{}' }, {}],
+    [{ 'support./quantity.py': 'trailing-dot directory' }, {}],
+  ])('rejects nonportable or conflicting workflow file sets %j', (first, second) => {
+    expect(() => mergeWorkflowFiles(first, second)).toThrow(
+      expect.objectContaining({ code: 'INVALID_ARTIFACT' }),
+    );
+  });
+
+  it('deduplicates identical paths without changing their bytes', () => {
+    expect(mergeWorkflowFiles({ 'notes.md': 'same' }, { 'notes.md': 'same' })).toEqual({
+      'notes.md': 'same',
+    });
+  });
+
+  it.each(['PROVENANCE.json', 'provenance.JSON', 'BUNDLE-README.md', 'STAGE-EVIDENCE/fake.json'])(
+    'blocks a producer that writes the reserved bundle path %s',
+    async (path) => {
+      const f = fixture({
+        execute: async (call) => {
+          if (call.kind !== 'build') return;
+          if (path.includes('/')) await mkdir(join(call.input.directory, 'STAGE-EVIDENCE'));
+          await writeFile(join(call.input.directory, path), '{}');
+        },
+      });
+      const job = await settled(f.service, f.start().id);
+      expect(job.status).toBe('blocked');
+      expect(job.bundle).toBeUndefined();
+      expect(f.calls.some((call) => call.kind === 'qa')).toBe(false);
+    },
+  );
+
   it('captures the trimmed named review owner while production and QA proceed with acceptance pending', async () => {
     const f = fixture();
     const request = {
@@ -401,7 +600,7 @@ describe('Product Studio job orchestration', () => {
     });
     const reviewedBytes = f.service.download(job.id);
     expect(job.bundle).toMatchObject({
-      version: 1,
+      version: 2,
       sha256: sha256(reviewedBytes),
       bytes: reviewedBytes.length,
     });
@@ -581,9 +780,29 @@ describe('Product Studio job orchestration', () => {
     expect(() => f.service.retry(job.id, 'exhausted-ordinary-repair')).toThrow();
   });
 
-  it('retains an unchanged deliverable in the exact repaired candidate snapshot', async () => {
+  it('retains observed repair support and omits deleted files from the exact current candidate', async () => {
     let checks = 0;
+    let builds = 0;
     const f = fixture({
+      execute: async (call) => {
+        if (call.kind !== 'build') return;
+        if (builds++ === 0) {
+          await writeFile(join(call.input.directory, 'retained.py'), '# retained support\n');
+          await writeFile(join(call.input.directory, 'removed.py'), '# obsolete support\n');
+          await writeFile(
+            join(call.input.directory, 'reproduction.md'),
+            'First candidate commands.',
+          );
+        } else {
+          expect(call.files['retained.py']).toBe('# retained support\n');
+          expect(call.files['removed.py']).toBe('# obsolete support\n');
+          await rm(join(call.input.directory, 'removed.py'));
+          await writeFile(
+            join(call.input.directory, 'reproduction.md'),
+            'Repaired candidate commands.',
+          );
+        }
+      },
       report: (call) =>
         JSON.parse(call.files['oracle-result.json']).exitCode === 0
           ? report()
@@ -600,11 +819,23 @@ describe('Product Studio job orchestration', () => {
     const job = await settled(f.service, f.start().id);
     expect(job.status).toBe('waiting_owner');
     expect(job.candidate).toBe(1);
-    const builds = job.stages.filter((stage) => stage.kind === 'build');
+    const buildStages = job.stages.filter((stage) => stage.kind === 'build');
     for (const [path, text] of Object.entries(buildFiles)) {
-      const artifact = builds[1]!.artifacts.find((a) => a.path === path)!;
+      const artifact = buildStages[1]!.artifacts.find((a) => a.path === path)!;
       expect(f.service.artifact(job.id, artifact.id).content).toBe(text);
     }
+    const retained = buildStages[1]!.artifacts.find((a) => a.path === 'retained.py')!;
+    expect(retained.source).toBe('input');
+    expect(f.service.artifact(job.id, retained.id).content).toBe('# retained support\n');
+    expect(buildStages[1]!.artifacts.some((a) => a.path === 'removed.py')).toBe(false);
+    const qa = f.calls.filter((call) => call.kind === 'qa')[1]!;
+    expect(qa.files['retained.py']).toBe('# retained support\n');
+    expect(qa.files).not.toHaveProperty('removed.py');
+    expect(qa.files['reproduction.md']).toBe('Repaired candidate commands.');
+    const bundled = zipFiles(f.service.download(job.id));
+    expect(bundled['retained.py']).toBe('# retained support\n');
+    expect(bundled).not.toHaveProperty('removed.py');
+    expect(bundled['reproduction.md']).toBe('Repaired candidate commands.');
   });
 
   it.each([
@@ -1042,6 +1273,89 @@ describe('Product Studio job orchestration', () => {
 });
 
 describe('durable workflow recovery', () => {
+  it('does not reuse a historical QA pass that never received a producer support dependency', async () => {
+    const f = fixture({
+      execute: async (call, result) => {
+        if (call.kind === 'build')
+          await writeFile(
+            join(call.input.directory, 'reproduction.md'),
+            'Required producer support.',
+          );
+        return call.kind === 'handoff' ? { ...result, status: 'failed', exitCode: 1 } : result;
+      },
+    });
+    const job = await settled(f.service, f.start().id);
+    expect(job.status).toBe('failed');
+    expect(job.stages.find((s) => s.kind === 'qa')!.status).toBe('completed');
+    // Model the earlier runtime's required-files-only QA input, before any seal.
+    delete job.stages.find((s) => s.kind === 'qa')!.inputHashes['reproduction.md'];
+    const db = new DatabaseSync(join(f.dir, 'workspace.sqlite'));
+    db.prepare('UPDATE workflow_jobs SET info=? WHERE id=?').run(JSON.stringify(job), job.id);
+    db.close();
+    const originalCalls = f.calls.length;
+    f.service.retry(job.id, 'legacy-incomplete-support-review');
+    const retried = await settled(f.service, job.id);
+    expect(retried.status).toBe('blocked');
+    expect(retried.error).toContain('did not receive the captured reproduction.md');
+    expect(retried.bundle).toBeUndefined();
+    expect(f.calls).toHaveLength(originalCalls);
+  });
+
+  it.each(['waiting_owner', 'accepted', 'rejected'] as const)(
+    'preserves an already sealed v1 %s ZIP and owner hash across reopen and restore',
+    async (status) => {
+      const f = fixture();
+      const ready = await settled(f.service, f.start().id);
+      if (status !== 'waiting_owner')
+        f.service.review(ready.id, { decision: status, note: 'Existing v1 owner decision.' });
+      const job = f.service.get(ready.id);
+      await f.close();
+      const db = new DatabaseSync(join(f.dir, 'workspace.sqlite'));
+      const bytes = workflowBundleBytes(db, job, job.bundle!.provenance, 1);
+      job.bundle = {
+        version: 1,
+        provenance: job.bundle!.provenance,
+        sha256: sha256(bytes),
+        bytes: bytes.length,
+      };
+      if (job.ownerReview) job.ownerReview.bundleSha256 = job.bundle.sha256;
+      db.prepare('UPDATE workflow_jobs SET info=? WHERE id=?').run(JSON.stringify(job), job.id);
+      db.close();
+      expect(Object.keys(zipFiles(bytes))).toHaveLength(14);
+      expect(zipFiles(bytes)).not.toHaveProperty('EXPECTED-REFERENCE.json');
+      const store = createWorkspaceStore(f.dir);
+      cleanups.push(() => store.close());
+      const execute = vi.fn(async () => {
+        throw new Error('Existing evidence must not dispatch.');
+      });
+      const service = createJobService(store, f.dir, { content, execute });
+      cleanups.push(() => service.close());
+      expect(service.get(job.id)).toEqual(job);
+      expect(service.download(job.id)).toEqual(bytes);
+      if (status === 'waiting_owner') {
+        const reviewed = service.review(job.id, {
+          decision: 'rejected',
+          note: 'Keep the reviewed v1 bytes.',
+        });
+        expect(reviewed.bundle?.version).toBe(1);
+        expect(reviewed.ownerReview?.bundleSha256).toBe(sha256(bytes));
+        expect(service.download(job.id)).toEqual(bytes);
+      }
+      const snapshot = service.export(job.id);
+      const backup = join(directory('gitflash-v1-backup-'), 'workspace.sqlite');
+      await store.backup(backup);
+      const restoredDirectory = directory('gitflash-v1-restored-');
+      await restoreWorkspaceBackup(restoredDirectory, backup);
+      const restoredStore = createWorkspaceStore(restoredDirectory);
+      cleanups.push(() => restoredStore.close());
+      const restored = createJobService(restoredStore, restoredDirectory, { content, execute });
+      cleanups.push(() => restored.close());
+      expect(restored.export(job.id)).toEqual(snapshot);
+      expect(restored.download(job.id)).toEqual(bytes);
+      expect(execute).not.toHaveBeenCalled();
+    },
+  );
+
   it.each(['waiting_owner', 'accepted', 'rejected'] as const)(
     'preserves historical %s evidence without inventing an earlier bundle attestation',
     async (status) => {
@@ -1070,6 +1384,7 @@ describe('durable workflow recovery', () => {
         note,
       });
       if (status === 'waiting_owner') {
+        expect(reviewed.bundle!.version).toBe(1);
         expect(reviewed.bundle!.sha256).toBe(sha256(bytes));
         expect(reviewed.ownerReview!.bundleSha256).toBe(sha256(bytes));
       } else {
@@ -1099,7 +1414,7 @@ describe('durable workflow recovery', () => {
     expect(f.service.get(job.id).ownerReview).toBeNull();
   });
 
-  it.each(['hash', 'size', 'provenance', 'owner-hash', 'missing-bundle'])(
+  it.each(['hash', 'size', 'provenance', 'owner-hash', 'missing-bundle', 'version'])(
     'rejects %s corruption in owner bundle evidence during open and restore',
     async (tamper) => {
       const f = fixture();
@@ -1116,6 +1431,7 @@ describe('durable workflow recovery', () => {
       if (tamper === 'provenance') job.bundle!.provenance += '\n';
       if (tamper === 'owner-hash') job.ownerReview!.bundleSha256 = '0'.repeat(64);
       if (tamper === 'missing-bundle') delete job.bundle;
+      if (tamper === 'version') job.bundle!.version = 3 as 2;
       db.prepare('UPDATE workflow_jobs SET info=? WHERE id=?').run(JSON.stringify(job), job.id);
       db.close();
       const corruptDirectory = directory('gitflash-bundle-corrupt-open-');
