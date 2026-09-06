@@ -66,38 +66,23 @@ export function CorporationWorkspace({
     return (
       <section className="corporation-empty" aria-labelledby="corporation-empty-title">
         <span className="eyebrow">Virtual Corporation Manager</span>
-        <h1 id="corporation-empty-title">Set up your virtual corporation.</h1>
-        <p>Create agents, define reporting lines and log delivery hours in one place.</p>
+        <h1 id="corporation-empty-title">Your companies, in one place.</h1>
+        <p>Manage your virtual corporations and the agents and people behind them.</p>
         <div className="welcome-actions">
           <button className="button primary large" onClick={actions.onCreate}>
-            Set up a corporation <ArrowRight size={17} />
+            Create your company <ArrowRight size={17} />
           </button>
           <button className="button" onClick={actions.onBrowseTemplates}>
-            <Layers3 size={16} /> Browse company templates
+            <Layers3 size={16} /> Browse templates
           </button>
         </div>
-        <ol className="corporation-steps" aria-label="Corporation setup">
-          <li>
-            <span>01</span>
-            <strong>Give it an identity</strong>
-            <p>Name your corporation and define its purpose.</p>
-          </li>
-          <li>
-            <span>02</span>
-            <strong>Choose its structure</strong>
-            <p>Start blank or organize a small team and its roles.</p>
-          </li>
-          <li>
-            <span>03</span>
-            <strong>Review and create</strong>
-            <p>Check the organization, then save it to your workspace.</p>
-          </li>
-        </ol>
         <p className="corporation-local-note">
-          Your corporation is saved on this computer. Setup does not run agents.
+          Start with a name. Add your team and its responsibilities when you are ready.
+          <br />
+          Your companies are saved on this computer.
         </p>
         <button className="text-button" onClick={actions.onImport}>
-          Import an existing company definition <ArrowRight size={14} />
+          Import a company <ArrowRight size={14} />
         </button>
       </section>
     );
@@ -109,40 +94,32 @@ export function CorporationWorkspace({
         <div className="corporation-page-heading">
           <div>
             <span className="eyebrow">Virtual Corporation Manager</span>
-            <h1 id="corporations-title">Your corporations</h1>
-            <p>Manage your companies, their agents and the hours recorded against their work.</p>
+            <h1 id="corporations-title">Your companies</h1>
+            <p>Manage each company, its team and their responsibilities.</p>
             <button className="text-button" onClick={actions.onBrowseTemplates}>
-              <Layers3 size={14} /> Browse company templates
+              <Layers3 size={14} /> Browse templates
             </button>
           </div>
           <button className="button primary" onClick={actions.onCreate}>
-            <Plus size={16} /> Set up a corporation
+            <Plus size={16} /> Create company
           </button>
         </div>
-        {timeNotice}
         <div className="corporation-list-context">
           <span>
-            {companies.length} {companies.length === 1 ? 'corporation' : 'corporations'}
+            {companies.length} {companies.length === 1 ? 'company' : 'companies'}
           </span>
-          <span>Recorded hours · {period}</span>
+          <span>Agents and people, together</span>
         </div>
         <ul className="corporation-list">
           {companies.map((row) => {
-            const agents = companyAgents(state, row.id).filter((member) => member.kind === 'agent');
-            const count = state.departments.filter(
-              (department) => department.companyId === row.id,
-            ).length;
-            const hours = ledger
-              ? aggregateTime(
-                  ledger.entries.filter((entry) => entry.companyId === row.id),
-                  from,
-                  ledger.today,
-                )
-              : null;
+            const team = companyAgents(state, row.id);
+            const agents = team.filter((member) => member.kind === 'agent').length;
+            const people = team.length - agents;
+            const teamDescription = `${agents} ${agents === 1 ? 'agent' : 'agents'} · ${people} ${people === 1 ? 'person' : 'people'}`;
             return (
               <li key={row.id}>
                 <button
-                  className="corporation-list-row"
+                  className="corporation-list-row company-picker-row"
                   onClick={() => actions.onOpenCompany(row.id)}
                 >
                   <span
@@ -156,23 +133,13 @@ export function CorporationWorkspace({
                     <strong>{row.name}</strong>
                     <span>
                       {textExcerpt(row.description, 140) ||
-                        'Open your corporation to define its team and responsibilities.'}
+                        'Add your company’s purpose and introduce its team.'}
                     </span>
-                    <span className="corporation-row-mobile-meta">
-                      {agents.length} agents · {count} departments
-                    </span>
+                    <span className="corporation-row-mobile-meta">{teamDescription}</span>
                   </span>
-                  <span className="corporation-row-stat">
-                    <strong>{agents.length}</strong>
-                    <span>agents</span>
-                  </span>
-                  <span className="corporation-row-stat">
-                    <strong>{count}</strong>
-                    <span>departments</span>
-                  </span>
-                  <span className="corporation-row-stat hours">
-                    <strong>{hours ? `${formatTenths(hours.tenths)}h` : '—'}</strong>
-                    <span>this week</span>
+                  <span className="corporation-row-stat" title={teamDescription}>
+                    <strong>{team.length}</strong>
+                    <span>{team.length === 1 ? 'team member' : 'team members'}</span>
                   </span>
                   <ArrowRight size={18} aria-hidden="true" />
                 </button>
@@ -181,11 +148,9 @@ export function CorporationWorkspace({
           })}
         </ul>
         <div className="corporation-index-footer">
-          <p>
-            Configured roles describe the team. Recorded delivery hours come from saved entries.
-          </p>
+          <p>Your companies are saved on this computer.</p>
           <button className="text-button" onClick={actions.onImport}>
-            Import a definition <ArrowRight size={14} />
+            Import a company <ArrowRight size={14} />
           </button>
         </div>
       </section>
