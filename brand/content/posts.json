@@ -2,15 +2,17 @@
   "version": 1,
   "brand": "VCM — Virtual Corporation Manager",
   "channel": "X",
-  "account": null,
-  "accountStatus": "Owner handle and connected account pending",
+  "account": "@virtualcorpman",
+  "accountStatus": "Owner-confirmed account; authenticated profile updated and visually verified on 2026-09-08",
   "cadence": "Three posts per week: Monday team, Wednesday product, Friday culture. Start dates follow account setup.",
   "pinnedPost": {
     "status": "draft",
     "asset": "09-team-sculpture",
     "text": "Big ideas deserve a team.\n\nVCM is the open-source workspace for your virtual corporation. Organize humans + AI agents, responsibilities and reporting lines. Keep it on your machine.\n\nMIT core. Technical alpha. Build with us.\nhttps://github.com/strobl/virtual-corporation-manager",
     "alt": "Solo. Never small. A clay sculpture shows a human founder connected to three V-shaped orange, mint and yellow teammates. Editorial brand illustration.",
-    "weightedCharacters": 248
+    "weightedCharacters": 248,
+    "platformDraftVerifiedAt": "2026-09-08",
+    "platformDraftLocation": "X > Drafts > Unsent posts"
   },
   "posts": [
     {
@@ -160,5 +162,8 @@
       "alt": "Solo. Never small. A clay sculpture shows a human founder connected to three V-shaped orange, mint and yellow teammates. Editorial brand illustration.",
       "weightedCharacters": 209
     }
-  ]
+  ],
+  "accountUrl": "https://x.com/virtualcorpman",
+  "profileStatus": "live",
+  "publishingStatus": "Awaiting owner instruction for launch publication and scheduling"
 }

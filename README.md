@@ -5,6 +5,7 @@
   <a href="docs/developer-quickstart.md">Quickstart</a> ·
   <a href="docs/examples/README.md">Try the example</a> ·
   <a href="CONTRIBUTING.md">Contribute</a> ·
+  <a href="https://x.com/virtualcorpman">Follow VCM on X</a> ·
   <a href="https://github.com/strobl/virtual-corporation-manager/tree/main/brand">Brand kit</a>
 </p>
 

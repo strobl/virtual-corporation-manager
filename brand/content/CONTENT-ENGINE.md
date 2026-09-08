@@ -23,7 +23,7 @@ Use 09:00 Europe/Berlin as a provisional production time. Posting time is a hypo
 
 Use a separate VCM brand/workspace and a dedicated VCM X connection. Import [BRAND-BRIEF.md](BRAND-BRIEF.md) as its source brief; provide current repository URLs, release notes and the approved asset family. Keep Chris Strobl's personal LinkedIn brand separate. A VCM org chart is a primary illustration, not a reason to recycle an unrelated personal-brand screenshot.
 
-Until a dedicated VCM account and workspace are identified, the local JSON queue is the source of draft state. Preparing these files does not claim a Pressmaster connection. Upload each approved PNG, paste the exact draft and its alt text, verify the account selector, then schedule according to the owner's publishing instruction.
+The dedicated product account is [@virtualcorpman](https://x.com/virtualcorpman), with its profile live and verified on 8 September 2026. The local JSON queue is the source of content state until each draft, schedule or publication has its actual platform evidence. Preparing these files does not claim a Pressmaster connection. Upload each approved PNG, paste the exact draft and its alt text, verify the account selector, then schedule according to the owner's publishing instruction.
 
 ## Reusable release-post brief
 
