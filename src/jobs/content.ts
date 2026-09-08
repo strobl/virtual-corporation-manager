@@ -26,6 +26,10 @@ export function workflowInfo(content = studioContent): WorkflowInfo {
       ? content.help.replaceAll(guideVersion, __GITFLASH_VERSION__)
       : content.help;
   const help = versionedHelp
+    .replace(
+      /This guide accompanies candidate \*\*[0-9A-Za-z.+-]+\*\*\.[\s\S]*?(?=Company setup needs no VCM account\.)/,
+      'Use Node.js **24.14 or newer in the 24.x line, or 26.x**. Launch VCM with:\n\n```sh\nnpx virtualcorporationmanager --data-dir ./vcm-first-company --no-open\n```\n\nUse a new data directory for this exercise and open the local URL printed in the terminal. Add `--port 4311` if the default port is occupied. Keep the process running while the job works. For permanent installation, run `npm install -g virtualcorporationmanager`, then use `vcm` with the same options. This is a technical alpha; the local core and optional execution have separate acceptance records.\n\n',
+    )
     .replaceAll(
       '**Integrations → Check connections**',
       '**Tools → Connections → Check connections**',

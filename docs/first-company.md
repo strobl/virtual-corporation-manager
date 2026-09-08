@@ -4,17 +4,24 @@ Create a company, add its people and agents, and keep their responsibilities att
 
 ## Install VCM
 
-This guide accompanies the **`0.1.0-alpha.9` product-brand release**. Obtain the matching versioned archive and verify its source revision and SHA-256 using the [README instructions](../README.md#install-the-reviewed-archive), or build this checkout. The release manifest records its actual verification. Published Alpha 7, [alpha.6 branding maintenance](acceptance.md#branding-maintenance-release--6-september-2026) and [alpha.5 technical release](acceptance.md#technical-prerelease--6-september-2026) retain their own evidence and earlier interfaces.
+This guide accompanies the **`0.1.0-alpha.10` technical alpha**. The [README](../README.md#install-vcm) records the installation route. Earlier releases retain their own artifacts and acceptance evidence.
 
-Use Node.js **24.14+ within 24.x, or 26.x**, with npm. From the directory containing the verified archive:
+Use Node.js **24.14+ within 24.x, or 26.x**, with npm:
 
 ```sh
-npm install --offline --ignore-scripts --prefix ./vcm-preview ./vcm-0.1.0-alpha.9.tgz
-npm exec --offline --prefix ./vcm-preview -- vcm --version
-npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./vcm-first-company --no-open
+npx virtualcorporationmanager
 ```
 
-Expected version: `0.1.0-alpha.9`. Keep it with the archive checksum for support. Open the loopback URL printed in the terminal; add `--port 4311` if the default port is occupied. Use a new data directory for this exercise. Stop with Ctrl+C and restart with the same working directory and `--data-dir` to reopen it. Existing installations retain their data-directory and command compatibility; see [naming and compatibility](branding.md).
+For a permanent installation:
+
+```sh
+npm install -g virtualcorporationmanager
+vcm
+```
+
+Open the local URL printed in the terminal. Stop with Ctrl+C and run the same command to return to your corporation. The workspace defaults to `~/.gitflash`; existing `GITFLASH_DATA_DIR` settings are retained. Add `--port 4311` if the default port is occupied. For a separate learning workspace after a permanent install, use `vcm --data-dir ./vcm-first-company` and restart from the same working directory with that path.
+
+For verified offline archives or an existing global `gitflash` installation, use the [advanced installation instructions](../README.md#install-the-reviewed-archive) and [compatibility guide](branding.md). After a permanent install, include `vcm --version` with any support report; this release prints `0.1.0-alpha.10`.
 
 ## Create and return to your company
 

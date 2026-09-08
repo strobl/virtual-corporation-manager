@@ -12,17 +12,17 @@ The file configures these roles. It contains no executed work, accepted result, 
 
 ## Import and inspect
 
-Use the `0.1.0-alpha.9` archive through the [README installation route](../../README.md#install-the-reviewed-archive). The versioned release manifest binds the archive; alpha.5 and alpha.6 package evidence is historical. Follow [the quickstart](../developer-quickstart.md), then open **Settings → Import a company definition**. Select the JSON file or paste its full contents, choose **Review import**, inspect the changes and choose **Apply changes**. Open **Corporations → Patchwork Studio (example)**.
+Use the [README installation route](../../README.md#install-vcm) for the `0.1.0-alpha.10` technical alpha. Verified offline archives are covered in its advanced section. Earlier package evidence remains historical. Follow [the quickstart](../developer-quickstart.md), then open **Settings → Import a company definition**. Select the JSON file or paste its full contents, choose **Review import**, inspect the changes and choose **Apply changes**. Open **Corporations → Patchwork Studio (example)**.
 
 Select a member to inspect its role, instructions and responsibilities. Choose **Edit member**, make a focused change, then **Review change → Save member**. The company overview also supports **Add member** for an **AI agent** or **Human**; this shipped fixture contains only the three agents listed above. Saving a member does not execute work or book time.
 
-The installed example is at `vcm-preview/node_modules/gitflash/docs/examples/three-agent-studio.json`. **Settings → Export company definition** exports the workspace's configuration. Importing that export creates fresh IDs and preserves existing companies; repeated import adds another company with a suffixed short code. A SQLite backup is the full recovery route.
+The example ships with the package for offline use. For a permanent installation, run `npm root -g` and find `virtualcorporationmanager/docs/examples/three-agent-studio.json` within that directory. For the README’s isolated archive installation, it is at `vcm-preview/node_modules/virtualcorporationmanager/docs/examples/three-agent-studio.json`. **Settings → Export company definition** exports the workspace's configuration. Importing that export creates fresh IDs and preserves existing companies; repeated import adds another company with a suffixed short code. A SQLite backup is the full recovery route.
 
 ## Change this example
 
 Start with a concrete responsibility, instruction or role that makes the fictional project easier to understand. Keep references consistent with `src/domain/contracts.ts` and `validateDefinition` in `src/domain/model.ts`. The definition permits JSON configuration only: unknown fields, including work or credentials, are rejected. Keep the file below the UI's 5 MB limit.
 
-After building the checkout, run:
+From a source checkout, build and check the example:
 
 ```sh
 npm run build
@@ -34,7 +34,7 @@ The verification script uses the actual built CLI on an ephemeral loopback port 
 The script ships in the installed package and defaults to that package's adjacent CLI and example, so the same check can run after the README's isolated install:
 
 ```sh
-node ./vcm-preview/node_modules/gitflash/docs/examples/verify.mjs
+node ./vcm-preview/node_modules/virtualcorporationmanager/docs/examples/verify.mjs
 ```
 
 To check another built/installed CLI or a proposed fixture, pass filesystem paths as the first and second arguments:

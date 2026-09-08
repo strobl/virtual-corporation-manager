@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://virtualcorporationmanager.com/">Website</a> ·
-  <a href="#install-the-reviewed-archive"><strong>Get VCM →</strong></a> ·
+  <a href="#install-vcm"><strong>Get VCM →</strong></a> ·
   <a href="docs/developer-quickstart.md">Quickstart</a> ·
   <a href="docs/examples/README.md">Try the example</a> ·
   <a href="#build-the-team-bring-it-to-buzz">Buzz + Slack</a> ·
@@ -31,32 +31,62 @@ The local core works offline with no hosted database, cloud inference, billing o
 
 _Actual company-management interface with fictional example data. [Screenshot provenance](docs/images/product-brand-provenance.json)._
 
-> **Technical alpha — for developer evaluation.** The local core manages companies, members and the Time Tracker. Optional execution is experimental. [Current release: 0.1.0-alpha.9](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.9) · [Acceptance and limits](docs/acceptance.md)
+> **Technical alpha — for developer evaluation.** The local core manages companies, members and the Time Tracker. Optional execution is experimental. [Release 0.1.0-alpha.10](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.10). [Acceptance and limits](docs/acceptance.md)
 
-## Install the reviewed archive
+## Install VCM
 
 You need **Node.js 24.14+ in the 24.x line, or Node 26.x**, with npm. No database compiler, Python or provider account is needed for the local core.
 
-1. Download `vcm-0.1.0-alpha.9.tgz`, `checksums.txt` and `release-manifest.json` from the [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.9).
-2. Verify the archive's SHA-256 against those records before going offline. Keep the records with the source revision.
+Start VCM:
+
+```sh
+npx virtualcorporationmanager
+```
+
+Or install once, then start it with `vcm`:
+
+```sh
+npm install -g virtualcorporationmanager
+vcm
+```
+
+Open the local URL printed in your terminal. Stop with Ctrl+C and run the same command to return to your workspace. The first npm download needs an internet connection; the installed local core works offline.
+
+<details>
+<summary><strong>Platforms, launch options and existing installations</strong></summary>
+
+The declared local-core targets are macOS, Linux and native Windows. Check the exact release's [OS/Node acceptance](docs/acceptance.md) for observed results. Add `--port 4311` if 4310 is occupied, or `--no-open` to open the URL yourself. After a permanent install, `vcm --version` prints the installed version; this release prints `0.1.0-alpha.10`.
+
+The npm package is `virtualcorporationmanager`. `vcm` is the everyday command; `gitflash` remains a compatibility alias. Both keep `~/.gitflash`, `GITFLASH_DATA_DIR` and existing workspaces. An explicit `--data-dir` takes precedence. [Naming and compatibility contract](docs/branding.md)
+
+If you previously installed the `gitflash` package globally, stop VCM before replacing that installation:
+
+```sh
+npm uninstall -g gitflash
+npm install -g virtualcorporationmanager
+```
+
+Then run `vcm` with the same data settings as before. Uninstalling the application preserves its default and custom workspace directories. An older isolated `./vcm-preview` installation can also remain separate; stop its process before opening the same workspace with the new command.
+
+</details>
+
+<a id="install-the-reviewed-archive"></a>
+<details>
+<summary><strong>Advanced: install a verified archive offline</strong></summary>
+
+1. Obtain `vcm-0.1.0-alpha.10.tgz`, `checksums.txt` and `release-manifest.json` from the matching [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.10) or build this checkout.
+2. Verify the release archive's SHA-256 against those records before going offline. Keep the records with the source revision.
 3. Run these commands in the directory containing the verified archive:
 
 ```sh
-npm install --offline --ignore-scripts --prefix ./vcm-preview ./vcm-0.1.0-alpha.9.tgz
+npm install --offline --prefix ./vcm-preview ./vcm-0.1.0-alpha.10.tgz
 npm exec --offline --prefix ./vcm-preview -- vcm --version
-npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company
+npm exec --offline --prefix ./vcm-preview -- vcm
 ```
 
-Expected version: `0.1.0-alpha.9`. Open the loopback URL printed by the command if the browser does not open. Restart from the same directory with the same `--data-dir` to reopen your company.
+Expected version: `0.1.0-alpha.10`. This installs the application into `./vcm-preview`; workspace data still defaults to `~/.gitflash`. For a separate example workspace, append `--data-dir ./my-company` to the last command and keep using that path.
 
-<details>
-<summary><strong>Platforms, launch options and package compatibility</strong></summary>
-
-The declared local-core targets are macOS, Linux and native Windows. Check the exact release's [OS/Node acceptance](docs/acceptance.md) for observed results. Add `--port 4311` if 4310 is occupied, or `--no-open` to open the URL yourself.
-
-Run VCM with `vcm`. The installed npm package remains `gitflash` for compatibility; the visible archive uses the VCM filename. No npm registry namespace is required. Existing installations keep their workspace and settings. [Naming and compatibility contract](docs/branding.md)
-
-Alpha.9 brings the VCM wordmark, companion, Rubik headings, warm cream surfaces, orange actions and cobalt selections into the product. Company management and the Time Tracker retain their existing behavior. Each earlier candidate retains its own release artifacts and evidence.
+For later commands without a permanent install, replace the leading `vcm` with `npm exec --offline --prefix ./vcm-preview -- vcm`, from the directory containing `vcm-preview`. The package files are in `vcm-preview/node_modules/virtualcorporationmanager`. To remove this isolated installation, stop VCM and run `npm uninstall --prefix ./vcm-preview virtualcorporationmanager`; workspace data remains intact.
 
 </details>
 
@@ -69,7 +99,7 @@ npm run check
 npm run pack:release
 ```
 
-Then use your generated archive with the install commands above. A build from a later checkout is distinct from the frozen release asset. Obtaining source and uncached development dependencies needs network access; the supplied archive and local core work offline. See the [source checkout route](CONTRIBUTING.md#fresh-checkout) for revision and review guidance.
+Use the generated archive with the advanced install commands above. A build from a later checkout is distinct from the frozen release asset. Obtaining source and uncached development dependencies needs network access. See the [source checkout route](CONTRIBUTING.md#fresh-checkout) for revision and review guidance. Earlier releases retain their own artifacts and acceptance evidence.
 
 </details>
 
@@ -125,20 +155,20 @@ Keep your company locally in SQLite. Export a company definition to reuse its st
 
 **Settings → Export company definition** downloads the current configuration as JSON. Import validates the whole definition and creates fresh IDs; it does not reconcile or overwrite existing companies. Export configuration for reuse and make a SQLite backup for full recovery.
 
-Stop the workspace before these commands. They use the same isolated installation as above:
+Stop the workspace before these commands. After a permanent install, these use the default workspace; if you start VCM with a custom `--data-dir`, add that same option to export and backup:
 
 ```sh
-npm exec --offline --prefix ./vcm-preview -- vcm export --data-dir ./my-company --output ./company-definition.json
-npm exec --offline --prefix ./vcm-preview -- vcm backup --data-dir ./my-company --output ./company-backup.sqlite
-npm exec --offline --prefix ./vcm-preview -- vcm restore --data-dir ./restored-company --from ./company-backup.sqlite
-npm exec --offline --prefix ./vcm-preview -- vcm doctor --data-dir ./restored-company
+vcm export --output ./company-definition.json
+vcm backup --output ./company-backup.sqlite
+vcm restore --data-dir ./restored-company --from ./company-backup.sqlite
+vcm doctor --data-dir ./restored-company
 ```
 
 Backups preserve configuration, work and job records, artifact bytes, time entries, history and recovery receipts. They contain instructions and results in plaintext SQLite; keep them private. Definition export and time export are different, partial formats. The [quickstart](docs/developer-quickstart.md#export-and-recovery) demonstrates all three paths; [recovery](docs/recovery.md) documents locks, failed restores and schema upgrades.
 
 The server binds to loopback. This is a single-operator local product, with no shared accounts or supported LAN/tunnel hosting. See [architecture and data boundaries](docs/developer-architecture.md) and [security](SECURITY.md).
 
-To remove the isolated application, stop it and run `npm uninstall --prefix ./vcm-preview gitflash`. Your default and custom workspace directories remain intact.
+To remove the permanent installation, stop VCM and run `npm uninstall -g virtualcorporationmanager`. Your default and custom workspace directories remain intact. For an isolated archive installation, use the [advanced instructions](#install-the-reviewed-archive).
 
 </details>
 

@@ -1,6 +1,6 @@
 {
-  "name": "gitflash",
-  "version": "0.1.0-alpha.9",
+  "name": "virtualcorporationmanager",
+  "version": "0.1.0-alpha.10",
   "description": "VCM — Virtual Corporation Manager: manage companies, people, AI agents and recorded hours locally",
   "type": "module",
   "license": "MIT",
@@ -35,7 +35,8 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "check": "npm run typecheck && npm test && npm run build",
-    "test:package": "node scripts/packed-smoke.mjs"
+    "test:package": "node scripts/packed-smoke.mjs",
+    "test:npm-upgrade": "node scripts/npm-upgrade-smoke.mjs"
   },
   "devDependencies": {
     "@slack/socket-mode": "^3.0.1",
@@ -57,5 +58,13 @@
     "typescript": "^5.8.3",
     "vite": "^8.2.0",
     "vitest": "^4.1.10"
-  }
+  },
+  "homepage": "https://virtualcorporationmanager.com",
+  "keywords": [
+    "vcm",
+    "virtual-corporation-manager",
+    "ai-agents",
+    "local-first",
+    "team-management"
+  ]
 }

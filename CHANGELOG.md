@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-alpha.10 — One-command installation
+
+- Publish the bundled application as `virtualcorporationmanager`, enabling `npx virtualcorporationmanager` or `npm install -g virtualcorporationmanager` followed by `vcm`.
+- Keep both `vcm` and `gitflash` command aliases, `~/.gitflash`, `GITFLASH_DATA_DIR`, existing SQLite data and export formats. Existing global `gitflash` installations must be uninstalled before installing the renamed package; workspace directories are retained.
+- Verify normal installation without lifecycle-script suppression, executable inference, isolated global commands and the existing packed-product acceptance. The distributed package has no runtime dependencies or install lifecycle hooks.
+- Simplify current setup documentation and in-product workflow help. Keep the versioned offline archive available for reviewed installations. No company, time-tracking or execution behavior changes.
+
 ## 0.1.0-alpha.9 — The VCM brand, inside the product
 
 - Apply the canonical VCM wordmark, original V-shaped companion, Rubik Bold, cream, orange, cobalt, mint and butter across navigation, company setup, the company index, member details, forms and the Time Tracker.

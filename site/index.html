@@ -60,7 +60,7 @@
           <div class="command-panel" id="install" tabindex="-1">
             <div class="panel-header">
               <h2>Install VCM</h2>
-              <span class="release-label">Alpha 8 distribution-name maintenance</span>
+              <span class="release-label">Technical alpha 10</span>
             </div>
             <p class="compact release-status">
               Company management and the Time Tracker run locally. No VCM account or AI provider is
@@ -70,25 +70,29 @@
             <div class="command-toolbar">
               <span>Terminal</span
               ><button class="copy-button" type="button" data-copy="install-command" hidden>
-                Copy commands
+                Copy command
               </button>
             </div>
             <pre
               class="command-block"
               id="install-command"
               tabindex="0"
-              aria-label="Alpha 8 installation commands"
-            ><code>npm install --ignore-scripts --prefix ./vcm-preview https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.9/vcm-0.1.0-alpha.9.tgz
-npm exec --offline --prefix ./vcm-preview -- vcm --version
-npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code></pre>
+              aria-label="Start VCM with npm"
+            ><code>npx virtualcorporationmanager</code></pre>
             <p class="copy-status" role="status" aria-live="polite"></p>
             <p class="compact release-status">
-              Alpha 8 keeps simpler company management and gives the visible archive its VCM name.
-              <a
-                href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.9"
-                >Release details ↗</a
-              >
+              One command to open your local workspace.
+              <a href="./docs/#install">Release and installation details →</a>
             </p>
+            <details>
+              <summary>Install once, then use vcm</summary>
+              <pre
+                class="command-block"
+                tabindex="0"
+                aria-label="Permanently install and start VCM"
+              ><code>npm install -g virtualcorporationmanager
+vcm</code></pre>
+            </details>
             <p class="compact">
               Open the local URL printed in your terminal.
               <a href="./docs/#install">Setup and requirements →</a>
@@ -290,16 +294,16 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code><
           </p>
         </details>
         <details>
-          <summary>What can I install today?</summary>
+          <summary>Which release do these commands target?</summary>
           <p>
-            The <strong>0.1.0-alpha.9 product-brand release</strong> brings the VCM brand into the
-            company, human and AI agent workspace. Optional Product Studio execution remains
-            incomplete. Screenshot captions identify their actual source. Check the
-            <a
-              href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.9"
-              >versioned release notes</a
+            The <strong>0.1.0-alpha.10 technical alpha</strong> simplifies installation with npm.
+            Earlier releases retain their own archives and evidence. Optional Product Studio
+            execution remains incomplete. Screenshot captions identify their actual source. Check
+            the
+            <a href="https://github.com/strobl/virtual-corporation-manager/releases"
+              >versioned releases</a
             >
-            for the exact archive, requirements and known failures.
+            for available archives, requirements and known failures.
           </p>
         </details>
         <details>
@@ -321,9 +325,10 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code><
         <details>
           <summary>Where is my data?</summary>
           <p>
-            The default directory is <code>~/.gitflash</code>. The installation example explicitly
-            uses <code>./my-company</code>. Restart from the same directory with the same data path.
-            See <a href="./docs/#local-data">local data and backups</a>.
+            The default directory is <code>~/.gitflash</code>. Existing
+            <code>GITFLASH_DATA_DIR</code> settings are retained. If you use
+            <code>--data-dir</code>, restart with the same path. See
+            <a href="./docs/#local-data">local data and backups</a>.
           </p>
         </details>
       </section>

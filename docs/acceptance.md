@@ -1,5 +1,15 @@
 # VCM acceptance record
 
+## npm installation release — 9 September 2026
+
+**0.1.0-alpha.10** packages the existing local application as `virtualcorporationmanager`. Its two aliases still resolve to one executable, and the SQLite schema, data directory precedence, environment names and export formats remain unchanged. The package has no runtime dependencies or install lifecycle hooks. The simplified setup is `npx virtualcorporationmanager`, or a permanent `npm install -g virtualcorporationmanager` followed by `vcm`.
+
+The source acceptance includes type checking, 350 passing tests with three opt-in sandbox skips, and the production build on macOS arm64 / Node 26.0.0. `npm run test:package` checks normal offline tarball installation without `--ignore-scripts`, bare package-name executable inference against an isolated local registry with an empty cache, and global command installation. It retains the company creation, saved IDs, Time Tracker, lock, export, backup/restore and uninstall-preservation checks. The configured matrix repeats packed acceptance on macOS, Linux and Windows with Node 24.14 / 24.x / 26.0 / 26.x; observed jobs belong to the exact source in the release manifest.
+
+`npm run test:npm-upgrade -- <alpha.9.tgz> <alpha.10.tgz> <evidence.json>` verifies the published alpha.9 archive by its frozen hash, creates a synthetic company/member/time entry, stops the old process, replaces the global package and checks the retained workspace. Uninstalling the package must preserve SQLite bytes. The [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.10) carries the exact source, tested archive SHA-256, observed OS/Node jobs, upgrade receipt and fresh public-registry verification. Those external receipts establish publication; a local registry fixture does not.
+
+The initial registry dist-tag is explicitly `latest` so the short commands resolve this technical alpha. This is not a stable-release claim. Optional Product Studio execution, live Buzz/Slack gaps and external human-usefulness acceptance retain their previous limits. No provider work or time booking is inferred from installation tests.
+
 ## Corporation-management release — 6 September 2026
 
 This checkout targets **0.1.0-alpha.7**, combining the accepted simpler company-management interface with alpha.6's VCM naming. Companies, people and AI agents, responsibilities, reporting, membership and company relationships are the product baseline. Creating a company needs only a name; execution is a secondary capability. The [product contract](product/corporation-management.md) defines these decisions.

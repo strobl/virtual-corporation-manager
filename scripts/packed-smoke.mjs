@@ -14,6 +14,7 @@ import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+const sourceManifest = JSON.parse(await readFile('package.json', 'utf8'));
 const started = performance.now();
 const temp = await mkdtemp(join(tmpdir(), 'gitflash-packed-'));
 const children = new Set();
@@ -49,7 +50,7 @@ async function installedBinary(install, name, entry) {
     // Short commands execute the real .cmd shim through npm exec. Long-running
     // startup uses its verified target so SIGTERM reaches Node rather than cmd.exe.
     const commandShim = await readFile(shim + '.cmd', 'utf8');
-    assert.match(commandShim, /gitflash[\\/]dist[\\/]cli\.js/);
+    assert(commandShim.replaceAll('\\', '/').includes(`${sourceManifest.name}/dist/cli.js`));
     return { name, install, entry };
   }
   assert.equal(await realpath(shim), await realpath(entry));
@@ -134,11 +135,8 @@ async function stop(app) {
 let evidence;
 try {
   const packed = JSON.parse(command(['pack', '--json', '--pack-destination', temp]))[0];
-  // npm names the archive from the compatibility package name. The released
-  // artifact is deliberately VCM-facing, so exercise the same filename users
-  // download while keeping the package manifest and installed directory
-  // unchanged.
-  const archiveFilename = `vcm-${packed.filename.replace(/^gitflash-/, '')}`;
+  // Keep the downloadable filename independent of the npm package name.
+  const archiveFilename = `vcm-${sourceManifest.version}.tgz`;
   const tarball = join(temp, archiveFilename);
   await rename(join(temp, packed.filename), tarball);
   const bytes = await readFile(tarball);
@@ -149,21 +147,16 @@ try {
   const install = join(temp, 'installed');
   await mkdir(install);
   await writeFile(join(install, 'package.json'), '{"private":true}');
-  command([
-    'install',
-    '--offline',
-    '--ignore-scripts',
-    '--no-audit',
-    '--no-fund',
-    '--prefix',
-    install,
-    tarball,
-  ]);
-  const entry = join(install, 'node_modules', 'gitflash', 'dist', 'cli.js');
+  command(['install', '--offline', '--no-audit', '--no-fund', '--prefix', install, tarball]);
+  const entry = join(install, 'node_modules', sourceManifest.name, 'dist', 'cli.js');
   const manifest = JSON.parse(
-    await readFile(join(install, 'node_modules', 'gitflash', 'package.json'), 'utf8'),
+    await readFile(join(install, 'node_modules', sourceManifest.name, 'package.json'), 'utf8'),
   );
-  assert.equal(manifest.name, 'gitflash');
+  assert.equal(manifest.name, 'virtualcorporationmanager');
+  assert.deepEqual(manifest.dependencies ?? {}, {});
+  assert.deepEqual(manifest.optionalDependencies ?? {}, {});
+  for (const hook of ['preinstall', 'install', 'postinstall'])
+    assert.equal(manifest.scripts?.[hook], undefined);
   assert.deepEqual(manifest.bin, { vcm: 'dist/cli.js', gitflash: 'dist/cli.js' });
   const vcm = await installedBinary(install, 'vcm', entry);
   const gitflash = await installedBinary(install, 'gitflash', entry);
@@ -183,6 +176,102 @@ try {
     'VCM: Unknown command: init. Use --help.',
     'VCM: Unknown command: init. Use --help.',
   ]);
+  // An isolated local registry exercises the same bare package-name inference
+  // as npx without requiring an unpublished name on the public registry.
+  const registry = spawn(process.execPath, [
+    '--input-type=module',
+    '-e',
+    `
+    import http from 'node:http';
+    import { readFileSync } from 'node:fs';
+    const bytes = readFileSync(${JSON.stringify(tarball)});
+    const manifest = ${JSON.stringify(manifest)};
+    const server = http.createServer((req, res) => {
+      if (req.url.startsWith('/' + manifest.name + '/-/')) {
+        res.setHeader('content-type', 'application/octet-stream'); res.end(bytes); return;
+      }
+      if (req.url === '/' + manifest.name) {
+        res.setHeader('content-type', 'application/json');
+        res.end(JSON.stringify({ name: manifest.name, 'dist-tags': { latest: manifest.version }, versions: {
+          [manifest.version]: { ...manifest, dist: { tarball: 'http://127.0.0.1:' + server.address().port + '/' + manifest.name + '/-/package.tgz', integrity: ${JSON.stringify(packed.integrity)} } }
+        } })); return;
+      }
+      res.writeHead(404); res.end();
+    });
+    server.listen(0, '127.0.0.1', () => console.log('http://127.0.0.1:' + server.address().port));
+  `,
+  ]);
+  children.add(registry);
+  registry.on('exit', () => children.delete(registry));
+  const registryUrl = await new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('Local npm fixture timed out')), 10000);
+    registry.once('error', (error) => {
+      clearTimeout(timer);
+      reject(error);
+    });
+    registry.stdout.once('data', (chunk) => {
+      clearTimeout(timer);
+      resolve(chunk.toString().trim());
+    });
+  });
+  const inferredVersion = command(
+    [
+      'exec',
+      '--yes',
+      '--registry',
+      registryUrl,
+      '--cache',
+      join(temp, 'npx-cache'),
+      '--',
+      manifest.name,
+      '--version',
+    ],
+    temp,
+  ).trim();
+  assert.equal(inferredVersion, manifest.version);
+  await stop({ child: registry });
+  const globalPrefix = join(temp, 'global');
+  command([
+    'install',
+    '--global',
+    '--offline',
+    '--no-audit',
+    '--no-fund',
+    '--prefix',
+    globalPrefix,
+    tarball,
+  ]);
+  const globalModules = command(['root', '--global', '--prefix', globalPrefix]).trim();
+  const globalEntry = join(globalModules, manifest.name, 'dist', 'cli.js');
+  const globalShim = join(globalPrefix, process.platform === 'win32' ? 'vcm.cmd' : 'bin/vcm');
+  if (process.platform === 'win32') {
+    const shim = await readFile(globalShim, 'utf8');
+    assert(shim.replaceAll('\\', '/').includes(`${manifest.name}/dist/cli.js`));
+    // npm exec finds the real global .cmd shim on PATH, including spaces.
+    const pathKey = Object.keys(process.env).find((key) => key.toLowerCase() === 'path') ?? 'PATH';
+    const result = spawnSync(
+      process.execPath,
+      [npm, 'exec', '--offline', '--call', 'vcm --version'],
+      {
+        cwd: temp,
+        encoding: 'utf8',
+        timeout: 15000,
+        env: { ...process.env, [pathKey]: `${globalPrefix};${process.env[pathKey]}` },
+      },
+    );
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout.trim(), manifest.version);
+  } else {
+    assert.equal(await realpath(globalShim), await realpath(globalEntry));
+    const result = spawnSync(globalShim, ['--version'], { encoding: 'utf8', timeout: 15000 });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout.trim(), manifest.version);
+  }
+  const globalBinary = {
+    name: 'vcm',
+    install: globalPrefix,
+    entry: process.platform === 'win32' ? globalEntry : globalShim,
+  };
   const defaultDirectory = await assertDefaultDirectory(binaries);
   const data = join(temp, 'data');
   let app = await start(vcm, data);
@@ -264,6 +353,8 @@ try {
   assert.equal(workflows[0].stages.length, 5);
   assert.equal(workflows[0].maxRepairCandidates, 2);
   assert.ok(workflows[0].help.includes('PS-001'));
+  assert.ok(workflows[0].help.includes('npx virtualcorporationmanager'));
+  assert.ok(!workflows[0].help.includes('--ignore-scripts'));
   for (const stage of workflows[0].stages)
     assert.equal(state.agents.filter((a) => a.role === stage.role).length, 1);
   const templates = await (await fetch(app.url + '/api/templates')).json();
@@ -385,16 +476,30 @@ try {
   assert.deepEqual(compatibilityRecoveredTime.entries, savedTime.entries);
   assert.deepEqual(compatibilityRecoveredTime.history, savedTime.history);
   await stop(app);
+  app = await start(globalBinary, data);
+  assert.deepEqual(await (await fetch(app.url + '/api/state')).json(), reopened);
+  assert.deepEqual((await (await fetch(app.url + '/api/time')).json()).entries, savedTime.entries);
+  await stop(app);
   const dataBeforeUninstall = await readFile(join(data, 'workspace.sqlite'));
   command([
     'uninstall',
+    '--global',
     '--offline',
-    '--ignore-scripts',
+    '--no-audit',
+    '--no-fund',
+    '--prefix',
+    globalPrefix,
+    manifest.name,
+  ]);
+  assert.deepEqual(await readFile(join(data, 'workspace.sqlite')), dataBeforeUninstall);
+  command([
+    'uninstall',
+    '--offline',
     '--no-audit',
     '--no-fund',
     '--prefix',
     install,
-    'gitflash',
+    manifest.name,
   ]);
   assert.deepEqual(await readFile(join(data, 'workspace.sqlite')), dataBeforeUninstall);
   evidence = {
@@ -418,7 +523,9 @@ try {
     template100PreviewAndApplyMs: Math.round(templateMs),
     totalMs: Math.round(performance.now() - started),
     checks: [
-      'offline npm install of self-contained tarball',
+      'offline npm install of self-contained tarball without --ignore-scripts; no runtime dependencies or install hooks',
+      'bare package-name npx inference against a local registry fixture with an empty cache',
+      'isolated global installation creates a working vcm command and reopens the populated workspace',
       'vcm and gitflash installed aliases expose identical help/version and invalid-command exit codes',
       'both aliases retain ~/.gitflash default and GITFLASH_DATA_DIR; --data-dir takes precedence',
       'both aliases start the same populated workspace and contend for the same live lock',
@@ -436,7 +543,7 @@ try {
       'no seeded work claimed',
     ],
     networkScope:
-      'Registry blocked by npm --offline; core assets and API use loopback. Browser offline acceptance is recorded separately.',
+      'Tarball installation uses npm --offline. The npx inference check uses an isolated loopback registry with this archive and an empty cache; core assets and API use loopback. Public registry verification is recorded separately.',
   };
   console.log(JSON.stringify(evidence, null, 2));
   if (process.env.GITFLASH_EVIDENCE_DIR) {
