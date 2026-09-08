@@ -2,37 +2,37 @@
 
 Copy-ready drafts. Images are editorial illustrations; no live delivery or publishing is claimed.
 
-## Your team. In the conversation.
+## Build the team. Bring it to Buzz.
 
 X · Draft
 
-[Image](exports/01-conversation.png)
+[Image](campaign/buzz-import-hero.png)
 
-Your team. In the conversation.
+Build the team. Bring it to Buzz.
 
-Organize in VCM. Export AI roles to Buzz.xyz, or explore Slack mentions through your local runtime.
+VCM roles and instructions, in a native Buzz import preview. Builder. Reviewer. Researcher.
 
-Optional setup. Task connections are experimental.
+A screenshot-based look at the actual handoff.
 
-https://github.com/strobl/virtual-corporation-manager/blob/main/docs/integrations/README.md
+https://github.com/strobl/virtual-corporation-manager/tree/main/brand/integrations/campaign
 
-**Alt text:** VCM: Your team. In the conversation. Organize in VCM and explore optional Buzz.xyz and Slack connections. Team import and experimental task connections.
+**Alt text:** Build the team. Bring it to Buzz. Three clay VCM companions carry Builder, Reviewer and Researcher role cards toward a large composition based on the real Buzz Import team snapshot preview for Patchwork Studio. The Import button is highlighted; the team has not been activated.
 
-## Give your agents a room.
+## Your setup. Comes with you.
 
 X · Draft
 
-[Image](exports/02-buzz-team.png)
+[Image](campaign/buzz-export-to-import.png)
 
-Give your agents a room.
+Your setup. Comes with you.
 
-Build the team in VCM. Export roles and instructions. Preview the team in Buzz.xyz.
+Export Buzz team in VCM → preview the .team.json in Buzz Desktop.
 
-Configuration travels. Starting agents is a separate step.
+Your roles and instructions travel together. Starting agents is a separate step.
 
 https://github.com/strobl/virtual-corporation-manager/blob/main/docs/integrations/buzz.md
 
-**Alt text:** Give your agents a room. Export a VCM team file, review its roles and instructions in Buzz, then configure the runtime separately before starting agents. Orange Vic companions stand beside three steps.
+**Alt text:** Your setup. Comes with you. On a dark ink background, the real VCM Buzz export card and native Buzz team-import preview are composed around an orange Vic carrying a cobalt .team.json file. Export Buzz team is emphasized. The screenshots show configuration transfer, not agent execution.
 
 ## A mention. A mission.
 
@@ -70,7 +70,7 @@ https://github.com/strobl/virtual-corporation-manager/blob/main/docs/integration
 
 Buzz.xyz · Draft
 
-[Image](exports/05-meet-the-channel.png)
+[Image](campaign/buzz-import-hero.png)
 
 Big ideas deserve a team. Give yours a room.
 
@@ -82,7 +82,7 @@ The export transfers configuration. The optional task connection is experimental
 
 Start here: https://github.com/strobl/virtual-corporation-manager/blob/main/docs/integrations/buzz.md
 
-**Alt text:** Big ideas. Meet the channel. Organize your team in VCM and explore optional Buzz.xyz and Slack connections. Team import; experimental task connections. The original orange Vic appears on cream.
+**Alt text:** Build the team. Bring it to Buzz. Three clay VCM companions carry Builder, Reviewer and Researcher role cards toward a large composition based on the real Buzz Import team snapshot preview for Patchwork Studio. The Import button is highlighted; the team has not been activated.
 
 ## One role. One focused brief.
 

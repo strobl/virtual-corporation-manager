@@ -1,24 +1,24 @@
 {
-  "campaign": "Your team. In the conversation.",
+  "campaign": "Build the team. Bring it to Buzz.",
   "status": "draft",
   "posts": [
     {
       "id": "connections-intro",
       "channel": "X",
-      "title": "Your team. In the conversation.",
-      "asset": "01-conversation",
-      "text": "Your team. In the conversation.\n\nOrganize in VCM. Export AI roles to Buzz.xyz, or explore Slack mentions through your local runtime.\n\nOptional setup. Task connections are experimental.\n\nhttps://github.com/strobl/virtual-corporation-manager/blob/main/docs/integrations/README.md",
-      "alt": "VCM: Your team. In the conversation. Organize in VCM and explore optional Buzz.xyz and Slack connections. Team import and experimental task connections.",
-      "weightedCharacters": 209
+      "title": "Build the team. Bring it to Buzz.",
+      "asset": "buzz-import-hero",
+      "text": "Build the team. Bring it to Buzz.\n\nVCM roles and instructions, in a native Buzz import preview. Builder. Reviewer. Researcher.\n\nA screenshot-based look at the actual handoff.\n\nhttps://github.com/strobl/virtual-corporation-manager/tree/main/brand/integrations/campaign",
+      "alt": "Build the team. Bring it to Buzz. Three clay VCM companions carry Builder, Reviewer and Researcher role cards toward a large composition based on the real Buzz Import team snapshot preview for Patchwork Studio. The Import button is highlighted; the team has not been activated.",
+      "weightedCharacters": 199
     },
     {
       "id": "buzz-team",
       "channel": "X",
-      "title": "Give your agents a room.",
-      "asset": "02-buzz-team",
-      "text": "Give your agents a room.\n\nBuild the team in VCM. Export roles and instructions. Preview the team in Buzz.xyz.\n\nConfiguration travels. Starting agents is a separate step.\n\nhttps://github.com/strobl/virtual-corporation-manager/blob/main/docs/integrations/buzz.md",
-      "alt": "Give your agents a room. Export a VCM team file, review its roles and instructions in Buzz, then configure the runtime separately before starting agents. Orange Vic companions stand beside three steps.",
-      "weightedCharacters": 194
+      "title": "Your setup. Comes with you.",
+      "asset": "buzz-export-to-import",
+      "text": "Your setup. Comes with you.\n\nExport Buzz team in VCM → preview the .team.json in Buzz Desktop.\n\nYour roles and instructions travel together. Starting agents is a separate step.\n\nhttps://github.com/strobl/virtual-corporation-manager/blob/main/docs/integrations/buzz.md",
+      "alt": "Your setup. Comes with you. On a dark ink background, the real VCM Buzz export card and native Buzz team-import preview are composed around an orange Vic carrying a cobalt .team.json file. Export Buzz team is emphasized. The screenshots show configuration transfer, not agent execution.",
+      "weightedCharacters": 201
     },
     {
       "id": "slack-mention",
@@ -42,9 +42,9 @@
       "id": "buzz-community",
       "channel": "Buzz.xyz",
       "title": "Bring your VCM team into Buzz.",
-      "asset": "05-meet-the-channel",
+      "asset": "buzz-import-hero",
       "text": "Big ideas deserve a team. Give yours a room.\n\nVCM is an open-source workspace for organizing a corporation with humans and AI agents. Its Buzz export carries active AI roles and instructions into a native .team.json.\n\nSelect your corporation → Tools → Connections → Export Buzz team. In Buzz Desktop, preview the import before confirming. Check the runtime before starting agents.\n\nThe export transfers configuration. The optional task connection is experimental; a live useful-result proof is still open.\n\nStart here: https://github.com/strobl/virtual-corporation-manager/blob/main/docs/integrations/buzz.md",
-      "alt": "Big ideas. Meet the channel. Organize your team in VCM and explore optional Buzz.xyz and Slack connections. Team import; experimental task connections. The original orange Vic appears on cream.",
+      "alt": "Build the team. Bring it to Buzz. Three clay VCM companions carry Builder, Reviewer and Researcher role cards toward a large composition based on the real Buzz Import team snapshot preview for Patchwork Studio. The Import button is highlighted; the team has not been activated.",
       "weightedCharacters": 542
     },
     {

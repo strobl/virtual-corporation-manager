@@ -1,0 +1,27 @@
+{
+  "primaryAsset": "buzz-import-hero",
+  "assets": [
+    {
+      "id": "buzz-import-hero",
+      "width": 1672,
+      "height": 941,
+      "purpose": "Flagship Buzz screenshot campaign",
+      "alt": "Build the team. Bring it to Buzz. Three clay VCM companions carry Builder, Reviewer and Researcher role cards toward a large composition based on the real Buzz Import team snapshot preview for Patchwork Studio. The Import button is highlighted; the team has not been activated.",
+      "status": "Screenshot-based campaign composition; example import preview",
+      "png": "campaign/buzz-import-hero.png",
+      "masterType": "raster",
+      "provenance": "campaign/provenance.json"
+    },
+    {
+      "id": "buzz-export-to-import",
+      "width": 1672,
+      "height": 941,
+      "purpose": "VCM export to native Buzz preview",
+      "alt": "Your setup. Comes with you. On a dark ink background, the real VCM Buzz export card and native Buzz team-import preview are composed around an orange Vic carrying a cobalt .team.json file. Export Buzz team is emphasized. The screenshots show configuration transfer, not agent execution.",
+      "status": "Screenshot-based campaign composition; configuration preview",
+      "png": "campaign/buzz-export-to-import.png",
+      "masterType": "raster",
+      "provenance": "campaign/provenance.json"
+    }
+  ]
+}
