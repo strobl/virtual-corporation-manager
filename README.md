@@ -4,7 +4,7 @@
   <a href="#install-the-reviewed-archive"><strong>Get VCM →</strong></a> ·
   <a href="docs/developer-quickstart.md">Quickstart</a> ·
   <a href="docs/examples/README.md">Try the example</a> ·
-  <a href="docs/integrations/README.md">Buzz.xyz + Slack</a> ·
+  <a href="#build-the-team-bring-it-to-buzz">Buzz + Slack</a> ·
   <a href="CONTRIBUTING.md">Contribute</a> ·
   <a href="https://x.com/virtualcorpman">Follow VCM on X</a> ·
   <a href="https://github.com/strobl/virtual-corporation-manager/tree/main/brand">Brand kit</a>
@@ -99,18 +99,17 @@ The server binds to loopback. This is a single-operator local product, with no s
 
 To remove the isolated application, stop it and run `npm uninstall --prefix ./vcm-preview gitflash`. Your default and custom workspace directories remain intact.
 
-## Your team. In the conversation.
+## Build the team. Bring it to Buzz.
 
-![Build the team. Bring it to Buzz. VCM campaign based on the native Buzz import preview with three example roles.](docs/images/vcm-integrations.png)
+![Editorial VCM campaign based on the native Buzz import preview with three example roles.](docs/images/vcm-integrations.png)
 
-Organize in VCM. Bring your AI roles into Buzz.xyz, or explore focused tasks from Slack.
+Take your VCM team’s AI roles, instructions and responsibilities into Buzz with a native team file. Preview the configuration before importing.
 
-| Buzz.xyz — Give your agents a room.                                                                                                       | Slack — A mention. A mission.                                                                         |
-| ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Export active AI roles and instructions as a native team file. Preview the import in Buzz Desktop, then configure the runtime separately. | An allowed owner mentions a named role. Local Codex runs the task and VCM replies in the same thread. |
-| [Buzz setup guide](docs/integrations/buzz.md)                                                                                             | [Slack setup guide and app manifest](docs/integrations/slack.md)                                      |
+1. **VCM:** Select your company, then **Tools → Connections → Export Buzz team**.
+2. **Buzz Desktop:** Open **Agents → Agent teams → Import** and select the `.team.json` file.
+3. **Review and confirm the configuration.** Set up the runtime separately; importing does not start agents.
 
-Connections are optional. Buzz native import has historical evidence; Buzz task execution and Slack round trips remain experimental, with live useful-result acceptance still open. The campaign is based on a native Buzz import preview with the public three-role example; [see the screenshot story and source record](https://github.com/strobl/virtual-corporation-manager/tree/main/brand/integrations/campaign). [Integration overview](docs/integrations/README.md) · [Campaign images, app icons and post drafts](https://github.com/strobl/virtual-corporation-manager/tree/main/brand/integrations)
+[Buzz setup guide](docs/integrations/buzz.md) · Using Slack? [Slack setup guide](docs/integrations/slack.md).
 
 ## Optional execution
 
