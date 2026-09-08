@@ -1,0 +1,29 @@
+{
+  "date": "2026-09-09",
+  "purpose": "VCM homepage creative refresh: living team and illustrated values",
+  "method": "AI-generated brand-scene transformations; not product UI or evidence of executed work",
+  "brandReferences": [
+    "marketing/vcm-global-brand-site/public/brand/vic-team-master.png",
+    "brand/integrations/campaign/buzz-import-hero.png"
+  ],
+  "assets": [
+    {
+      "file": "hero-team.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 1842240,
+      "sha256": "2a29a47897411b2794fe6f8c2d930f706a43586ed6e9a3458b026be97e288eed",
+      "generatedSource": "exec-3cca4fca-280f-4673-a937-6021b025d343.png"
+    },
+    {
+      "file": "values-workshop.png",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 1733572,
+      "sha256": "c2ecafab4f44a371651989f1a69708399ece481daf8d85a45453a618badcb676",
+      "generatedSource": "exec-6f95bccf-1cc9-4c79-98a1-a4ac37e62870.png"
+    }
+  ],
+  "liveSite": "https://virtualcorporationmanager.com/",
+  "status": "artwork created; page integration pending"
+}
