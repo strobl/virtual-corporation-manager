@@ -1,0 +1,35 @@
+{
+  "date": "2026-09-08",
+  "baseRevision": "2c0b27eabf1c2601f369b95f460459f6f2a52648",
+  "scope": "README, brand kit, repository description/topics/social preview. Application and existing release archives unchanged.",
+  "productChecks": {
+    "npmRunCheck": "passed",
+    "testFilesPassed": 25,
+    "testFilesSkipped": 2,
+    "testsPassed": 350,
+    "testsSkipped": 3,
+    "packedArtifactAcceptance": "passed"
+  },
+  "assets": {
+    "pngAndSvgPairs": 17,
+    "textBounds": "all within artboard",
+    "xAvatar": "400x400, 4062 bytes",
+    "xHeader": "1500x500",
+    "githubPreview": "1280x640, 44775 bytes",
+    "queueDrafts": 12,
+    "pinnedDrafts": 1,
+    "bioCharacters": 136,
+    "maxPostWeightedCharacters": 248
+  },
+  "sourceNotes": [
+    "Original logo paths, palette, Rubik Bold and mascot from adopted 2026-09-06 brand system.",
+    "New sculpture illustration generated with original mascot reference on 2026-09-08.",
+    "README actual product screenshot and provenance preserved.",
+    "Product text checked against base revision and Alpha.8 release."
+  ],
+  "socialAccount": "Not yet identified; no social posts published or scheduled.",
+  "githubSocialPreview": {
+    "usesCustomOpenGraphImage": true,
+    "openGraphImageUrl": "https://repository-images.githubusercontent.com/1357592413/0b0a2917-2ab1-48a4-8326-d8645ac34227"
+  }
+}

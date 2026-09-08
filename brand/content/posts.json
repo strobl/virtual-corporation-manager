@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "brand": "VCM — Virtual Corporation Manager",
+  "channel": "X",
+  "account": null,
+  "accountStatus": "Owner handle and connected account pending",
+  "cadence": "Three posts per week: Monday team, Wednesday product, Friday culture. Start dates follow account setup.",
+  "pinnedPost": {
+    "status": "draft",
+    "asset": "09-team-sculpture",
+    "text": "Big ideas deserve a team.\n\nVCM is the open-source workspace for your virtual corporation. Organize humans + AI agents, responsibilities and reporting lines. Keep it on your machine.\n\nMIT core. Technical alpha. Build with us.\nhttps://github.com/strobl/virtual-corporation-manager",
+    "alt": "Solo. Never small. A clay sculpture shows a human founder connected to three V-shaped orange, mint and yellow teammates. Editorial brand illustration.",
+    "weightedCharacters": 248
+  },
+  "posts": [
+    {
+      "id": "VCM-X-001",
+      "slot": "Week 1 / Monday",
+      "series": "Show your team",
+      "status": "draft",
+      "asset": "01-show-your-team",
+      "text": "Solo founder. Multiple responsibilities.\n\nStart by drawing the team you need: research, building, review. Give each role a clear brief.\n\nThis is an example team structure you can organize in VCM. What would you change?",
+      "evidence": ["README.md#create-and-manage-your-corporation"],
+      "claimNote": "Illustrated hypothetical team; reporting lines do not execute work.",
+      "alt": "Illustrated example org chart: a human owner above Researcher, Builder and Reviewer AI roles. Lines show reporting, not automatic task execution.",
+      "weightedCharacters": 218
+    },
+    {
+      "id": "VCM-X-002",
+      "slot": "Week 1 / Wednesday",
+      "series": "Team recipe",
+      "status": "draft",
+      "asset": "02-team-recipe",
+      "text": "A starting team you can inspect, import and change.\n\nPatchwork Studio: Builder, Reviewer, Researcher. Three peer roles in one Product department.\n\nThe example configures the team; it doesn't run it.\nhttps://github.com/strobl/virtual-corporation-manager/tree/main/docs/examples",
+      "evidence": ["docs/examples/README.md", "docs/examples/three-agent-studio.json"],
+      "claimNote": "Fictional importable example, no completed work or user adoption claim.",
+      "alt": "Patchwork Studio fictional importable example: Builder, Reviewer and Researcher are three peer AI roles in the Product department. No work has executed.",
+      "weightedCharacters": 222
+    },
+    {
+      "id": "VCM-X-003",
+      "slot": "Week 1 / Friday",
+      "series": "Never stop hacking",
+      "status": "draft",
+      "asset": "06-never-stop-hacking",
+      "text": "Read the code. Change a little. Share what you learn.\n\nThat's a good first contribution.\n\nVCM has starter tasks for examples, docs and UI work. Bring a small change you can demonstrate.\nhttps://github.com/strobl/virtual-corporation-manager/blob/main/docs/developer-contributing.md",
+      "evidence": ["CONTRIBUTING.md", "docs/developer-contributing.md"],
+      "claimNote": "Invitation to contribute, not a claim of a large existing community.",
+      "alt": "Try it. Break it. Make it better. Read the code, change a little and share what you learn. Orange VCM mascot.",
+      "weightedCharacters": 209
+    },
+    {
+      "id": "VCM-X-004",
+      "slot": "Week 2 / Monday",
+      "series": "Show your team",
+      "status": "draft",
+      "asset": "05-people-and-agents",
+      "text": "Your org chart should have room for people.\n\nVCM lets you add humans and AI agents to the same company, with explicit roles and responsibilities.\n\nA human stays a human. An agent stays an agent. The company keeps the context.",
+      "evidence": ["README.md#create-and-manage-your-corporation"],
+      "claimNote": "Shared organization does not imply multi-user live collaboration.",
+      "alt": "A human member and an AI agent side by side. Different member kinds belong in the same VCM company.",
+      "weightedCharacters": 225
+    },
+    {
+      "id": "VCM-X-005",
+      "slot": "Week 2 / Wednesday",
+      "series": "Build notes",
+      "status": "draft",
+      "asset": "03-name-your-corporation",
+      "text": "The first move is simple.\n\nName your corporation. Add its purpose. Bring in a person or an AI agent. Give them a responsibility. Review the change and save.\n\nStart with the company you want to build.\nhttps://github.com/strobl/virtual-corporation-manager#install-the-reviewed-archive",
+      "evidence": ["README.md#create-and-manage-your-corporation"],
+      "claimNote": "Matches the reviewed corporation-management flow.",
+      "alt": "Three steps in VCM: company name and purpose; human and AI members; roles and responsibilities. Review changes, save and return later.",
+      "weightedCharacters": 223
+    },
+    {
+      "id": "VCM-X-006",
+      "slot": "Week 2 / Friday",
+      "series": "Show your team",
+      "status": "draft",
+      "asset": "08-first-three-roles",
+      "text": "You have an idea and three empty role cards.\n\nWhat goes on them?\n\nShare the three roles, one responsibility each, and what you would keep for yourself.\n\nWe're collecting ways to think about teams, not fantasy headcounts.",
+      "evidence": ["README.md#create-and-manage-your-corporation"],
+      "claimNote": "Community invitation; do not imply responses already exist.",
+      "alt": "What would your first three roles be? Three empty role cards invite builders to sketch their team.",
+      "weightedCharacters": 220
+    },
+    {
+      "id": "VCM-X-007",
+      "slot": "Week 3 / Monday",
+      "series": "Your workspace",
+      "status": "draft",
+      "asset": "04-your-machine",
+      "text": "Your company, ready for the next session.\n\nVCM keeps its local workspace in SQLite. Reopen the same company, export its definition, or make a backup.\n\nNo account is required for the local core. Optional provider execution has its own setup.",
+      "evidence": ["README.md#inspect-and-recover", "docs/recovery.md"],
+      "claimNote": "Local core only; no absolute privacy or offline provider claim.",
+      "alt": "Your company on your machine. The VCM core uses local SQLite and requires no account. Organize, back up and export. Orange mascot on a cobalt laptop.",
+      "weightedCharacters": 240
+    },
+    {
+      "id": "VCM-X-008",
+      "slot": "Week 3 / Wednesday",
+      "series": "Built in the open",
+      "status": "draft",
+      "asset": "07-alpha8-release",
+      "text": "A small naming change, a clearer download.\n\nAlpha.8 uses vcm-0.1.0-alpha.8.tgz. The installed package keeps its compatibility name; the command is vcm.\n\nSame local core. Clearer front door.\nhttps://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.8",
+      "evidence": [
+        "CHANGELOG.md",
+        "https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.8"
+      ],
+      "claimNote": "Release of 6 September 2026. Recheck latest release before publishing; do not call it today's release.",
+      "alt": "Alpha.8 distribution-name maintenance: download vcm-0.1.0-alpha.8.tgz. The local core and installed package compatibility remain.",
+      "weightedCharacters": 213
+    },
+    {
+      "id": "VCM-X-009",
+      "slot": "Week 3 / Friday",
+      "series": "Build what comes next",
+      "status": "draft",
+      "asset": "11-square-culture",
+      "text": "Play 2 win. Be adaptable. Never stop hacking. Hackers first. Be open.\n\nFive values. Plenty of ways to build.\n\nWhat's one thing you changed in your tools this week that made the work better?",
+      "evidence": ["brand/README.md"],
+      "claimNote": "Adopted brand values; no product-performance claim.",
+      "alt": "Build what comes next. Orange and mint VCM mascots. Hackers first. Be open.",
+      "weightedCharacters": 189
+    },
+    {
+      "id": "VCM-X-010",
+      "slot": "Week 4 / Monday",
+      "series": "Show your team",
+      "status": "draft",
+      "asset": "01-show-your-team",
+      "text": "A useful role answers three questions.\n\nWhat are you responsible for?\nWhat context do you need?\nWho reviews the result?\n\nTry those questions on your next team sketch. The org chart gets more interesting when the boxes mean something.",
+      "evidence": ["README.md#create-and-manage-your-corporation", "docs/examples/README.md"],
+      "claimNote": "Editorial team-design guidance, not an automatic workflow claim.",
+      "alt": "Illustrated example org chart: a human owner above Researcher, Builder and Reviewer AI roles. Lines show reporting, not automatic task execution.",
+      "weightedCharacters": 233
+    },
+    {
+      "id": "VCM-X-011",
+      "slot": "Week 4 / Wednesday",
+      "series": "Build notes",
+      "status": "draft",
+      "asset": "02-team-recipe",
+      "text": "Make the example your own.\n\nImport Patchwork Studio. Open one member. Rewrite a responsibility. Review and save. Export the definition when you're ready to reuse it.\n\nSmall edits are a good way to learn a tool.\nhttps://github.com/strobl/virtual-corporation-manager/tree/main/docs/examples",
+      "evidence": ["docs/examples/README.md#import-and-inspect"],
+      "claimNote": "Import creates fresh IDs; it is not a merge or an overwrite.",
+      "alt": "Patchwork Studio fictional importable example: Builder, Reviewer and Researcher are three peer AI roles in the Product department. No work has executed.",
+      "weightedCharacters": 234
+    },
+    {
+      "id": "VCM-X-012",
+      "slot": "Week 4 / Friday",
+      "series": "Solo. Never small.",
+      "status": "draft",
+      "asset": "09-team-sculpture",
+      "text": "Big ideas deserve a team.\n\nStart with a purpose. Make the responsibilities visible. Keep learning as you build.\n\nVCM is open source, and we're building it in the open. Come take a look.\nhttps://github.com/strobl/virtual-corporation-manager",
+      "evidence": ["README.md", "LICENSE"],
+      "claimNote": "Brand illustration; no customer, revenue or autonomous-business result.",
+      "alt": "Solo. Never small. A clay sculpture shows a human founder connected to three V-shaped orange, mint and yellow teammates. Editorial brand illustration.",
+      "weightedCharacters": 209
+    }
+  ]
+}

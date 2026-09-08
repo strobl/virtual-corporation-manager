@@ -1,0 +1,160 @@
+{
+  "brand": "VCM \u2014 Virtual Corporation Manager",
+  "brandLine": "Big ideas deserve a team.",
+  "created": "2026-09-08",
+  "assets": [
+    {
+      "id": "x-avatar",
+      "width": 400,
+      "height": 400,
+      "purpose": "X profile photo",
+      "alt": "VCM V symbol in dark ink on orange.",
+      "svg": "exports/x-avatar.svg",
+      "png": "exports/x-avatar.png"
+    },
+    {
+      "id": "mascot-avatar",
+      "width": 800,
+      "height": 800,
+      "purpose": "Community mascot avatar",
+      "alt": "The orange VCM mascot with two eyes and a smile on cream.",
+      "svg": "exports/mascot-avatar.svg",
+      "png": "exports/mascot-avatar.png"
+    },
+    {
+      "id": "x-header",
+      "width": 1500,
+      "height": 500,
+      "purpose": "X header",
+      "alt": "VCM. Big ideas deserve a team. Humans and AI agents, your corporation. Orange and mint V mascots.",
+      "svg": "exports/x-header.svg",
+      "png": "exports/x-header.png"
+    },
+    {
+      "id": "github-social-preview",
+      "width": 1280,
+      "height": 640,
+      "purpose": "GitHub social preview",
+      "alt": "VCM. Big ideas deserve a team. The open-source workspace for your virtual corporation. Humans and AI agents, your corporation. MIT, local, open.",
+      "svg": "exports/github-social-preview.svg",
+      "png": "exports/github-social-preview.png"
+    },
+    {
+      "id": "readme-hero",
+      "width": 1600,
+      "height": 640,
+      "purpose": "README hero",
+      "alt": "VCM. Big ideas deserve a team. The open-source workspace for your virtual corporation. Humans and AI agents, your corporation. MIT, local, open.",
+      "svg": "exports/readme-hero.svg",
+      "png": "exports/readme-hero.png"
+    },
+    {
+      "id": "01-show-your-team",
+      "width": 1600,
+      "height": 900,
+      "purpose": "X launch / org chart",
+      "alt": "Illustrated example org chart: a human owner above Researcher, Builder and Reviewer AI roles. Lines show reporting, not automatic task execution.",
+      "svg": "exports/01-show-your-team.svg",
+      "png": "exports/01-show-your-team.png"
+    },
+    {
+      "id": "02-team-recipe",
+      "width": 1600,
+      "height": 900,
+      "purpose": "X educational post",
+      "alt": "Patchwork Studio fictional importable example: Builder, Reviewer and Researcher are three peer AI roles in the Product department. No work has executed.",
+      "svg": "exports/02-team-recipe.svg",
+      "png": "exports/02-team-recipe.png"
+    },
+    {
+      "id": "03-name-your-corporation",
+      "width": 1600,
+      "height": 900,
+      "purpose": "X product walkthrough",
+      "alt": "Three steps in VCM: company name and purpose; human and AI members; roles and responsibilities. Review changes, save and return later.",
+      "svg": "exports/03-name-your-corporation.svg",
+      "png": "exports/03-name-your-corporation.png"
+    },
+    {
+      "id": "04-your-machine",
+      "width": 1600,
+      "height": 900,
+      "purpose": "X local-first positioning",
+      "alt": "Your company on your machine. The VCM core uses local SQLite and requires no account. Organize, back up and export. Orange mascot on a cobalt laptop.",
+      "svg": "exports/04-your-machine.svg",
+      "png": "exports/04-your-machine.png"
+    },
+    {
+      "id": "05-people-and-agents",
+      "width": 1600,
+      "height": 900,
+      "purpose": "X product distinction",
+      "alt": "A human member and an AI agent side by side. Different member kinds belong in the same VCM company.",
+      "svg": "exports/05-people-and-agents.svg",
+      "png": "exports/05-people-and-agents.png"
+    },
+    {
+      "id": "06-never-stop-hacking",
+      "width": 1600,
+      "height": 900,
+      "purpose": "X culture / contribution",
+      "alt": "Try it. Break it. Make it better. Read the code, change a little and share what you learn. Orange VCM mascot.",
+      "svg": "exports/06-never-stop-hacking.svg",
+      "png": "exports/06-never-stop-hacking.png"
+    },
+    {
+      "id": "07-alpha8-release",
+      "width": 1600,
+      "height": 900,
+      "purpose": "X verified release update",
+      "alt": "Alpha.8 distribution-name maintenance: download vcm-0.1.0-alpha.8.tgz. The local core and installed package compatibility remain.",
+      "svg": "exports/07-alpha8-release.svg",
+      "png": "exports/07-alpha8-release.png"
+    },
+    {
+      "id": "08-first-three-roles",
+      "width": 1600,
+      "height": 900,
+      "purpose": "X community prompt",
+      "alt": "What would your first three roles be? Three empty role cards invite builders to sketch their team.",
+      "svg": "exports/08-first-three-roles.svg",
+      "png": "exports/08-first-three-roles.png"
+    },
+    {
+      "id": "09-team-sculpture",
+      "width": 1600,
+      "height": 1080,
+      "purpose": "X campaign illustration",
+      "alt": "Solo. Never small. A clay sculpture shows a human founder connected to three V-shaped orange, mint and yellow teammates. Editorial brand illustration.",
+      "svg": "exports/09-team-sculpture.svg",
+      "png": "exports/09-team-sculpture.png"
+    },
+    {
+      "id": "10-story-team",
+      "width": 1080,
+      "height": 1920,
+      "purpose": "Story / Reel cover",
+      "alt": "Solo. Never small. Fictional reporting chart with a human, a Builder and a Reviewer. VCM, the open-source workspace for your virtual corporation.",
+      "svg": "exports/10-story-team.svg",
+      "png": "exports/10-story-team.png"
+    },
+    {
+      "id": "11-square-culture",
+      "width": 1080,
+      "height": 1080,
+      "purpose": "Square social cover",
+      "alt": "Build what comes next. Orange and mint VCM mascots. Hackers first. Be open.",
+      "svg": "exports/11-square-culture.svg",
+      "png": "exports/11-square-culture.png"
+    },
+    {
+      "id": "readme-team-map",
+      "width": 1600,
+      "height": 780,
+      "purpose": "README product model",
+      "alt": "Illustrated VCM company membership: human owner and Builder and Reviewer AI agents, with explicit responsibilities. This is not a software screenshot or automatic execution.",
+      "svg": "exports/readme-team-map.svg",
+      "png": "exports/readme-team-map.png"
+    }
+  ]
+}

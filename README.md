@@ -1,22 +1,40 @@
+![VCM — Big ideas deserve a team.](docs/images/vcm-readme-hero.png)
+
+<p align="center">
+  <a href="#install-the-reviewed-archive"><strong>Get VCM →</strong></a> ·
+  <a href="docs/developer-quickstart.md">Quickstart</a> ·
+  <a href="docs/examples/README.md">Try the example</a> ·
+  <a href="CONTRIBUTING.md">Contribute</a> ·
+  <a href="https://github.com/strobl/virtual-corporation-manager/tree/main/brand">Brand kit</a>
+</p>
+
 # VCM — Virtual Corporation Manager
 
-**Your company. People and agents together.**
+**The open-source workspace for your virtual corporation.**
 
-VCM is an MIT-licensed local workspace for managing virtual corporations: their human and AI members, responsibilities, departments, reporting lines, company relationships and recorded delivery hours. Inspect a change before saving it, then reopen the same organization later. One operator maintains the workspace on their own machine.
+Big ideas deserve a team. Give yours a name, bring humans and AI agents into the same picture, and make everyone's responsibilities clear. Keep your company on your machine, ready for the next session.
 
-Create a company, add the people and agents who belong to it, and keep their responsibilities in one place. VCM stores the context you enter; it does not synchronize arbitrary chats or make configured agents execute automatically. It is not a legal incorporation service or an equity register.
+VCM is a free, MIT-licensed local workspace. Manage companies, members, departments, reporting lines, company relationships and recorded delivery hours. Review a change before saving it. No account, hosted database or telemetry is required for the local core.
 
-**Technical alpha — for developer evaluation**
+## Put your team in the picture
 
-The local core manages companies, human and AI members, and the existing Time Tracker. Optional execution remains experimental. Consult the versioned [acceptance record](docs/acceptance.md) for observed checks and remaining limits.
+![An illustrated VCM company with human and AI members and clear responsibilities](docs/images/vcm-team-map.png)
 
-**`0.1.0-alpha.8` distribution-name maintenance release.** This guide uses the VCM-named archive for the simplified company workspace. The [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.8) identifies its archive, source revision, checksum and verification. Alpha.7, Alpha.6, alpha.5 and earlier candidates retain their own artifacts and evidence.
+| Start with an idea                                     | Give it a team                                                  | Keep the context                                                |
+| ------------------------------------------------------ | --------------------------------------------------------------- | --------------------------------------------------------------- |
+| Create a corporation with a name and optional purpose. | Add human and AI members, responsibilities and reporting lines. | Reopen the workspace, record work and hours, export or back up. |
 
-[Developer quickstart](docs/developer-quickstart.md) · [Three-agent example](docs/examples/README.md) · [Architecture and data](docs/developer-architecture.md) · [Contribute](CONTRIBUTING.md)
+The diagram is an illustrated example. Membership and reporting lines describe your organization; they do not make agents execute automatically. One operator maintains the workspace locally. VCM is not a legal incorporation service or an equity register.
+
+## See the workspace
 
 ![Linden Studio company workspace with a human member, responsibilities and reporting](docs/images/corporation-desktop.png)
 
-_Fictional company and member data in the company-management workspace. The [capture record](docs/images/corporation-provenance.json) identifies the actual source and viewport; this is not customer activity._
+_Fictional company and member data in the actual company-management interface. The [capture record](docs/images/corporation-provenance.json) identifies the source and viewport. This is not customer activity._
+
+**Technical alpha — for developer evaluation.** The local core manages companies, human and AI members, and the existing Time Tracker. Optional execution remains experimental. Read the [acceptance record](docs/acceptance.md) for observed checks and remaining limits.
+
+**Current download: `0.1.0-alpha.8`.** This distribution-name maintenance release uses the VCM-named archive for the simplified company workspace. The [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.8) identifies its archive, source revision, checksum and verification. Alpha.7, Alpha.6, alpha.5 and earlier candidates retain their own artifacts and evidence.
 
 ## Install the reviewed archive
 

@@ -1,0 +1,972 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VCM — Social launch kit</title>
+    <style>
+      @font-face {
+        font-family: Rubik;
+        src: url(assets/Rubik-Bold.ttf);
+        font-weight: 700;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: #f6f3e8;
+        color: #17252a;
+        font:
+          16px/1.55 Arial,
+          sans-serif;
+      }
+      a {
+        color: inherit;
+      }
+      header {
+        border-bottom: 1px solid #17252a30;
+        padding: 20px 4vw;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      header img {
+        width: 124px;
+      }
+      nav {
+        display: flex;
+        gap: 24px;
+      }
+      nav a {
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .intro {
+        padding: 64px 4vw 52px;
+        max-width: 1440px;
+        margin: auto;
+      }
+      .eyebrow {
+        font: 13px monospace;
+        letter-spacing: 0.1em;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: Rubik, Arial, sans-serif;
+        line-height: 1.02;
+        letter-spacing: -0.045em;
+      }
+      h1 {
+        font-size: clamp(50px, 7.5vw, 106px);
+        max-width: 1000px;
+        margin: 26px 0;
+      }
+      h1 em {
+        font-style: normal;
+        color: #ff5a2a;
+      }
+      .lead {
+        font-size: 22px;
+        max-width: 730px;
+      }
+      .pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 26px;
+      }
+      .pills span {
+        border: 1px solid #17252a40;
+        border-radius: 30px;
+        padding: 7px 16px;
+        font: 13px monospace;
+      }
+      .hero {
+        width: 100%;
+        display: block;
+        border-radius: 24px;
+        margin-top: 40px;
+      }
+      .section {
+        max-width: 1440px;
+        padding: 48px 4vw;
+        margin: auto;
+      }
+      h2 {
+        font-size: 56px;
+        margin: 0 0 30px;
+      }
+      .split {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 40px;
+      }
+      .profile {
+        background: #fff;
+        border: 1px solid #17252a20;
+        border-radius: 22px;
+        overflow: hidden;
+      }
+      .profile .banner {
+        width: 100%;
+        display: block;
+      }
+      .profilebody {
+        padding: 0 28px 32px;
+      }
+      .avatar {
+        width: 100px;
+        height: 100px;
+        border: 5px solid white;
+        border-radius: 50%;
+        margin-top: -38px;
+        position: relative;
+      }
+      .profile h3 {
+        font-size: 24px;
+        letter-spacing: -0.025em;
+        margin: 10px 0 2px;
+      }
+      .muted {
+        color: #526469;
+        font-size: 14px;
+      }
+      .profilebody p {
+        margin: 16px 0;
+      }
+      .profilebody > a {
+        color: #2441d8;
+      }
+      .brief {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .brief h3 {
+        font-size: 36px;
+        margin: 0 0 18px;
+      }
+      .brief p {
+        margin: 0 0 20px;
+      }
+      .note {
+        border-left: 4px solid #ff5a2a;
+        padding: 14px 18px;
+        background: #fff6;
+      }
+      .downloads {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .downloads a,
+      .actions button,
+      .actions a {
+        background: #17252a;
+        color: #f6f3e8;
+        border: 0;
+        padding: 12px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font: 700 14px Arial;
+        cursor: pointer;
+      }
+      .downloads a:first-child {
+        background: #ff5a2a;
+        color: #17252a;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+      }
+      .post {
+        border: 1px solid #17252a25;
+        border-radius: 18px;
+        overflow: hidden;
+        background: white;
+      }
+      .posthead {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 20px;
+        font: 12px monospace;
+      }
+      .post > img {
+        width: 100%;
+        aspect-ratio: 16/9;
+        object-fit: contain;
+        background: #f6f3e8;
+        display: block;
+      }
+      .copy {
+        padding: 22px;
+      }
+      .copy small {
+        font: 12px monospace;
+        color: #526469;
+      }
+      .caption {
+        font: inherit;
+        white-space: pre-wrap;
+        line-height: 1.55;
+        overflow-wrap: anywhere;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .actions a {
+        background: #f6f3e8;
+        color: #17252a;
+      }
+      .copy details {
+        margin-top: 18px;
+        font-size: 13px;
+        color: #526469;
+      }
+      .catalog {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+      .asset {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        text-decoration: none;
+        padding: 12px;
+      }
+      .asset img {
+        width: 100%;
+        height: 175px;
+        object-fit: contain;
+        background: #f6f3e8;
+      }
+      .asset strong {
+        font-size: 14px;
+      }
+      .asset small {
+        font: 12px monospace;
+        color: #526469;
+      }
+      footer {
+        padding: 40px 4vw;
+        border-top: 1px solid #17252a30;
+        max-width: 1440px;
+        margin: 30px auto 0;
+        font-size: 14px;
+      }
+      .rhythm {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+      .rhythm > div {
+        border-radius: 16px;
+        padding: 26px;
+        background: #ff5a2a;
+      }
+      .rhythm > div:nth-child(2) {
+        background: #a8ded0;
+      }
+      .rhythm > div:nth-child(3) {
+        background: #f7d85b;
+      }
+      .rhythm h3 {
+        font-size: 28px;
+        margin: 16px 0;
+      }
+      .rhythm p {
+        margin: 0;
+      }
+      #toast {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 12px 22px;
+        background: #17252a;
+        color: #fff;
+        border-radius: 10px;
+        display: none;
+      }
+      button:focus-visible,
+      a:focus-visible {
+        outline: 3px solid #2d4df0;
+        outline-offset: 4px;
+      }
+      @media (max-width: 800px) {
+        .split,
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .catalog {
+          grid-template-columns: 1fr 1fr;
+        }
+        .rhythm {
+          grid-template-columns: 1fr;
+        }
+        h2 {
+          font-size: 40px;
+        }
+        nav {
+          gap: 12px;
+          font-size: 13px;
+        }
+        .intro {
+          padding-top: 32px;
+        }
+        .section {
+          padding-top: 30px;
+        }
+        .profilebody {
+          padding: 0 20px 24px;
+        }
+        .lead {
+          font-size: 19px;
+        }
+        .posthead {
+          font-size: 10px;
+        }
+        .asset img {
+          height: 125px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="assets/vcm-logo-ink.svg" alt="VCM" />
+      <nav>
+        <a href="#profile">The profile</a><a href="#posts">The posts</a
+        ><a href="#assets">The assets</a>
+      </nav>
+    </header>
+    <main>
+      <section class="intro">
+        <div class="eyebrow">VCM / SOCIAL LAUNCH KIT / 08 SEPTEMBER 2026</div>
+        <h1>Big ideas deserve<br /><em>a following.</em></h1>
+        <p class="lead">
+          One recognizable brand. Seventeen ready-to-use assets. Four weeks of useful posts about
+          teams, building and the work behind the product.
+        </p>
+        <div class="pills">
+          <span>BIG IDEAS DESERVE A TEAM.</span><span>SOLO. NEVER SMALL.</span
+          ><span>BUILD WHAT COMES NEXT.</span>
+        </div>
+        <img class="hero" src="exports/09-team-sculpture.png" alt="VCM team sculpture campaign" />
+      </section>
+      <section class="section" id="profile">
+        <h2>The front door.</h2>
+        <div class="split">
+          <div class="profile">
+            <img class="banner" src="exports/x-header.png" alt="Proposed VCM X header" />
+            <div class="profilebody">
+              <img class="avatar" src="exports/x-avatar.png" alt="VCM avatar" />
+              <h3>VCM · Virtual Corporation Manager</h3>
+              <div class="muted">@buildwithvcm · proposed handle</div>
+              <p>
+                Big ideas deserve a team. Open-source workspace for your virtual corporation. Humans
+                + AI agents. Local MIT core. Build what comes next.
+              </p>
+              <a href="https://github.com/strobl/virtual-corporation-manager"
+                >github.com/strobl/virtual-corporation-manager</a
+              >
+            </div>
+          </div>
+          <div class="brief">
+            <div class="eyebrow">PROFILE PREVIEW / NOT A LIVE ACCOUNT</div>
+            <h3>Built to be recognized<br />before it is read.</h3>
+            <p>
+              The original V mark reads at avatar size. The headline and companion keep the header
+              recognizable. The public name explains what VCM does.
+            </p>
+            <p class="note">
+              Handle and account connection are pending. This preview contains no invented
+              followers, verification badge or posted activity.
+            </p>
+            <div class="downloads">
+              <a href="exports/x-header.png" download>Download header</a
+              ><a href="exports/x-avatar.png" download>Download avatar</a
+              ><a href="content/X-PROFILE.md">Profile copy ↗</a>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section">
+        <h2>A reason to come back.</h2>
+        <div class="rhythm">
+          <div>
+            <span class="eyebrow">MONDAY</span>
+            <h3>Show your team.</h3>
+            <p>A useful org chart. Explicit roles. A question worth answering.</p>
+          </div>
+          <div>
+            <span class="eyebrow">WEDNESDAY</span>
+            <h3>Built in the open.</h3>
+            <p>A real product change. A clear visual. A source you can inspect.</p>
+          </div>
+          <div>
+            <span class="eyebrow">FRIDAY</span>
+            <h3>Never stop hacking.</h3>
+            <p>A practical contribution, an experiment or an invitation to build.</p>
+          </div>
+        </div>
+      </section>
+      <section class="section" id="posts">
+        <h2>The first four weeks.</h2>
+        <p>
+          One pinned introduction and twelve copy-ready drafts. Relative slots become dates after
+          the account is connected.
+        </p>
+        <div class="grid">
+          <article class="post" data-series="Solo. Never small.">
+            <div class="posthead">
+              <span>Profile introduction</span><span>Solo. Never small.</span>
+            </div>
+            <img
+              loading="lazy"
+              src="exports/09-team-sculpture.png"
+              alt="Solo. Never small. A clay sculpture shows a human founder connected to three V-shaped orange, mint and yellow teammates. Editorial brand illustration."
+            />
+            <div class="copy">
+              <small>PINNED · DRAFT · 248 / 280</small>
+              <pre class="caption">
+Big ideas deserve a team.
+
+VCM is the open-source workspace for your virtual corporation. Organize humans + AI agents, responsibilities and reporting lines. Keep it on your machine.
+
+MIT core. Technical alpha. Build with us.
+https://github.com/strobl/virtual-corporation-manager</pre>
+              <div class="actions">
+                <button onclick="copyText(this)">Copy post</button
+                ><a href="exports/09-team-sculpture.png" download>Download image ↗</a
+                ><a href="exports/09-team-sculpture.svg" download>SVG ↗</a>
+              </div>
+              <details>
+                <summary>Alt text</summary>
+                <p>
+                  Solo. Never small. A clay sculpture shows a human founder connected to three
+                  V-shaped orange, mint and yellow teammates. Editorial brand illustration.
+                </p>
+              </details>
+            </div>
+          </article>
+          <article class="post" data-series="Show your team">
+            <div class="posthead"><span>Week 1 / Monday</span><span>Show your team</span></div>
+            <img
+              loading="lazy"
+              src="exports/01-show-your-team.png"
+              alt="Illustrated example org chart: a human owner above Researcher, Builder and Reviewer AI roles. Lines show reporting, not automatic task execution."
+            />
+            <div class="copy">
+              <small>VCM-X-001 · DRAFT · 218 / 280</small>
+              <pre class="caption">
+Solo founder. Multiple responsibilities.
+
+Start by drawing the team you need: research, building, review. Give each role a clear brief.
+
+This is an example team structure you can organize in VCM. What would you change?</pre>
+              <div class="actions">
+                <button onclick="copyText(this)">Copy post</button
+                ><a href="exports/01-show-your-team.png" download>Download image ↗</a
+                ><a href="exports/01-show-your-team.svg" download>SVG ↗</a>
+              </div>
+              <details>
+                <summary>Alt text</summary>
+                <p>
+                  Illustrated example org chart: a human owner above Researcher, Builder and
+                  Reviewer AI roles. Lines show reporting, not automatic task execution.
+                </p>
+              </details>
+            </div>
+          </article>
+          <article class="post" data-series="Team recipe">
+            <div class="posthead"><span>Week 1 / Wednesday</span><span>Team recipe</span></div>
+            <img
+              loading="lazy"
+              src="exports/02-team-recipe.png"
+              alt="Patchwork Studio fictional importable example: Builder, Reviewer and Researcher are three peer AI roles in the Product department. No work has executed."
+            />
+            <div class="copy">
+              <small>VCM-X-002 · DRAFT · 222 / 280</small>
+              <pre class="caption">
+A starting team you can inspect, import and change.
+
+Patchwork Studio: Builder, Reviewer, Researcher. Three peer roles in one Product department.
+
+The example configures the team; it doesn&#x27;t run it.
+https://github.com/strobl/virtual-corporation-manager/tree/main/docs/examples</pre>
+              <div class="actions">
+                <button onclick="copyText(this)">Copy post</button
+                ><a href="exports/02-team-recipe.png" download>Download image ↗</a
+                ><a href="exports/02-team-recipe.svg" download>SVG ↗</a>
+              </div>
+              <details>
+                <summary>Alt text</summary>
+                <p>
+                  Patchwork Studio fictional importable example: Builder, Reviewer and Researcher
+                  are three peer AI roles in the Product department. No work has executed.
+                </p>
+              </details>
+            </div>
+          </article>
+          <article class="post" data-series="Never stop hacking">
+            <div class="posthead"><span>Week 1 / Friday</span><span>Never stop hacking</span></div>
+            <img
+              loading="lazy"
+              src="exports/06-never-stop-hacking.png"
+              alt="Try it. Break it. Make it better. Read the code, change a little and share what you learn. Orange VCM mascot."
+            />
+            <div class="copy">
+              <small>VCM-X-003 · DRAFT · 209 / 280</small>
+              <pre class="caption">
+Read the code. Change a little. Share what you learn.
+
+That&#x27;s a good first contribution.
+
+VCM has starter tasks for examples, docs and UI work. Bring a small change you can demonstrate.
+https://github.com/strobl/virtual-corporation-manager/blob/main/docs/developer-contributing.md</pre>
+              <div class="actions">
+                <button onclick="copyText(this)">Copy post</button
+                ><a href="exports/06-never-stop-hacking.png" download>Download image ↗</a
+                ><a href="exports/06-never-stop-hacking.svg" download>SVG ↗</a>
+              </div>
+              <details>
+                <summary>Alt text</summary>
+                <p>
+                  Try it. Break it. Make it better. Read the code, change a little and share what
+                  you learn. Orange VCM mascot.
+                </p>
+              </details>
+            </div>
+          </article>
+          <article class="post" data-series="Show your team">
+            <div class="posthead"><span>Week 2 / Monday</span><span>Show your team</span></div>
+            <img
+              loading="lazy"
+              src="exports/05-people-and-agents.png"
+              alt="A human member and an AI agent side by side. Different member kinds belong in the same VCM company."
+            />
+            <div class="copy">
+              <small>VCM-X-004 · DRAFT · 225 / 280</small>
+              <pre class="caption">
+Your org chart should have room for people.
+
+VCM lets you add humans and AI agents to the same company, with explicit roles and responsibilities.
+
+A human stays a human. An agent stays an agent. The company keeps the context.</pre>
+              <div class="actions">
+                <button onclick="copyText(this)">Copy post</button
+                ><a href="exports/05-people-and-agents.png" download>Download image ↗</a
+                ><a href="exports/05-people-and-agents.svg" download>SVG ↗</a>
+              </div>
+              <details>
+                <summary>Alt text</summary>
+                <p>
+                  A human member and an AI agent side by side. Different member kinds belong in the
+                  same VCM company.
+                </p>
+              </details>
+            </div>
+          </article>
+          <article class="post" data-series="Build notes">
+            <div class="posthead"><span>Week 2 / Wednesday</span><span>Build notes</span></div>
+            <img
+              loading="lazy"
+              src="exports/03-name-your-corporation.png"
+              alt="Three steps in VCM: company name and purpose; human and AI members; roles and responsibilities. Review changes, save and return later."
+            />
+            <div class="copy">
+              <small>VCM-X-005 · DRAFT · 223 / 280</small>
+              <pre class="caption">
+The first move is simple.
+
+Name your corporation. Add its purpose. Bring in a person or an AI agent. Give them a responsibility. Review the change and save.
+
+Start with the company you want to build.
+https://github.com/strobl/virtual-corporation-manager#install-the-reviewed-archive</pre>
+              <div class="actions">
+                <button onclick="copyText(this)">Copy post</button
+                ><a href="exports/03-name-your-corporation.png" download>Download image ↗</a
+                ><a href="exports/03-name-your-corporation.svg" download>SVG ↗</a>
+              </div>
+              <details>
+                <summary>Alt text</summary>
+                <p>
+                  Three steps in VCM: company name and purpose; human and AI members; roles and
+                  responsibilities. Review changes, save and return later.
+                </p>
+              </details>
+            </div>
+          </article>
+          <article class="post" data-series="Show your team">
+            <div class="posthead"><span>Week 2 / Friday</span><span>Show your team</span></div>
+            <img
+              loading="lazy"
+              src="exports/08-first-three-roles.png"
+              alt="What would your first three roles be? Three empty role cards invite builders to sketch their team."
+            />
+            <div class="copy">
+              <small>VCM-X-006 · DRAFT · 220 / 280</small>
+              <pre class="caption">
+You have an idea and three empty role cards.
+
+What goes on them?
+
+Share the three roles, one responsibility each, and what you would keep for yourself.
+
+We&#x27;re collecting ways to think about teams, not fantasy headcounts.</pre>
+              <div class="actions">
+                <button onclick="copyText(this)">Copy post</button
+                ><a href="exports/08-first-three-roles.png" download>Download image ↗</a
+                ><a href="exports/08-first-three-roles.svg" download>SVG ↗</a>
+              </div>
+              <details>
+                <summary>Alt text</summary>
+                <p>
+                  What would your first three roles be? Three empty role cards invite builders to
+                  sketch their team.
+                </p>
+              </details>
+            </div>
+          </article>
+          <article class="post" data-series="Your workspace">
+            <div class="posthead"><span>Week 3 / Monday</span><span>Your workspace</span></div>
+            <img
+              loading="lazy"
+              src="exports/04-your-machine.png"
+              alt="Your company on your machine. The VCM core uses local SQLite and requires no account. Organize, back up and export. Orange mascot on a cobalt laptop."
+            />
+            <div class="copy">
+              <small>VCM-X-007 · DRAFT · 240 / 280</small>
+              <pre class="caption">
+Your company, ready for the next session.
+
+VCM keeps its local workspace in SQLite. Reopen the same company, export its definition, or make a backup.
+
+No account is required for the local core. Optional provider execution has its own setup.</pre>
+              <div class="actions">
+                <button onclick="copyText(this)">Copy post</button
+                ><a href="exports/04-your-machine.png" download>Download image ↗</a
+                ><a href="exports/04-your-machine.svg" download>SVG ↗</a>
+              </div>
+              <details>
+                <summary>Alt text</summary>
+                <p>
+                  Your company on your machine. The VCM core uses local SQLite and requires no
+                  account. Organize, back up and export. Orange mascot on a cobalt laptop.
+                </p>
+              </details>
+            </div>
+          </article>
+          <article class="post" data-series="Built in the open">
+            <div class="posthead">
+              <span>Week 3 / Wednesday</span><span>Built in the open</span>
+            </div>
+            <img
+              loading="lazy"
+              src="exports/07-alpha8-release.png"
+              alt="Alpha.8 distribution-name maintenance: download vcm-0.1.0-alpha.8.tgz. The local core and installed package compatibility remain."
+            />
+            <div class="copy">
+              <small>VCM-X-008 · DRAFT · 213 / 280</small>
+              <pre class="caption">
+A small naming change, a clearer download.
+
+Alpha.8 uses vcm-0.1.0-alpha.8.tgz. The installed package keeps its compatibility name; the command is vcm.
+
+Same local core. Clearer front door.
+https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.8</pre>
+              <div class="actions">
+                <button onclick="copyText(this)">Copy post</button
+                ><a href="exports/07-alpha8-release.png" download>Download image ↗</a
+                ><a href="exports/07-alpha8-release.svg" download>SVG ↗</a>
+              </div>
+              <details>
+                <summary>Alt text</summary>
+                <p>
+                  Alpha.8 distribution-name maintenance: download vcm-0.1.0-alpha.8.tgz. The local
+                  core and installed package compatibility remain.
+                </p>
+              </details>
+            </div>
+          </article>
+          <article class="post" data-series="Build what comes next">
+            <div class="posthead">
+              <span>Week 3 / Friday</span><span>Build what comes next</span>
+            </div>
+            <img
+              loading="lazy"
+              src="exports/11-square-culture.png"
+              alt="Build what comes next. Orange and mint VCM mascots. Hackers first. Be open."
+            />
+            <div class="copy">
+              <small>VCM-X-009 · DRAFT · 189 / 280</small>
+              <pre class="caption">
+Play 2 win. Be adaptable. Never stop hacking. Hackers first. Be open.
+
+Five values. Plenty of ways to build.
+
+What&#x27;s one thing you changed in your tools this week that made the work better?</pre>
+              <div class="actions">
+                <button onclick="copyText(this)">Copy post</button
+                ><a href="exports/11-square-culture.png" download>Download image ↗</a
+                ><a href="exports/11-square-culture.svg" download>SVG ↗</a>
+              </div>
+              <details>
+                <summary>Alt text</summary>
+                <p>Build what comes next. Orange and mint VCM mascots. Hackers first. Be open.</p>
+              </details>
+            </div>
+          </article>
+          <article class="post" data-series="Show your team">
+            <div class="posthead"><span>Week 4 / Monday</span><span>Show your team</span></div>
+            <img
+              loading="lazy"
+              src="exports/01-show-your-team.png"
+              alt="Illustrated example org chart: a human owner above Researcher, Builder and Reviewer AI roles. Lines show reporting, not automatic task execution."
+            />
+            <div class="copy">
+              <small>VCM-X-010 · DRAFT · 233 / 280</small>
+              <pre class="caption">
+A useful role answers three questions.
+
+What are you responsible for?
+What context do you need?
+Who reviews the result?
+
+Try those questions on your next team sketch. The org chart gets more interesting when the boxes mean something.</pre>
+              <div class="actions">
+                <button onclick="copyText(this)">Copy post</button
+                ><a href="exports/01-show-your-team.png" download>Download image ↗</a
+                ><a href="exports/01-show-your-team.svg" download>SVG ↗</a>
+              </div>
+              <details>
+                <summary>Alt text</summary>
+                <p>
+                  Illustrated example org chart: a human owner above Researcher, Builder and
+                  Reviewer AI roles. Lines show reporting, not automatic task execution.
+                </p>
+              </details>
+            </div>
+          </article>
+          <article class="post" data-series="Build notes">
+            <div class="posthead"><span>Week 4 / Wednesday</span><span>Build notes</span></div>
+            <img
+              loading="lazy"
+              src="exports/02-team-recipe.png"
+              alt="Patchwork Studio fictional importable example: Builder, Reviewer and Researcher are three peer AI roles in the Product department. No work has executed."
+            />
+            <div class="copy">
+              <small>VCM-X-011 · DRAFT · 234 / 280</small>
+              <pre class="caption">
+Make the example your own.
+
+Import Patchwork Studio. Open one member. Rewrite a responsibility. Review and save. Export the definition when you&#x27;re ready to reuse it.
+
+Small edits are a good way to learn a tool.
+https://github.com/strobl/virtual-corporation-manager/tree/main/docs/examples</pre>
+              <div class="actions">
+                <button onclick="copyText(this)">Copy post</button
+                ><a href="exports/02-team-recipe.png" download>Download image ↗</a
+                ><a href="exports/02-team-recipe.svg" download>SVG ↗</a>
+              </div>
+              <details>
+                <summary>Alt text</summary>
+                <p>
+                  Patchwork Studio fictional importable example: Builder, Reviewer and Researcher
+                  are three peer AI roles in the Product department. No work has executed.
+                </p>
+              </details>
+            </div>
+          </article>
+          <article class="post" data-series="Solo. Never small.">
+            <div class="posthead"><span>Week 4 / Friday</span><span>Solo. Never small.</span></div>
+            <img
+              loading="lazy"
+              src="exports/09-team-sculpture.png"
+              alt="Solo. Never small. A clay sculpture shows a human founder connected to three V-shaped orange, mint and yellow teammates. Editorial brand illustration."
+            />
+            <div class="copy">
+              <small>VCM-X-012 · DRAFT · 209 / 280</small>
+              <pre class="caption">
+Big ideas deserve a team.
+
+Start with a purpose. Make the responsibilities visible. Keep learning as you build.
+
+VCM is open source, and we&#x27;re building it in the open. Come take a look.
+https://github.com/strobl/virtual-corporation-manager</pre>
+              <div class="actions">
+                <button onclick="copyText(this)">Copy post</button
+                ><a href="exports/09-team-sculpture.png" download>Download image ↗</a
+                ><a href="exports/09-team-sculpture.svg" download>SVG ↗</a>
+              </div>
+              <details>
+                <summary>Alt text</summary>
+                <p>
+                  Solo. Never small. A clay sculpture shows a human founder connected to three
+                  V-shaped orange, mint and yellow teammates. Editorial brand illustration.
+                </p>
+              </details>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section class="section" id="assets">
+        <h2>The whole family.</h2>
+        <p>Download a PNG. Edit its SVG. Keep the same identity.</p>
+        <div class="catalog">
+          <a class="asset" href="exports/x-avatar.png" download
+            ><img
+              loading="lazy"
+              src="exports/x-avatar.png"
+              alt="VCM V symbol in dark ink on orange."
+            /><strong>X profile photo</strong><small>400 × 400 · PNG ↓</small></a
+          ><a class="asset" href="exports/mascot-avatar.png" download
+            ><img
+              loading="lazy"
+              src="exports/mascot-avatar.png"
+              alt="The orange VCM mascot with two eyes and a smile on cream."
+            /><strong>Community mascot avatar</strong><small>800 × 800 · PNG ↓</small></a
+          ><a class="asset" href="exports/x-header.png" download
+            ><img
+              loading="lazy"
+              src="exports/x-header.png"
+              alt="VCM. Big ideas deserve a team. Humans and AI agents, your corporation. Orange and mint V mascots."
+            /><strong>X header</strong><small>1500 × 500 · PNG ↓</small></a
+          ><a class="asset" href="exports/github-social-preview.png" download
+            ><img
+              loading="lazy"
+              src="exports/github-social-preview.png"
+              alt="VCM. Big ideas deserve a team. The open-source workspace for your virtual corporation. Humans and AI agents, your corporation. MIT, local, open."
+            /><strong>GitHub social preview</strong><small>1280 × 640 · PNG ↓</small></a
+          ><a class="asset" href="exports/readme-hero.png" download
+            ><img
+              loading="lazy"
+              src="exports/readme-hero.png"
+              alt="VCM. Big ideas deserve a team. The open-source workspace for your virtual corporation. Humans and AI agents, your corporation. MIT, local, open."
+            /><strong>README hero</strong><small>1600 × 640 · PNG ↓</small></a
+          ><a class="asset" href="exports/01-show-your-team.png" download
+            ><img
+              loading="lazy"
+              src="exports/01-show-your-team.png"
+              alt="Illustrated example org chart: a human owner above Researcher, Builder and Reviewer AI roles. Lines show reporting, not automatic task execution."
+            /><strong>X launch / org chart</strong><small>1600 × 900 · PNG ↓</small></a
+          ><a class="asset" href="exports/02-team-recipe.png" download
+            ><img
+              loading="lazy"
+              src="exports/02-team-recipe.png"
+              alt="Patchwork Studio fictional importable example: Builder, Reviewer and Researcher are three peer AI roles in the Product department. No work has executed."
+            /><strong>X educational post</strong><small>1600 × 900 · PNG ↓</small></a
+          ><a class="asset" href="exports/03-name-your-corporation.png" download
+            ><img
+              loading="lazy"
+              src="exports/03-name-your-corporation.png"
+              alt="Three steps in VCM: company name and purpose; human and AI members; roles and responsibilities. Review changes, save and return later."
+            /><strong>X product walkthrough</strong><small>1600 × 900 · PNG ↓</small></a
+          ><a class="asset" href="exports/04-your-machine.png" download
+            ><img
+              loading="lazy"
+              src="exports/04-your-machine.png"
+              alt="Your company on your machine. The VCM core uses local SQLite and requires no account. Organize, back up and export. Orange mascot on a cobalt laptop."
+            /><strong>X local-first positioning</strong><small>1600 × 900 · PNG ↓</small></a
+          ><a class="asset" href="exports/05-people-and-agents.png" download
+            ><img
+              loading="lazy"
+              src="exports/05-people-and-agents.png"
+              alt="A human member and an AI agent side by side. Different member kinds belong in the same VCM company."
+            /><strong>X product distinction</strong><small>1600 × 900 · PNG ↓</small></a
+          ><a class="asset" href="exports/06-never-stop-hacking.png" download
+            ><img
+              loading="lazy"
+              src="exports/06-never-stop-hacking.png"
+              alt="Try it. Break it. Make it better. Read the code, change a little and share what you learn. Orange VCM mascot."
+            /><strong>X culture / contribution</strong><small>1600 × 900 · PNG ↓</small></a
+          ><a class="asset" href="exports/07-alpha8-release.png" download
+            ><img
+              loading="lazy"
+              src="exports/07-alpha8-release.png"
+              alt="Alpha.8 distribution-name maintenance: download vcm-0.1.0-alpha.8.tgz. The local core and installed package compatibility remain."
+            /><strong>X verified release update</strong><small>1600 × 900 · PNG ↓</small></a
+          ><a class="asset" href="exports/08-first-three-roles.png" download
+            ><img
+              loading="lazy"
+              src="exports/08-first-three-roles.png"
+              alt="What would your first three roles be? Three empty role cards invite builders to sketch their team."
+            /><strong>X community prompt</strong><small>1600 × 900 · PNG ↓</small></a
+          ><a class="asset" href="exports/09-team-sculpture.png" download
+            ><img
+              loading="lazy"
+              src="exports/09-team-sculpture.png"
+              alt="Solo. Never small. A clay sculpture shows a human founder connected to three V-shaped orange, mint and yellow teammates. Editorial brand illustration."
+            /><strong>X campaign illustration</strong><small>1600 × 1080 · PNG ↓</small></a
+          ><a class="asset" href="exports/10-story-team.png" download
+            ><img
+              loading="lazy"
+              src="exports/10-story-team.png"
+              alt="Solo. Never small. Fictional reporting chart with a human, a Builder and a Reviewer. VCM, the open-source workspace for your virtual corporation."
+            /><strong>Story / Reel cover</strong><small>1080 × 1920 · PNG ↓</small></a
+          ><a class="asset" href="exports/11-square-culture.png" download
+            ><img
+              loading="lazy"
+              src="exports/11-square-culture.png"
+              alt="Build what comes next. Orange and mint VCM mascots. Hackers first. Be open."
+            /><strong>Square social cover</strong><small>1080 × 1080 · PNG ↓</small></a
+          ><a class="asset" href="exports/readme-team-map.png" download
+            ><img
+              loading="lazy"
+              src="exports/readme-team-map.png"
+              alt="Illustrated VCM company membership: human owner and Builder and Reviewer AI agents, with explicit responsibilities. This is not a software screenshot or automatic execution."
+            /><strong>README product model</strong><small>1600 × 780 · PNG ↓</small></a
+          >
+        </div>
+      </section>
+    </main>
+    <footer>
+      VCM — Virtual Corporation Manager · <a href="README.md">Source & asset catalog</a> ·
+      <a href="content/CONTENT-ENGINE.md">Content engine</a> ·
+      <a href="content/posts.json">Structured queue</a>
+      <p>
+        Original brand system preserved. Org charts are illustrative; the actual application
+        screenshot lives in the repository README. Draft, scheduled and published remain distinct
+        states.
+      </p>
+    </footer>
+    <div id="toast" role="status"></div>
+    <script>
+      async function copyText(button) {
+        const text = button.closest('.copy').querySelector('.caption').textContent;
+        try {
+          await navigator.clipboard.writeText(text);
+          const toast = document.getElementById('toast');
+          toast.textContent = 'Post copied';
+          toast.style.display = 'block';
+          setTimeout(() => (toast.style.display = 'none'), 1800);
+        } catch {
+          const range = document.createRange();
+          range.selectNodeContents(button.closest('.copy').querySelector('.caption'));
+          getSelection().removeAllRanges();
+          getSelection().addRange(range);
+          button.textContent = 'Text selected — copy manually';
+        }
+      }
+    </script>
+  </body>
+</html>
