@@ -2,13 +2,15 @@
 
 Create a virtual corporation, add its people and agents, and return to manage the same organization in a later session. VCM is for one local operator; adding a human member does not create a login or shared workspace. It does not import context automatically from arbitrary IDEs and chats.
 
-This guide accompanies **`0.1.0-alpha.9`**, the corporation-management technical prerelease. Follow [the README install block](../README.md#install-the-reviewed-archive) with the matching versioned archive and source/checksum record, or build this checkout. The commands below assume that `./vcm-preview` installation and the same working directory. Consult the release manifest for actual publication and verification. Published [alpha.6 branding maintenance](acceptance.md#branding-maintenance-release--6-september-2026) and [alpha.5 technical release](acceptance.md#technical-prerelease--6-september-2026) are historical, separate artifacts. Product Studio's actual useful-result acceptance remains open after two 300-second intake timeouts at `ultra`, with no v2 bundle or owner acceptance.
+This guide accompanies the **`0.1.0-alpha.10` technical alpha**. Follow [the README installation route](../README.md#install-vcm); the commands below assume a permanent `npm install -g virtualcorporationmanager` installation. For the [verified offline archive](../README.md#install-the-reviewed-archive), replace the leading `vcm` in each command with `npm exec --offline --prefix ./vcm-preview -- vcm`, from the directory containing `vcm-preview`.
+
+Earlier release artifacts retain their own source/checksum records and acceptance evidence. Product Studio's actual useful-result acceptance remains open after two 300-second intake timeouts at `ultra`, with no v2 bundle or owner acceptance.
 
 ## Start and keep the same workspace
 
 ```sh
-npm exec --offline --prefix ./vcm-preview -- vcm --help
-npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company --no-open
+vcm --help
+vcm --data-dir ./my-company --no-open
 ```
 
 Use Node.js 24.14+ in the 24.x line, or 26.x. Open the printed `http://127.0.0.1:…` URL. Stop with Ctrl+C before maintenance. Relative paths are relative to your terminal's working directory; use an absolute `--data-dir` if you start from different directories.
@@ -29,7 +31,7 @@ The useful outcome is a company you can find and maintain. There is no required 
 
 ## Try the three-agent example
 
-Use [three-agent-studio.json](examples/three-agent-studio.json). It ships at `vcm-preview/node_modules/gitflash/docs/examples/three-agent-studio.json`, so no network download is needed after installation.
+Use [three-agent-studio.json](examples/three-agent-studio.json). The file also ships with the package, so it is available offline. For a permanent install, run `npm root -g` and open `virtualcorporationmanager/docs/examples/three-agent-studio.json` within the directory it prints. For an isolated archive install, use `vcm-preview/node_modules/virtualcorporationmanager/docs/examples/three-agent-studio.json`.
 
 1. Open **Settings → Import a company definition**.
 2. Choose that JSON file, or paste its full contents in **Definition JSON**.
@@ -64,12 +66,12 @@ The Settings export covers the workspace's configuration, not only the selected 
 Stop VCM, then run:
 
 ```sh
-npm exec --offline --prefix ./vcm-preview -- vcm export --data-dir ./my-company --output ./company-definition.json
-npm exec --offline --prefix ./vcm-preview -- vcm time-export --data-dir ./my-company --output ./delivery-hours.json
-npm exec --offline --prefix ./vcm-preview -- vcm backup --data-dir ./my-company --output ./company-backup.sqlite
-npm exec --offline --prefix ./vcm-preview -- vcm restore --data-dir ./restored-company --from ./company-backup.sqlite
-npm exec --offline --prefix ./vcm-preview -- vcm doctor --data-dir ./restored-company
-npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./restored-company --no-open
+vcm export --data-dir ./my-company --output ./company-definition.json
+vcm time-export --data-dir ./my-company --output ./delivery-hours.json
+vcm backup --data-dir ./my-company --output ./company-backup.sqlite
+vcm restore --data-dir ./restored-company --from ./company-backup.sqlite
+vcm doctor --data-dir ./restored-company
+vcm --data-dir ./restored-company --no-open
 ```
 
 Choose new output filenames on a repeated run; existing destinations are refused. Inspect the restored corporation, member identities and any real work/time history. Restore replaces the selected workspace rather than merging newer records. Start into a fresh `restored-company` directory for this rehearsal.

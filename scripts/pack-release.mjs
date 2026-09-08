@@ -4,8 +4,9 @@ import { join } from 'node:path';
 
 const root = process.cwd();
 const manifest = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
-const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-const output = execFileSync(npm, ['pack', '--json', '--pack-destination', root], {
+const npm = process.env.npm_execpath;
+if (!npm) throw new Error('Run with npm run pack:release so the npm executable is explicit.');
+const output = execFileSync(process.execPath, [npm, 'pack', '--json', '--pack-destination', root], {
   cwd: root,
   encoding: 'utf8',
 });
@@ -22,7 +23,7 @@ console.log(
       version: manifest.version,
       files: packed.files,
       bytes: packed.size,
-      note: 'The archive filename is VCM-facing; the package manifest remains gitflash for compatibility.',
+      note: 'Publish this tested archive as virtualcorporationmanager; vcm and gitflash share the existing workspace.',
     },
     null,
     2,

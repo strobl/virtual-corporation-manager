@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Install VCM locally, create your company, add people and AI agents, and manage responsibilities and recorded hours. Alpha 8 documentation."
+      content="Install VCM locally, create your company, add people and AI agents, and manage responsibilities and recorded hours. Alpha 10 installation documentation."
     />
     <meta name="theme-color" content="#f6f4ef" />
     <title>Developer quickstart — VCM</title>
@@ -66,61 +66,100 @@
 
           <section class="section" id="install" aria-labelledby="install-title">
             <p class="kicker">Local setup</p>
-            <h2 id="install-title">Install VCM</h2>
+            <h2 id="install-title">Start VCM with one command.</h2>
             <p>
-              <strong>Alpha 8 distribution-name maintenance.</strong> The commands below install the
-              <code>0.1.0-alpha.9</code> archive for local company-management evaluation.
+              <strong>0.1.0-alpha.10 technical alpha.</strong>
+              Company setup, membership, responsibilities and the Time Tracker need no provider
+              account or runtime connection.
             </p>
-            <p>
-              Plain company setup, membership, responsibilities and the Time Tracker need no
-              provider account or runtime connection.
-              <a href="#configuration">Create your company →</a>
-            </p>
-            <p>
-              Use Node.js <strong>24.14 or later within 24.x, or 26.x</strong> with npm:
-              <code>&gt;=24.14 &lt;25</code> or <code>&gt;=26 &lt;27</code>. Check the versioned
-              release, source revision and archive checksum before installing. The release includes
-              <code>checksums.txt</code> and <code>release-manifest.json</code>.
-            </p>
+            <p>Use <strong>Node.js 24.14+ within 24.x, or 26.x</strong>, with npm.</p>
             <div class="command-panel">
-              <p class="kicker">Terminal · Alpha 8 distribution-name maintenance</p>
+              <p class="kicker">Terminal</p>
               <button
                 class="copy-button"
                 type="button"
                 data-copy="install-command"
-                aria-label="Copy installation commands"
+                aria-label="Copy the VCM launch command"
                 hidden
               >
-                Copy commands
+                Copy command
               </button>
               <pre
                 class="command-block"
                 id="install-command"
                 tabindex="0"
-                aria-label="Install Alpha 8, check its version and start VCM"
-              ><code>npm install --ignore-scripts --prefix ./vcm-preview https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.9/vcm-0.1.0-alpha.9.tgz
-npm exec --offline --prefix ./vcm-preview -- vcm --version
-npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code></pre>
+                aria-label="Start VCM with npm"
+              ><code>npx virtualcorporationmanager</code></pre>
               <p class="copy-status" role="status" aria-live="polite"></p>
             </div>
+            <p>Or install once, then use <code>vcm</code>:</p>
+            <pre
+              class="command-block"
+              tabindex="0"
+              aria-label="Permanently install and start VCM"
+            ><code>npm install -g virtualcorporationmanager
+vcm</code></pre>
             <p>
-              Expected version: <code>0.1.0-alpha.9</code>. The first command downloads the archive;
-              subsequent commands use the isolated installation. Open the loopback URL printed by
-              VCM. Use the same working directory and data directory when restarting. Add
+              Open the local URL printed in your terminal. Stop with Ctrl+C and run the same command
+              to return to your workspace. The initial download needs an internet connection; the
+              installed local core works offline. After a permanent install,
+              <code>vcm --version</code> prints the installed version; this release is
+              <code>0.1.0-alpha.10</code>.
+            </p>
+            <p>
+              The examples below use the permanent installation. With npx, replace the leading
+              <code>vcm</code> with <code>npx virtualcorporationmanager</code>. Add
               <code>--port 4311</code> if port 4310 is occupied, or <code>--no-open</code> to open
               the URL yourself.
             </p>
+            <details>
+              <summary>Existing global gitflash installation</summary>
+              <p>Stop VCM, then replace the old application before starting the new command:</p>
+              <pre
+                class="command-block"
+                tabindex="0"
+                aria-label="Replace an existing global gitflash installation"
+              ><code>npm uninstall -g gitflash
+npm install -g virtualcorporationmanager
+vcm</code></pre>
+              <p>
+                Keep the same <code>GITFLASH_DATA_DIR</code> or <code>--data-dir</code> setting. The
+                default remains <code>~/.gitflash</code>; removing the application leaves workspace
+                data intact. The <code>gitflash</code> command remains a compatibility alias.
+              </p>
+            </details>
+            <details id="install-the-reviewed-archive">
+              <summary>Advanced: install a verified archive offline</summary>
+              <p>
+                Obtain <code>vcm-0.1.0-alpha.10.tgz</code>, <code>checksums.txt</code> and
+                <code>release-manifest.json</code> from the matching
+                <a
+                  href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.10"
+                  >versioned release</a
+                >
+                or build the source checkout. Verify the release archive’s SHA-256 against those
+                records before going offline. Keep its source revision and checksum. From the
+                directory containing the archive, run:
+              </p>
+              <pre
+                class="command-block"
+                tabindex="0"
+                aria-label="Install and run the verified VCM archive offline"
+              ><code>npm install --offline --prefix ./vcm-preview ./vcm-0.1.0-alpha.10.tgz
+npm exec --offline --prefix ./vcm-preview -- vcm --version
+npm exec --offline --prefix ./vcm-preview -- vcm</code></pre>
+              <p>
+                Expected version: <code>0.1.0-alpha.10</code>. For later commands, replace the
+                leading <code>vcm</code> with
+                <code>npm exec --offline --prefix ./vcm-preview -- vcm</code>, from the directory
+                containing <code>vcm-preview</code>. This isolates the application; workspace data
+                still defaults to <code>~/.gitflash</code>. To use a separate example workspace,
+                append <code>--data-dir ./my-company</code> and keep using that path.
+              </p>
+            </details>
             <p>
-              The package name remains <code>gitflash</code>. <code>vcm</code> is the canonical
-              command; <code>gitflash</code> is a compatible alias for the same executable. No npm
-              package named <code>vcm</code> is required.
-            </p>
-            <p>
-              <a
-                href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.9"
-                >Versioned release</a
-              >
-              · <a href="#local-data">Keep the same workspace</a>
+              <a href="#configuration">Create your company →</a> ·
+              <a href="#local-data">Keep the same workspace</a>
             </p>
           </section>
 
@@ -142,8 +181,13 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code><
               >
             </p>
             <p>
-              The same file ships with the installation at
-              <code>vcm-preview/node_modules/gitflash/docs/examples/three-agent-studio.json</code>.
+              The file also ships with the package for offline use. For a permanent installation,
+              run <code>npm root -g</code> and open
+              <code>virtualcorporationmanager/docs/examples/three-agent-studio.json</code> inside
+              the directory it prints. For an isolated archive install, use
+              <code
+                >vcm-preview/node_modules/virtualcorporationmanager/docs/examples/three-agent-studio.json</code
+              >.
             </p>
             <ol>
               <li>Open <strong>Settings → Import a company definition</strong>.</li>
@@ -184,17 +228,19 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company</code><
               class="command-block"
               tabindex="0"
               aria-label="Inspect commands and start without opening a browser"
-            ><code>npm exec --offline --prefix ./vcm-preview -- vcm --help
-npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company --no-open</code></pre>
+            ><code>vcm --help
+vcm --no-open</code></pre>
             <p>
               Stop with Ctrl+C before maintenance. The server binds to loopback for one local
               operator. It has no shared accounts or supported LAN, proxy or tunnel hosting. The
               local core needs no provider account, hosted database, billing or telemetry.
             </p>
             <p>
-              To remove this isolated installation, stop VCM and run
-              <code>npm uninstall --prefix ./vcm-preview gitflash</code>. Your workspace directories
-              remain intact.
+              To remove a permanent installation, stop VCM and run
+              <code>npm uninstall -g virtualcorporationmanager</code>. For the isolated archive
+              installation, use
+              <code>npm uninstall --prefix ./vcm-preview virtualcorporationmanager</code>. Your
+              workspace directories remain intact.
             </p>
           </section>
 
@@ -389,17 +435,21 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company --no-op
                 recovery receipts.
               </dd>
             </dl>
-            <p>Stop VCM first. Choose new output filenames; existing destinations are refused.</p>
+            <p>
+              Stop VCM first. These commands use the default workspace. If you started VCM with a
+              custom <code>--data-dir</code>, add that same option to export, time-export and
+              backup. Choose new output filenames; existing destinations are refused.
+            </p>
             <pre
               class="command-block"
               tabindex="0"
               aria-label="Export configuration and hours, then back up and restore a stopped workspace"
-            ><code>npm exec --offline --prefix ./vcm-preview -- vcm export --data-dir ./my-company --output ./company-definition.json
-npm exec --offline --prefix ./vcm-preview -- vcm time-export --data-dir ./my-company --output ./delivery-hours.json
-npm exec --offline --prefix ./vcm-preview -- vcm backup --data-dir ./my-company --output ./company-backup.sqlite
-npm exec --offline --prefix ./vcm-preview -- vcm restore --data-dir ./restored-company --from ./company-backup.sqlite
-npm exec --offline --prefix ./vcm-preview -- vcm doctor --data-dir ./restored-company
-npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./restored-company --no-open</code></pre>
+            ><code>vcm export --output ./company-definition.json
+vcm time-export --output ./delivery-hours.json
+vcm backup --output ./company-backup.sqlite
+vcm restore --data-dir ./restored-company --from ./company-backup.sqlite
+vcm doctor --data-dir ./restored-company
+vcm --data-dir ./restored-company --no-open</code></pre>
             <p>
               Restore replaces the selected workspace; it does not merge later changes. Rehearse
               into a fresh <code>restored-company</code> directory, then inspect corporation
@@ -428,13 +478,13 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./restored-company -
               contributions need no provider credentials or private planning access.
             </p>
             <p>
-              Use the source revision recorded in the Alpha 8 release manifest. In that checkout,
-              install development dependencies and run the checks:
+              Use the source revision recorded with the release or candidate you are checking. In
+              that checkout, install development dependencies and run the checks:
             </p>
             <pre
               class="command-block"
               tabindex="0"
-              aria-label="Check the Alpha 8 source checkout"
+              aria-label="Check the source checkout"
             ><code>npm ci --ignore-scripts
 npm run check
 npm run format:check
@@ -447,13 +497,14 @@ npm run test:package</code></pre>
             </p>
             <p>
               The installed example also includes a provider-free import, edit, restart, export and
-              recovery check:
+              recovery check. After the advanced isolated archive installation, run this from the
+              directory containing <code>vcm-preview</code>:
             </p>
             <pre
               class="command-block"
               tabindex="0"
               aria-label="Verify the installed three-agent example"
-            ><code>node ./vcm-preview/node_modules/gitflash/docs/examples/verify.mjs</code></pre>
+            ><code>node ./vcm-preview/node_modules/virtualcorporationmanager/docs/examples/verify.mjs</code></pre>
             <p>
               Report the exact source or archive, VCM version, Node and OS versions, commands and
               observed results. The maintainer reviews scope and changes before merge, then checks
