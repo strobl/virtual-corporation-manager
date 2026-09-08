@@ -8,6 +8,7 @@ The adopted VCM identity, ready for GitHub and social: original VCM wordmark, wa
 
 ## Use it
 
+- [VCM on X: @virtualcorpman](https://x.com/virtualcorpman)
 - [X profile fields and upload files](content/X-PROFILE.md)
 - [Twelve launch posts and pinned introduction](content/LAUNCH-POSTS.md)
 - [Structured draft queue with alt text](content/posts.json)
