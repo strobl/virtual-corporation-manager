@@ -1,13 +1,15 @@
 # Big ideas, in motion
 
-Two original VCM brand scenes for the creative refresh of [virtualcorporationmanager.com](https://virtualcorporationmanager.com/). They extend the approved orange, mint and butter Vic cast from the Buzz campaign into a homepage story about people and agents building together.
+VCM brand scenes and a matching social preview for the creative refresh of [virtualcorporationmanager.com](https://virtualcorporationmanager.com/). They extend the approved orange, mint and butter Vic cast from the Buzz campaign into a homepage story about people and agents building together.
 
 | Asset                                      | Scene                                                                      | Intended placement                                         |
 | ------------------------------------------ | -------------------------------------------------------------------------- | ---------------------------------------------------------- |
 | [hero-team.png](hero-team.png)             | A person and three Vic characters assemble an oversized cobalt paper plane | Homepage opening, alongside live HTML headline and actions |
 | [values-workshop.png](values-workshop.png) | The Vic team experiments with code brackets and an open toolbox            | Dark illustrated values section                            |
 
-Both are AI-generated illustrations, not screenshots or records of product activity. Current product captures and screenshot-based integration compositions remain separate. Use the complete images at their original aspect ratios; do not add text inside the artwork. Dimensions and SHA-256 hashes are recorded in [provenance.json](provenance.json).
+These are AI-generated illustrations, not screenshots or records of product activity. Current product captures and screenshot-based integration compositions remain separate. Use the complete images at their original aspect ratios; do not add text inside the artwork. Dimensions and SHA-256 hashes are recorded in [provenance.json](provenance.json).
+
+The human figure uses warm sand skin, brown hair, an oatmeal shirt and blue-gray trousers. The [social-preview.png](social-preview.png) card carries this revised palette into Open Graph and Twitter sharing. Use its actual 1734 × 907 dimensions in metadata and a new public filename when deploying to avoid stale image caches.
 
 ## Art direction
 

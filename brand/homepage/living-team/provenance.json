@@ -11,19 +11,25 @@
       "file": "hero-team.png",
       "width": 1254,
       "height": 1254,
-      "bytes": 1842240,
-      "sha256": "2a29a47897411b2794fe6f8c2d930f706a43586ed6e9a3458b026be97e288eed",
-      "generatedSource": "exec-3cca4fca-280f-4673-a937-6021b025d343.png"
+      "bytes": 1769584,
+      "sha256": "8535f1f8d9dca8a9e92e647b6b9f5e12ab0387c525f1a1618012d0d6b6198d37"
     },
     {
       "file": "values-workshop.png",
       "width": 1448,
       "height": 1086,
       "bytes": 1733572,
-      "sha256": "c2ecafab4f44a371651989f1a69708399ece481daf8d85a45453a618badcb676",
-      "generatedSource": "exec-6f95bccf-1cc9-4c79-98a1-a4ac37e62870.png"
+      "sha256": "c2ecafab4f44a371651989f1a69708399ece481daf8d85a45453a618badcb676"
+    },
+    {
+      "file": "social-preview.png",
+      "width": 1734,
+      "height": 907,
+      "bytes": 1744089,
+      "sha256": "29e59dd1edc09ad8525002a880f20414c47232b28aa8e32e89006618c17f2884"
     }
   ],
   "liveSite": "https://virtualcorporationmanager.com/",
-  "status": "artwork created; page integration pending"
+  "status": "Versioned artwork source; website publication is verified separately.",
+  "revision": "Human palette revised to warm sand, oatmeal and blue-gray; matching Open Graph/Twitter card added."
 }
