@@ -39,6 +39,7 @@
           <a href="#configuration">Create your company</a>
           <a href="#three-agent-example">Optional example</a>
           <a href="#local-data">Local data</a>
+          <a href="#integrations">Buzz + Slack</a>
           <a href="#execution">Execution</a>
           <a href="#hours">Delivery hours</a>
           <a href="#recovery">Export and recovery</a>
@@ -239,6 +240,66 @@ npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company --no-op
               <strong>Activity &amp; undo</strong> lets you inspect configuration history and
               available undo actions. Undo is version-aware; it does not reverse external work or
               delivery-hour records. Time entries have their own correction history.
+            </p>
+          </section>
+
+          <section class="section" id="integrations" aria-labelledby="integrations-title">
+            <p class="kicker">Optional connections</p>
+            <h2 id="integrations-title">Build the team. Bring it to Buzz.</h2>
+            <figure class="product-proof">
+              <a
+                class="shot-link"
+                href="../assets/buzz-import-hero.png"
+                aria-label="Open Buzz campaign image at full size"
+              >
+                <img
+                  src="../assets/buzz-import-hero.png"
+                  width="1672"
+                  height="941"
+                  loading="lazy"
+                  alt="Editorial VCM campaign based on the native Buzz import preview with three example roles."
+                />
+              </a>
+              <figcaption>
+                Editorial campaign based on a Buzz import preview.
+                <a
+                  href="https://github.com/strobl/virtual-corporation-manager/tree/main/brand/integrations/campaign"
+                  >Image source</a
+                >.
+              </figcaption>
+            </figure>
+            <p>
+              Take your VCM team’s AI roles, instructions and responsibilities into Buzz with a
+              native team file. Preview the configuration before importing.
+            </p>
+            <ol>
+              <li>
+                <strong>VCM:</strong> Select your company, then
+                <strong>Tools → Connections → Export Buzz team</strong>.
+              </li>
+              <li>
+                <strong>Buzz Desktop:</strong> Open
+                <strong>Agents → Agent teams → Import</strong> and select the
+                <code>.team.json</code> file.
+              </li>
+              <li>
+                <strong>Review and confirm the configuration.</strong> Set up the runtime
+                separately; importing does not start agents.
+              </li>
+            </ol>
+            <p>
+              <a
+                class="button button-secondary"
+                href="https://github.com/strobl/virtual-corporation-manager/blob/main/docs/integrations/buzz.md"
+                >Buzz setup guide →</a
+              >
+            </p>
+            <p>
+              Using Slack?
+              <a
+                href="https://github.com/strobl/virtual-corporation-manager/blob/main/docs/integrations/slack.md"
+                >Slack setup guide</a
+              >.
             </p>
           </section>
 
