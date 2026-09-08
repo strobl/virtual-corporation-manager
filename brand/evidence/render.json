@@ -1,0 +1,121 @@
+[
+  {
+    "id": "x-avatar",
+    "width": 400,
+    "height": 400,
+    "bytes": 4062,
+    "clipped": []
+  },
+  {
+    "id": "mascot-avatar",
+    "width": 800,
+    "height": 800,
+    "bytes": 11652,
+    "clipped": []
+  },
+  {
+    "id": "x-header",
+    "width": 1500,
+    "height": 500,
+    "bytes": 35088,
+    "clipped": []
+  },
+  {
+    "id": "github-social-preview",
+    "width": 1280,
+    "height": 640,
+    "bytes": 44775,
+    "clipped": []
+  },
+  {
+    "id": "readme-hero",
+    "width": 1600,
+    "height": 640,
+    "bytes": 57191,
+    "clipped": []
+  },
+  {
+    "id": "01-show-your-team",
+    "width": 1600,
+    "height": 900,
+    "bytes": 69167,
+    "clipped": []
+  },
+  {
+    "id": "02-team-recipe",
+    "width": 1600,
+    "height": 900,
+    "bytes": 80947,
+    "clipped": []
+  },
+  {
+    "id": "03-name-your-corporation",
+    "width": 1600,
+    "height": 900,
+    "bytes": 77141,
+    "clipped": []
+  },
+  {
+    "id": "04-your-machine",
+    "width": 1600,
+    "height": 900,
+    "bytes": 70036,
+    "clipped": []
+  },
+  {
+    "id": "05-people-and-agents",
+    "width": 1600,
+    "height": 900,
+    "bytes": 55873,
+    "clipped": []
+  },
+  {
+    "id": "06-never-stop-hacking",
+    "width": 1600,
+    "height": 900,
+    "bytes": 56900,
+    "clipped": []
+  },
+  {
+    "id": "07-alpha8-release",
+    "width": 1600,
+    "height": 900,
+    "bytes": 77696,
+    "clipped": []
+  },
+  {
+    "id": "08-first-three-roles",
+    "width": 1600,
+    "height": 900,
+    "bytes": 57929,
+    "clipped": []
+  },
+  {
+    "id": "09-team-sculpture",
+    "width": 1600,
+    "height": 1080,
+    "bytes": 1245627,
+    "clipped": []
+  },
+  {
+    "id": "10-story-team",
+    "width": 1080,
+    "height": 1920,
+    "bytes": 84458,
+    "clipped": []
+  },
+  {
+    "id": "11-square-culture",
+    "width": 1080,
+    "height": 1080,
+    "bytes": 44245,
+    "clipped": []
+  },
+  {
+    "id": "readme-team-map",
+    "width": 1600,
+    "height": 780,
+    "bytes": 64050,
+    "clipped": []
+  }
+]

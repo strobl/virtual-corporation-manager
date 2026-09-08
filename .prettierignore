@@ -11,3 +11,7 @@ site/assets/vcm-favicon.svg
 
 # Preserve original manifests and recorded display-adaptation hashes; do not reformat.
 docs/agent-operations/
+
+# Keep campaign SVG masters, source font and native logo paths intact.
+brand/assets/
+brand/exports/

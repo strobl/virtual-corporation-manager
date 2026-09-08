@@ -6,3 +6,8 @@ dist/
 coverage/
 .gitflash/
 .DS_Store
+
+# Local brand QA logs and preview captures
+brand/evidence/*.log
+brand/evidence/*-preview.png
+brand/evidence/contact-sheet.png
