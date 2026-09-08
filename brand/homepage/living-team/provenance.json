@@ -27,9 +27,17 @@
       "height": 907,
       "bytes": 1744089,
       "sha256": "29e59dd1edc09ad8525002a880f20414c47232b28aa8e32e89006618c17f2884"
+    },
+    {
+      "file": "social-preview-simple.png",
+      "width": 1734,
+      "height": 907,
+      "bytes": 1255331,
+      "sha256": "69663bd70722ae43d020f941f2863773bcf0681cda721ebf277da5e24888b8d5"
     }
   ],
   "liveSite": "https://virtualcorporationmanager.com/",
   "status": "Versioned artwork source; website publication is verified separately.",
-  "revision": "Human palette revised to warm sand, oatmeal and blue-gray; matching Open Graph/Twitter card added."
+  "revision": "Simplified share card: Solo. Never small., one orange Vic and a cobalt paper plane; homepage artwork unchanged.",
+  "primarySocialAsset": "social-preview-simple.png"
 }
