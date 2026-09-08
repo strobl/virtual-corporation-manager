@@ -53,7 +53,7 @@
   },
   "captures": {
     "desktop": {
-      "file": "product-brand-company.png",
+      "file": "product-brand-company.jpg",
       "sha256": "7eb6fd34fb44965aa5734503eddaf1b6355fa95396fbe2a3a989ab4730c71a7f",
       "viewport": {
         "width": 1440,
@@ -61,7 +61,7 @@
       }
     },
     "mobile": {
-      "file": "product-brand-mobile.png",
+      "file": "product-brand-mobile.jpg",
       "sha256": "4bab94663e745fafc7acd7b2975a6d65838ee1c8faea05190871f2a62c23993c",
       "viewport": {
         "width": 390,

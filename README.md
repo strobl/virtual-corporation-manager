@@ -28,7 +28,7 @@ The diagram is an illustrated example. Membership and reporting lines describe y
 
 ## See the workspace
 
-![Northstar Studio in the VCM brand: human and AI members, responsibilities and reporting](docs/images/product-brand-company.png)
+![Northstar Studio in the VCM brand: human and AI members, responsibilities and reporting](docs/images/product-brand-company.jpg)
 
 _Fictional company and member data in the actual company-management interface. The [capture record](docs/images/product-brand-provenance.json) identifies the source and viewport. This is not customer activity._
 
