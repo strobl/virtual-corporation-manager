@@ -1,0 +1,60 @@
+{
+  "campaign": "Your team. In the conversation.",
+  "status": "draft",
+  "posts": [
+    {
+      "id": "connections-intro",
+      "channel": "X",
+      "title": "Your team. In the conversation.",
+      "asset": "01-conversation",
+      "text": "Your team. In the conversation.\n\nOrganize in VCM. Export AI roles to Buzz.xyz, or explore Slack mentions through your local runtime.\n\nOptional setup. Task connections are experimental.\n\nhttps://github.com/strobl/virtual-corporation-manager/blob/main/docs/integrations/README.md",
+      "alt": "VCM: Your team. In the conversation. Organize in VCM and explore optional Buzz.xyz and Slack connections. Team import and experimental task connections.",
+      "weightedCharacters": 209
+    },
+    {
+      "id": "buzz-team",
+      "channel": "X",
+      "title": "Give your agents a room.",
+      "asset": "02-buzz-team",
+      "text": "Give your agents a room.\n\nBuild the team in VCM. Export roles and instructions. Preview the team in Buzz.xyz.\n\nConfiguration travels. Starting agents is a separate step.\n\nhttps://github.com/strobl/virtual-corporation-manager/blob/main/docs/integrations/buzz.md",
+      "alt": "Give your agents a room. Export a VCM team file, review its roles and instructions in Buzz, then configure the runtime separately before starting agents. Orange Vic companions stand beside three steps.",
+      "weightedCharacters": 194
+    },
+    {
+      "id": "slack-mention",
+      "channel": "X",
+      "title": "A mention. A mission.",
+      "asset": "03-slack-mention",
+      "text": "A mention. A mission.\n\nVCM's experimental Slack adapter routes a named-role task to local Codex and replies in the same thread.\n\nYour app. One allowed owner and channel. Live proof remains open.\n\nhttps://github.com/strobl/virtual-corporation-manager/blob/main/docs/integrations/slack.md",
+      "alt": "A mention. A mission. An illustrated Slack flow: an owner mentions VCM and names a Reviewer task; the local runtime executes and returns the result to the thread. Experimental; one allowed owner and channel.",
+      "weightedCharacters": 219
+    },
+    {
+      "id": "local-open",
+      "channel": "X",
+      "title": "Local roots. Open doors.",
+      "asset": "04-local-open",
+      "text": "Local roots. Open doors.\n\nYour VCM corporation lives on your machine. Buzz.xyz team import and experimental Slack tasks are optional connections.\n\nKeep organizing. Connect when useful.\n\nhttps://github.com/strobl/virtual-corporation-manager/blob/main/docs/integrations/README.md",
+      "alt": "Local roots. Open doors. Two separate routes: VCM team configuration exports to Buzz Desktop; an allowed Slack mention goes to local VCM and Codex, then returns a threaded reply. The core works offline; connections need external setup.",
+      "weightedCharacters": 209
+    },
+    {
+      "id": "buzz-community",
+      "channel": "Buzz.xyz",
+      "title": "Bring your VCM team into Buzz.",
+      "asset": "05-meet-the-channel",
+      "text": "Big ideas deserve a team. Give yours a room.\n\nVCM is an open-source workspace for organizing a corporation with humans and AI agents. Its Buzz export carries active AI roles and instructions into a native .team.json.\n\nSelect your corporation → Tools → Connections → Export Buzz team. In Buzz Desktop, preview the import before confirming. Check the runtime before starting agents.\n\nThe export transfers configuration. The optional task connection is experimental; a live useful-result proof is still open.\n\nStart here: https://github.com/strobl/virtual-corporation-manager/blob/main/docs/integrations/buzz.md",
+      "alt": "Big ideas. Meet the channel. Organize your team in VCM and explore optional Buzz.xyz and Slack connections. Team import; experimental task connections. The original orange Vic appears on cream.",
+      "weightedCharacters": 542
+    },
+    {
+      "id": "slack-community",
+      "channel": "Slack",
+      "title": "One role. One focused brief.",
+      "asset": "03-slack-mention",
+      "text": "A mention. A mission.\n\nVCM organizes the team. Its experimental Slack adapter gives one allowed owner a way to address a named AI role in one channel. Local Codex runs the task; the result returns to its thread and stays in VCM for review.\n\nThe repo now includes a Slack app manifest, a VCM app icon and a setup guide. Configure your own app and runtime, then explicitly connect in Tools → Connections.\n\nLive execution acceptance is still open. The illustrated example is a walkthrough, not a real delivery receipt.\n\nSetup: https://github.com/strobl/virtual-corporation-manager/blob/main/docs/integrations/slack.md",
+      "alt": "A mention. A mission. An illustrated Slack flow: an owner mentions VCM and names a Reviewer task; the local runtime executes and returns the result to the thread. Experimental; one allowed owner and channel.",
+      "weightedCharacters": 547
+    }
+  ]
+}

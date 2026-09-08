@@ -13,6 +13,7 @@ The adopted VCM identity, ready for GitHub and social: original VCM wordmark, wa
 - [Twelve launch posts and pinned introduction](content/LAUNCH-POSTS.md)
 - [Structured draft queue with alt text](content/posts.json)
 - [Three-series content rhythm and Pressmaster handoff](content/CONTENT-ENGINE.md)
+- [Buzz.xyz + Slack integration assets and post drafts](integrations/README.md)
 - [Brand brief](content/BRAND-BRIEF.md)
 - [Offline gallery](gallery.html) — download the kit and open this HTML file locally.
 
