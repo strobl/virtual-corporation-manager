@@ -38,3 +38,7 @@ Use clear HTML type, asymmetrical compositions and restrained motion to establis
 - The refreshed native Lovable page is published and checked at the custom domain.
 
 The native page implementation lives in the existing Lovable project; this directory is its versioned brand source.
+
+## Compact social card
+
+The current website share card is [social-preview-simple.png](social-preview-simple.png): the VCM wordmark, the campaign line **Solo. Never small.**, and a single orange Vic holding a cobalt paper plane. The earlier team composition remains archived above. The simplified composition prioritizes readability in small messaging previews.
