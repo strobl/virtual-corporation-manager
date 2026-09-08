@@ -1,50 +1,45 @@
-![VCM — Big ideas deserve a team.](docs/images/vcm-readme-hero.png)
+[![VCM — Solo. Never small. An orange Vic holds a cobalt paper plane on cream.](docs/images/vcm-readme-solo.jpg)](https://virtualcorporationmanager.com/)
 
 <p align="center">
+  <a href="https://virtualcorporationmanager.com/">Website</a> ·
   <a href="#install-the-reviewed-archive"><strong>Get VCM →</strong></a> ·
   <a href="docs/developer-quickstart.md">Quickstart</a> ·
   <a href="docs/examples/README.md">Try the example</a> ·
   <a href="#build-the-team-bring-it-to-buzz">Buzz + Slack</a> ·
-  <a href="CONTRIBUTING.md">Contribute</a> ·
-  <a href="https://x.com/virtualcorpman">Follow VCM on X</a> ·
-  <a href="https://github.com/strobl/virtual-corporation-manager/tree/main/brand">Brand kit</a>
+  <a href="#contribute">Contribute</a>
 </p>
 
 # VCM — Virtual Corporation Manager
 
-**The open-source workspace for your virtual corporation.**
+**Big ideas deserve a team.**
 
-Big ideas deserve a team. Give yours a name, bring humans and AI agents into the same picture, and make everyone's responsibilities clear. Keep your company on your machine, ready for the next session.
+Bring people and AI agents into one local workspace. Give everyone a role, make responsibilities clear, and pick up where you left off.
 
-VCM is a free, MIT-licensed local workspace. Manage companies, members, departments, reporting lines, company relationships and recorded delivery hours. Review a change before saving it. No account, hosted database or telemetry is required for the local core.
+**Free and open source · MIT licensed · Local SQLite · No account required**
 
 ## Put your team in the picture
 
-![An illustrated VCM company with human and AI members and clear responsibilities](docs/images/vcm-team-map.png)
+| Your corporation                                                                           | Your team                                                                                 | Your context                                                                                              |
+| ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Start with a name and a purpose. Manage departments and company relationships as you grow. | Add humans and AI agents. Define responsibilities, shared membership and reporting lines. | Review changes before saving. Record work and delivery hours. Export your setup or back up the workspace. |
 
-| Start with an idea                                     | Give it a team                                                  | Keep the context                                                |
-| ------------------------------------------------------ | --------------------------------------------------------------- | --------------------------------------------------------------- |
-| Create a corporation with a name and optional purpose. | Add human and AI members, responsibilities and reporting lines. | Reopen the workspace, record work and hours, export or back up. |
-
-The diagram is an illustrated example. Membership and reporting lines describe your organization; they do not make agents execute automatically. One operator maintains the workspace locally. VCM is not a legal incorporation service or an equity register.
+The local core works offline with no hosted database, cloud inference, billing or telemetry. One operator maintains the workspace on their machine. Membership and reporting lines describe the organization; agent execution is a separate, optional action.
 
 ## See the workspace
 
-![Northstar Studio in the VCM brand: human and AI members, responsibilities and reporting](docs/images/product-brand-company.jpg)
+![The actual VCM interface showing Northstar Studio, human and AI members, responsibilities and reporting.](docs/images/product-brand-company.jpg)
 
-_Fictional company and member data in the actual company-management interface. The [capture record](docs/images/product-brand-provenance.json) identifies the source and viewport. This is not customer activity._
+_Actual company-management interface with fictional example data. [Screenshot provenance](docs/images/product-brand-provenance.json)._
 
-**Technical alpha — for developer evaluation.** The local core manages companies, human and AI members, and the existing Time Tracker. Optional execution remains experimental. Read the [acceptance record](docs/acceptance.md) for observed checks and remaining limits.
-
-**Current download: `0.1.0-alpha.9`.** This release brings the VCM brand into the product: native wordmark and companion, Rubik headings, warm cream surfaces, orange actions and cobalt selections. Company management and the Time Tracker retain their existing behavior. The [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.9) identifies its archive, source revision, checksum and verification. Alpha.8, Alpha.7, Alpha.6, alpha.5 and earlier candidates retain their own artifacts and evidence.
+> **Technical alpha — for developer evaluation.** The local core manages companies, members and the Time Tracker. Optional execution is experimental. [Current release: 0.1.0-alpha.9](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.9) · [Acceptance and limits](docs/acceptance.md)
 
 ## Install the reviewed archive
 
-Use **Node.js 24.14+ in the 24.x line, or Node 26.x**, with npm. The declared local-core targets are macOS, Linux and native Windows; consult the exact release's [OS/Node acceptance](docs/acceptance.md) rather than inferring a passing matrix from these targets. No database compiler, provider account or Python installation is needed for corporation management, the Time Tracker or the example below.
+You need **Node.js 24.14+ in the 24.x line, or Node 26.x**, with npm. No database compiler, Python or provider account is needed for the local core.
 
-Download `vcm-0.1.0-alpha.9.tgz` from the [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.9) and verify its SHA-256 against the attached `checksums.txt` and `release-manifest.json` before going offline. Keep those records with the source revision. The installed npm package remains `gitflash` for compatibility; the visible distribution archive uses the VCM filename. No npm registry namespace is required. You can also build this checkout with the source commands below.
-
-Run these commands in the directory containing that verified archive. They install into a separate folder and start its `vcm` binary:
+1. Download `vcm-0.1.0-alpha.9.tgz`, `checksums.txt` and `release-manifest.json` from the [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.9).
+2. Verify the archive's SHA-256 against those records before going offline. Keep the records with the source revision.
+3. Run these commands in the directory containing the verified archive:
 
 ```sh
 npm install --offline --ignore-scripts --prefix ./vcm-preview ./vcm-0.1.0-alpha.9.tgz
@@ -52,11 +47,21 @@ npm exec --offline --prefix ./vcm-preview -- vcm --version
 npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company
 ```
 
-Expected version: `0.1.0-alpha.9`. Open the loopback URL printed by the command if the browser does not open. Use the same working directory and `--data-dir` when restarting. Add `--port 4311` if 4310 is occupied, or `--no-open` to open the URL yourself.
+Expected version: `0.1.0-alpha.9`. Open the loopback URL printed by the command if the browser does not open. Restart from the same directory with the same `--data-dir` to reopen your company.
 
-**Run VCM with `vcm`.** Existing installations keep their workspace and settings. The archive retains its established package name for compatibility; see the [naming and compatibility contract](docs/branding.md).
+<details>
+<summary><strong>Platforms, launch options and package compatibility</strong></summary>
 
-To build a source checkout instead:
+The declared local-core targets are macOS, Linux and native Windows. Check the exact release's [OS/Node acceptance](docs/acceptance.md) for observed results. Add `--port 4311` if 4310 is occupied, or `--no-open` to open the URL yourself.
+
+Run VCM with `vcm`. The installed npm package remains `gitflash` for compatibility; the visible archive uses the VCM filename. No npm registry namespace is required. Existing installations keep their workspace and settings. [Naming and compatibility contract](docs/branding.md)
+
+Alpha.9 brings the VCM wordmark, companion, Rubik headings, warm cream surfaces, orange actions and cobalt selections into the product. Company management and the Time Tracker retain their existing behavior. Each earlier candidate retains its own release artifacts and evidence.
+
+</details>
+
+<details>
+<summary><strong>Build from source</strong></summary>
 
 ```sh
 npm ci --ignore-scripts
@@ -66,7 +71,18 @@ npm run pack:release
 
 Then use your generated archive with the install commands above. A build from a later checkout is distinct from the frozen release asset. Obtaining source and uncached development dependencies needs network access; the supplied archive and local core work offline. See the [source checkout route](CONTRIBUTING.md#fresh-checkout) for revision and review guidance.
 
+</details>
+
 ## Create and manage your corporation
+
+1. **Give it a name.** Open **Corporations → Create company**, enter a name and optional purpose, then review and confirm.
+2. **Bring in the team.** Choose **Add member**, select **Human** or **AI agent**, and add a role and responsibilities. Review the change before saving.
+3. **Keep building.** Add reporting lines and shared memberships, record completed work, or explicitly log delivery hours. Restart VCM to return to the same workspace.
+
+Prefer a starting point? Import the [fictional three-agent example](docs/examples/README.md) through **Settings → Import a company definition**. It includes a builder, reviewer and researcher, with no executed jobs or booked hours.
+
+<details>
+<summary><strong>Detailed walkthrough, work records and time tracking</strong></summary>
 
 1. Open **Corporations**. Choose **Create company**, or **Create your company** in an empty workspace. Enter **Company name** and optional **Purpose**; internal code and color receive defaults.
 2. Choose **Continue**, review the company, then **Create company**. **Back** preserves your draft; **Cancel** before confirmation creates nothing. The saved company opens with an empty team.
@@ -80,7 +96,32 @@ When real work exists, use **Log time** from the company or member context. **Ti
 
 A human member can use **Record work** to submit completed text for review. This creates a manual work record without a runtime ID or duration; it does not book time. Agent execution is a separate optional action.
 
-## Inspect and recover
+VCM is not a legal incorporation service or an equity register.
+
+</details>
+
+## Build the team. Bring it to Buzz.
+
+[![VCM × Buzz: an editorial campaign based on the native team-import preview with three example roles.](docs/images/vcm-integrations.png)](https://virtualcorporationmanager.com/integrations)
+
+Take your VCM team's AI roles, instructions and responsibilities into Buzz with a native team file. Preview the configuration before importing.
+
+1. **VCM:** Select your company, then **Tools → Connections → Export Buzz team**.
+2. **Buzz Desktop:** Open **Agents → Agent teams → Import** and select the `.team.json` file.
+3. **Review and confirm.** Set up the runtime separately; importing does not start agents.
+
+[Explore integrations](https://virtualcorporationmanager.com/integrations) · [Buzz setup](docs/integrations/buzz.md) · [Slack setup](docs/integrations/slack.md)
+
+Buzz configuration import has historical evidence. Buzz task dispatch and Slack round trips remain experimental. See [optional execution](#optional-execution) for prerequisites and observed limits.
+
+## Your workspace stays yours
+
+Keep your company locally in SQLite. Export a company definition to reuse its structure; make a full backup to preserve work records, artifacts, time entries and history.
+
+### Inspect and recover
+
+<details>
+<summary><strong>Export, backup, restore and uninstall commands</strong></summary>
 
 **Settings → Export company definition** downloads the current configuration as JSON. Import validates the whole definition and creates fresh IDs; it does not reconcile or overwrite existing companies. Export configuration for reuse and make a SQLite backup for full recovery.
 
@@ -99,19 +140,14 @@ The server binds to loopback. This is a single-operator local product, with no s
 
 To remove the isolated application, stop it and run `npm uninstall --prefix ./vcm-preview gitflash`. Your default and custom workspace directories remain intact.
 
-## Build the team. Bring it to Buzz.
+</details>
 
-![Editorial VCM campaign based on the native Buzz import preview with three example roles.](docs/images/vcm-integrations.png)
+### Optional execution
 
-Take your VCM team’s AI roles, instructions and responsibilities into Buzz with a native team file. Preview the configuration before importing.
+The local core runs without a provider account. Optional Codex execution uses your installed runtime, authenticated access and allowance. Configuring an agent or reporting line does not dispatch a task.
 
-1. **VCM:** Select your company, then **Tools → Connections → Export Buzz team**.
-2. **Buzz Desktop:** Open **Agents → Agent teams → Import** and select the `.team.json` file.
-3. **Review and confirm the configuration.** Set up the runtime separately; importing does not start agents.
-
-[Buzz setup guide](docs/integrations/buzz.md) · Using Slack? [Slack setup guide](docs/integrations/slack.md).
-
-## Optional execution
+<details>
+<summary><strong>Runtime requirements and incomplete execution journeys</strong></summary>
 
 **Product Studio PS-001 did not complete:** intake and one retry each timed out after 300 seconds at `ultra`. No v2 delivery bundle or owner acceptance exists. The earlier v1 download was rejected because its expected-reference file was missing. This optional useful-result journey remains incomplete. [Observed failures and evidence](docs/acceptance.md#technical-prerelease--6-september-2026)
 
@@ -119,16 +155,35 @@ Open **Tools → Agent runs & records** for optional execution and manual work r
 
 Codex execution requires your own installed runtime, authenticated provider access and allowance. Individual tasks return read-only text. The bounded **Product Studio** company workflow uses five sequential roles to create and check a Python stock-alert utility from fictional input. It needs a working macOS or Linux sandbox; its fixed checker is unavailable on native Windows, and stock Ubuntu 24.04 with restricted user namespaces is unsupported for that optional route. This is not an arbitrary workflow engine. Buzz native configuration import has historical evidence; Buzz task dispatch and Slack round trips remain experimental. [Integration prerequisites](docs/integrations.md) · [Product Studio contract](docs/product-studio.md)
 
+</details>
+
 ## Contribute
 
-Start with a small change you can demonstrate in an isolated workspace. [CONTRIBUTING](CONTRIBUTING.md) contains the checkout, build, example verification and review route. [Starter tasks](docs/developer-contributing.md) include bounded example, documentation and UI work with reproduction steps and acceptance criteria. All necessary context belongs in the repository and issue; private 8090 access and paid provider credentials are not prerequisites.
+**Play 2 win. Be adaptable. Never stop hacking. Hackers first. Be open.**
 
-`npm run check` runs types, tests and build. `npm run test:package` installs and exercises an actual offline tarball. Configured CI coverage is distinct from an observed passing run on the exact source. Historical acceptance remains in [release evidence](docs/acceptance.md); agent verification is not an external developer pilot.
+Help make VCM useful for the next person building a team. Start with a small change you can demonstrate in an isolated workspace. Public repository context is enough to contribute; private prototype access and paid provider credentials are not prerequisites.
+
+| Get started                                                                        | Make it better                                                                                          | Understand the project                         |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| [Contributor guide](CONTRIBUTING.md)                                               | [Starter tasks](docs/developer-contributing.md)                                                         | [Architecture](docs/developer-architecture.md) |
+| [Example company](docs/examples/README.md)                                         | [Report a bug](https://github.com/strobl/virtual-corporation-manager/issues/new?template=bug_report.md) | [Security](SECURITY.md)                        |
+| [Brand kit](https://github.com/strobl/virtual-corporation-manager/tree/main/brand) | [Follow VCM on X](https://x.com/virtualcorpman)                                                         | [Acceptance evidence](docs/acceptance.md)      |
+
+`npm run check` runs types, tests and build. `npm run test:package` installs and exercises an actual offline tarball. Configured CI coverage is distinct from an observed passing run on the exact source; agent verification is not an external developer pilot.
 
 ## License and provenance
+
+The complete current VCM core is [MIT licensed](LICENSE), including commercial use, hosting and forks subject to the MIT notice requirement. No Enterprise fee or company-size limit applies to the MIT core. [Licensing model](docs/licensing.md)
+
+<details>
+<summary><strong>Source, fonts and third-party notices</strong></summary>
 
 MIT for the application code. Useful organization, inspector and domain work was selectively adapted from the owner's prior prototype. Private history, hosted infrastructure and private/customer records were excluded. The Time Tracker bundles 124 owner-authorized Shared catalog definitions from the live prototype. Catalog provenance and complete upstream notices for bundled dependencies and adapted component patterns are in [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md).
 
 The retained Rubik Bold font keeps its SIL OFL 1.1 attribution in `dist/web/fonts/Rubik-OFL-1.1.txt`. The VCM interface uses system fonts and native SVG assets; historical third-party attribution remains in the notices.
 
 The complete current VCM core is MIT licensed, including commercial use, hosting and forks subject to the MIT notice requirement. Optional, newly developed Enterprise components may be offered separately under their own license. No Enterprise fee or company-size limit applies to the MIT core. See the [licensing model](docs/licensing.md) for the component, service and contribution boundaries.
+
+The README header is a JPEG export of the approved [homepage share artwork](https://github.com/strobl/virtual-corporation-manager/blob/main/brand/homepage/living-team/social-preview-simple.png). [Artwork provenance](docs/images/vcm-readme-provenance.json).
+
+</details>
