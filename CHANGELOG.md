@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-alpha.9 — The VCM brand, inside the product
+
+- Apply the canonical VCM wordmark, original V-shaped companion, Rubik Bold, cream, orange, cobalt, mint and butter across navigation, company setup, the company index, member details, forms and the Time Tracker.
+- Give people and agents distinct labelled avatars, emphasize selected records, and retain compact working tables with responsive layouts and keyboard focus states.
+- Consolidate the product palette in shared tokens. Bundle every font and illustration locally with the existing license notices.
+- Preserve company data, review actions, time calculations, optional execution and CLI compatibility. No schema migration or service requirement is added.
+
 ## 0.1.0-alpha.8 — VCM distribution filenames
 
 - Use `vcm-<version>.tgz` for the visible GitHub archive and `vcm-*` for user-facing company, time, workflow and work-result downloads.

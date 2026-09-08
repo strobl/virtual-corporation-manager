@@ -636,7 +636,7 @@ export function App() {
         </button>
         <a className="brand" href="/" aria-label={`${brand.name} home`}>
           <span className="brand-copy">
-            <img className="brand-lockup" src="/vcm-lockup.svg" width={123} height={34} alt="" />
+            <img className="brand-lockup" src="/vcm-lockup.svg" width={116} height={43} alt="" />
             <small>{brand.descriptor}</small>
           </span>
           <span className="local-badge">local</span>
@@ -730,6 +730,10 @@ export function App() {
           )}
         </div>
         <div className="sidebar-bottom">
+          <div className="sidebar-brand-note">
+            <img src="/vic.svg" alt="" width={29} height={32} />
+            <span>Solo. Never small.</span>
+          </div>
           <details
             className="company-utilities"
             open={['work', 'integrations', 'organization'].includes(area) || undefined}

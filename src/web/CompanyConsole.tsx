@@ -8,7 +8,6 @@ import {
   Pencil,
   Plus,
   Search,
-  Users,
   X,
 } from 'lucide-react';
 import type { WorkspaceState } from '../domain/contracts';
@@ -504,8 +503,14 @@ export function CompanyConsole({
               </>
             ) : (
               <div className="console-empty-team">
-                <Users size={26} aria-hidden="true" />
-                <h2>A company starts with its people.</h2>
+                <img
+                  className="console-empty-companion"
+                  src="/vic.svg"
+                  alt=""
+                  width={64}
+                  height={69}
+                />
+                <h2>Great things start with a team.</h2>
                 <p>
                   Add an agent or a human. Give them a role and responsibilities; organize
                   departments whenever you need them.

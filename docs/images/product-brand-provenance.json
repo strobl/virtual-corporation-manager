@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "product": "VCM \u2014 Virtual Corporation Manager",
+  "version": "0.1.0-alpha.9",
+  "capturedAt": "2026-09-08T09:38:12.458151+00:00",
+  "method": "Unedited screenshots from the mounted in-app browser, rendering the source-built product.",
+  "data": "Fictional Northstar Studio, human Alex Morgan and agent Sage created through the product UI in a separate local workspace. No provider request or execution was triggered. These are QA examples, not installation defaults or customer activity.",
+  "sourceBase": "02570bb8e658225b650bd3b0eeb5bbec745ff3c3",
+  "sourceFileHashes": {
+    "index.html": "8603407ea001459fd270b071a7eb9102474576fbcff2d3030729eaae39b9da2a",
+    "public/fonts/Rubik-Bold.ttf": "b1c36dfcbc5fe5011c552c76725c84d989a71d56440e8bfbfa0cb68b593dbad6",
+    "public/fonts/Rubik-OFL-1.1.txt": "a1d9cc536b8327829aaaeb6957bb105d6926b0a45766050257c1461ac519b575",
+    "public/vcm-favicon.svg": "7dd20471c9aad1dd40c686b6a2acd146db2c34c442e6bbcb5e9e5427f78820fd",
+    "public/vcm-glyph.svg": "7dd20471c9aad1dd40c686b6a2acd146db2c34c442e6bbcb5e9e5427f78820fd",
+    "public/vcm-lockup.svg": "d31287a3bf9924d6d2a3b89826e03e8717f569286886a67c2e301647bd0cd605",
+    "public/vcm-wordmark.svg": "d31287a3bf9924d6d2a3b89826e03e8717f569286886a67c2e301647bd0cd605",
+    "public/vic.svg": "d403a272d744a65fec6bd682b258f8c28fac19834d47696c4f7a6eec4750ab4f",
+    "src/brand.ts": "0e35849adf947269b934ebc5bdc41610f2b7a16debc324018a4f02c7b070e7b4",
+    "src/web/AdvancedDialogs.tsx": "323f2a46c9cb615f2092771f982cad4a8de348c906195d0a5bd25e703dcdbb7a",
+    "src/web/AgentPlacement.tsx": "dadbf67f6fc0c991f9e82c110aa48252909b33ae3a802aba1f636959bbd06d2c",
+    "src/web/App.tsx": "12311147fe29e163aaa4585325e7de21e9af55f7d00002a61444a41d6f13cb06",
+    "src/web/BrandMark.tsx": "a22d9c198b84e03763a942132f8087737bba9ed5c0687798eeb054948689da92",
+    "src/web/CompanyConsole.tsx": "3eb1031c61769556904075f6a281fdd52e05ef331d353ae3733ed9e259c4bc8e",
+    "src/web/CompanyMap.tsx": "7def4d8d90327a235526f3124ff918787fd317fcf7e151529749f6b0887580ea",
+    "src/web/CorporationSetup.tsx": "f37cda96c2e4c9910faee93cc46d951fcbf4f617ee83a6ac2ce715928a09d6fd",
+    "src/web/CorporationWorkspace.tsx": "3b4d70d82ffac3c557d0fbed3ce726aee239ceca2de3586c3aaadc779b741c68",
+    "src/web/Dialogs.tsx": "a14d225bd94240af9b9fa74455ba2629d361fe29330f5f95b8b67b3b26b15ae8",
+    "src/web/HumanResultDialog.tsx": "7fd28510768328fbc3bf4b3adbcd7126f6176a3d16ac79b6cfc6bba78821a369",
+    "src/web/Jobs.tsx": "78bdcfc68c309e84e5d23f2ceb7446eb82d26a7d6a5b921c87311d07aa83e46c",
+    "src/web/QuickCompanySetup.tsx": "9438801906e985cc903ac1d7c7fed7705c6bfc590214a09c7ed8fe5da3e826a9",
+    "src/web/TextDisclosure.tsx": "658c3b591916ed70d7671c1d8bc1d1ca4df3cb93d1cfd3bdeb6afde466218ae2",
+    "src/web/TimeTracker.tsx": "c70c8f55e6b67fecc51cc071f0e2cd0fb8de397967bc2c971218d0f8391fd05d",
+    "src/web/Work.tsx": "131fb9d7608ff793e703766e7b085316e72e84192b7fadc05101431633db03e4",
+    "src/web/brand-candidate.css": "3f2a3fd644f6af4a5b25b5cd751d4621df9498f9ab69257c6edc1081f725458e",
+    "src/web/company-console.css": "771eaf1d411cad334aa3ee58139226f39fd55831510ebd825bf2fc5dfe1a6fae",
+    "src/web/corporation.css": "712adfb2004f91f775a46bf20525af5322c1eaa721e65d5ce3f896a241b57b89",
+    "src/web/jobs.css": "2e3b5b3f2e03af926a6795102505ea171d2588ed31b879fee462cd7086faaae5",
+    "src/web/main.tsx": "97ea0530aea9dc22eec79fc3df14ab99e394bc46659af087f20afb9539f25776",
+    "src/web/styles.css": "829fd67e22e1480c95a79750a4e58a12b29fa45e65e64b0c84bb40398066d690",
+    "src/web/vcm.css": "82735d4d06c66670233b7f658cdb5220e3a06d672d3d0e9737fc20c8badb865b"
+  },
+  "servedAssets": {
+    "assets/index-Cikgo-k4.css": "103f39ccc465b405cb9f5c8388ecd481e2201b2a1814a365961397f1f7334b18",
+    "assets/index-DnBPDWQm.js": "0bdbf7b3b76c3b0365a6a9cf3e733f65ccb0112ca4b0ee2f5818406041cf1376",
+    "fonts/Rubik-Bold.ttf": "b1c36dfcbc5fe5011c552c76725c84d989a71d56440e8bfbfa0cb68b593dbad6",
+    "fonts/Rubik-OFL-1.1.txt": "a1d9cc536b8327829aaaeb6957bb105d6926b0a45766050257c1461ac519b575",
+    "index.html": "875934a891b935361d197e46e311b31bb95e3de6da8f3184c1a5fcba70c3e659",
+    "vcm-favicon.svg": "7dd20471c9aad1dd40c686b6a2acd146db2c34c442e6bbcb5e9e5427f78820fd",
+    "vcm-glyph.svg": "7dd20471c9aad1dd40c686b6a2acd146db2c34c442e6bbcb5e9e5427f78820fd",
+    "vcm-lockup.svg": "d31287a3bf9924d6d2a3b89826e03e8717f569286886a67c2e301647bd0cd605",
+    "vcm-wordmark.svg": "d31287a3bf9924d6d2a3b89826e03e8717f569286886a67c2e301647bd0cd605",
+    "vic.svg": "d403a272d744a65fec6bd682b258f8c28fac19834d47696c4f7a6eec4750ab4f"
+  },
+  "captures": {
+    "desktop": {
+      "file": "product-brand-company.png",
+      "sha256": "7eb6fd34fb44965aa5734503eddaf1b6355fa95396fbe2a3a989ab4730c71a7f",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    "mobile": {
+      "file": "product-brand-mobile.png",
+      "sha256": "4bab94663e745fafc7acd7b2975a6d65838ee1c8faea05190871f2a62c23993c",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    }
+  }
+}

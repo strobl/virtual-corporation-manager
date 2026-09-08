@@ -3,7 +3,7 @@
 @import 'tw-animate-css';
 
 @font-face {
-  font-family: 'GitFlash Rubik';
+  font-family: 'VCM Rubik';
   src: url('/fonts/Rubik-Bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
@@ -120,25 +120,30 @@
 }
 
 :root {
-  --flash-canvas: #f7f1e5;
+  --brand-orange: #ff5a2a;
+  --brand-cobalt: #2d4df0;
+  --brand-mint: #a8ded0;
+  --brand-butter: #f7d85b;
+  --brand-font: 'VCM Rubik', Arial, sans-serif;
+  --flash-canvas: #f6f3e8;
   --flash-surface: #ffffff;
-  --flash-surface-muted: #fbf8f1;
-  --flash-ink: #1c211f;
-  --flash-brand: #ef3b24;
-  --flash-brand-border: #bd2c19;
-  --flash-teal: #244add;
-  --flash-muted: #56625b;
-  --flash-border: #d3d8d0;
-  --flash-soft: #eee8dd;
-  --flash-control: #748177;
-  --flash-hover: #f6f0e5;
-  --flash-selected: #f9ce55;
-  --flash-console-control: #34433a;
-  --flash-console-border: #94a79b;
-  --flash-stage-surface: #f7f1e5;
-  --flash-stage-border: #ef3b24;
-  --flash-teal-soft: #ecefff;
-  --flash-teal-ink: #244add;
+  --flash-surface-muted: #fcfaf3;
+  --flash-ink: #17252a;
+  --flash-brand: #ff5a2a;
+  --flash-brand-border: #c13c16;
+  --flash-teal: #2d4df0;
+  --flash-muted: #58625f;
+  --flash-border: #d6d5c9;
+  --flash-soft: #eeece0;
+  --flash-control: #8e9488;
+  --flash-hover: #eeeee3;
+  --flash-selected: #e8ecff;
+  --flash-console-control: #17252a;
+  --flash-console-border: #8e9488;
+  --flash-stage-surface: #f6f3e8;
+  --flash-stage-border: #ff5a2a;
+  --flash-teal-soft: #e8ecff;
+  --flash-teal-ink: #2d4df0;
   --flash-amber-soft: #f3dec0;
   --flash-amber-ink: #674217;
   --flash-violet-soft: #e4deef;
@@ -208,7 +213,7 @@
   --state-selected-foreground: var(--flash-ink);
   --state-disabled: var(--flash-soft);
   --state-disabled-foreground: var(--flash-muted);
-  --focus: var(--flash-ink);
+  --focus: var(--brand-cobalt);
 
   /* Status */
   --danger: var(--flash-failed-ink);
@@ -361,7 +366,7 @@ p {
   min-height: 100dvh;
   line-height: 1.55;
   --gf-accent: var(--brand-accent, var(--flash-brand));
-  --flash-brand: var(--brand-accent, #ef3b24);
+  --flash-brand: var(--brand-accent, #ff5a2a);
 }
 .sidebar {
   position: fixed;
@@ -2369,7 +2374,7 @@ textarea:focus-visible,
   max-width: 1320px;
 }
 .welcome h1 {
-  font-family: 'GitFlash Rubik', var(--console-font-sans);
+  font-family: 'VCM Rubik', var(--console-font-sans);
   font-size: clamp(42px, 4.4vw, 68px);
   line-height: 1.02;
   letter-spacing: -0.045em;
@@ -3010,6 +3015,8 @@ textarea:focus-visible,
   border-color: var(--flash-border);
 }
 .dialog-header h2 {
+  font-family: var(--brand-font);
+  font-weight: 700;
   color: var(--flash-ink);
 }
 @media (min-width: 1550px) {

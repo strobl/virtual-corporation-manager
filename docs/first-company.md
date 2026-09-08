@@ -4,17 +4,17 @@ Create a company, add its people and agents, and keep their responsibilities att
 
 ## Install VCM
 
-This guide accompanies the **`0.1.0-alpha.8` distribution-name maintenance release**. Obtain the matching versioned archive and verify its source revision and SHA-256 using the [README instructions](../README.md#install-the-reviewed-archive), or build this checkout. The release manifest records its actual verification. Published Alpha 7, [alpha.6 branding maintenance](acceptance.md#branding-maintenance-release--6-september-2026) and [alpha.5 technical release](acceptance.md#technical-prerelease--6-september-2026) retain their own evidence and earlier interfaces.
+This guide accompanies the **`0.1.0-alpha.9` product-brand release**. Obtain the matching versioned archive and verify its source revision and SHA-256 using the [README instructions](../README.md#install-the-reviewed-archive), or build this checkout. The release manifest records its actual verification. Published Alpha 7, [alpha.6 branding maintenance](acceptance.md#branding-maintenance-release--6-september-2026) and [alpha.5 technical release](acceptance.md#technical-prerelease--6-september-2026) retain their own evidence and earlier interfaces.
 
 Use Node.js **24.14+ within 24.x, or 26.x**, with npm. From the directory containing the verified archive:
 
 ```sh
-npm install --offline --ignore-scripts --prefix ./vcm-preview ./vcm-0.1.0-alpha.8.tgz
+npm install --offline --ignore-scripts --prefix ./vcm-preview ./vcm-0.1.0-alpha.9.tgz
 npm exec --offline --prefix ./vcm-preview -- vcm --version
 npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./vcm-first-company --no-open
 ```
 
-Expected version: `0.1.0-alpha.8`. Keep it with the archive checksum for support. Open the loopback URL printed in the terminal; add `--port 4311` if the default port is occupied. Use a new data directory for this exercise. Stop with Ctrl+C and restart with the same working directory and `--data-dir` to reopen it. Existing installations retain their data-directory and command compatibility; see [naming and compatibility](branding.md).
+Expected version: `0.1.0-alpha.9`. Keep it with the archive checksum for support. Open the loopback URL printed in the terminal; add `--port 4311` if the default port is occupied. Use a new data directory for this exercise. Stop with Ctrl+C and restart with the same working directory and `--data-dir` to reopen it. Existing installations retain their data-directory and command compatibility; see [naming and compatibility](branding.md).
 
 ## Create and return to your company
 

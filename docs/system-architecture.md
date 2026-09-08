@@ -1,6 +1,6 @@
 # VCM system architecture
 
-This is the source map for the `0.1.0-alpha.8` corporation-management technical prerelease. VCM is a local workspace for one operator to maintain companies, human and AI members, responsibilities, reporting, membership and company relationships, and explicitly book delivery hours. Optional execution uses the operator's tools and provider access. The [product contract](product/corporation-management.md), [architecture overview](architecture.md), [contributor model](developer-architecture.md) and [acceptance evidence](acceptance.md) provide the surrounding contracts. Earlier local acceptance and published alpha.5/alpha.6 evidence retain their original source and package identities.
+This is the source map for the `0.1.0-alpha.9` corporation-management technical prerelease. VCM is a local workspace for one operator to maintain companies, human and AI members, responsibilities, reporting, membership and company relationships, and explicitly book delivery hours. Optional execution uses the operator's tools and provider access. The [product contract](product/corporation-management.md), [architecture overview](architecture.md), [contributor model](developer-architecture.md) and [acceptance evidence](acceptance.md) provide the surrounding contracts. Earlier local acceptance and published alpha.5/alpha.6 evidence retain their original source and package identities.
 
 ## Three core containers
 
