@@ -1,0 +1,108 @@
+{
+  "assets": [
+    {
+      "id": "01-conversation",
+      "width": 1600,
+      "height": 640,
+      "bytes": 66541,
+      "clipped": []
+    },
+    {
+      "id": "02-buzz-team",
+      "width": 1600,
+      "height": 900,
+      "bytes": 90277,
+      "clipped": []
+    },
+    {
+      "id": "03-slack-mention",
+      "width": 1600,
+      "height": 900,
+      "bytes": 79992,
+      "clipped": []
+    },
+    {
+      "id": "04-local-open",
+      "width": 1600,
+      "height": 900,
+      "bytes": 85330,
+      "clipped": []
+    },
+    {
+      "id": "05-meet-the-channel",
+      "width": 1080,
+      "height": 1080,
+      "bytes": 65610,
+      "clipped": []
+    },
+    {
+      "id": "06-slack-app-icon",
+      "width": 512,
+      "height": 512,
+      "bytes": 4468,
+      "clipped": []
+    },
+    {
+      "id": "07-buzz-agent-avatar",
+      "width": 512,
+      "height": 512,
+      "bytes": 6085,
+      "clipped": []
+    },
+    {
+      "id": "08-community-cover",
+      "width": 1600,
+      "height": 400,
+      "bytes": 30781,
+      "clipped": []
+    }
+  ],
+  "gallery": [
+    {
+      "width": 1440,
+      "overflow": false,
+      "missingImages": 0,
+      "posts": 6
+    },
+    {
+      "width": 390,
+      "overflow": false,
+      "missingImages": 0,
+      "posts": 6
+    }
+  ],
+  "drafts": [
+    {
+      "id": "connections-intro",
+      "channel": "X",
+      "weightedCharacters": 209
+    },
+    {
+      "id": "buzz-team",
+      "channel": "X",
+      "weightedCharacters": 194
+    },
+    {
+      "id": "slack-mention",
+      "channel": "X",
+      "weightedCharacters": 219
+    },
+    {
+      "id": "local-open",
+      "channel": "X",
+      "weightedCharacters": 209
+    },
+    {
+      "id": "buzz-community",
+      "channel": "Buzz.xyz",
+      "weightedCharacters": 542
+    },
+    {
+      "id": "slack-community",
+      "channel": "Slack",
+      "weightedCharacters": 547
+    }
+  ],
+  "livePlatformExecution": "not tested",
+  "publication": "drafts only"
+}

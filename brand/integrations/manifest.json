@@ -1,0 +1,88 @@
+{
+  "brand": "VCM — Virtual Corporation Manager",
+  "brandLine": "Big ideas deserve a team.",
+  "created": "2026-09-08",
+  "sourceIdentity": "../assets/",
+  "assets": [
+    {
+      "id": "01-conversation",
+      "width": 1600,
+      "height": 640,
+      "purpose": "README integration banner",
+      "alt": "VCM: Your team. In the conversation. Organize in VCM and explore optional Buzz.xyz and Slack connections. Team import and experimental task connections.",
+      "status": "Configuration import; execution experimental",
+      "svg": "exports/01-conversation.svg",
+      "png": "exports/01-conversation.png"
+    },
+    {
+      "id": "02-buzz-team",
+      "width": 1600,
+      "height": 900,
+      "purpose": "Buzz team-import social card",
+      "alt": "Give your agents a room. Export a VCM team file, review its roles and instructions in Buzz, then configure the runtime separately before starting agents. Orange Vic companions stand beside three steps.",
+      "status": "Configuration transfer; no activation implied",
+      "svg": "exports/02-buzz-team.svg",
+      "png": "exports/02-buzz-team.png"
+    },
+    {
+      "id": "03-slack-mention",
+      "width": 1600,
+      "height": 900,
+      "purpose": "Slack task-flow social card",
+      "alt": "A mention. A mission. An illustrated Slack flow: an owner mentions VCM and names a Reviewer task; the local runtime executes and returns the result to the thread. Experimental; one allowed owner and channel.",
+      "status": "Illustrated flow; live execution unverified",
+      "svg": "exports/03-slack-mention.svg",
+      "png": "exports/03-slack-mention.png"
+    },
+    {
+      "id": "04-local-open",
+      "width": 1600,
+      "height": 900,
+      "purpose": "Integration architecture explainer",
+      "alt": "Local roots. Open doors. Two separate routes: VCM team configuration exports to Buzz Desktop; an allowed Slack mention goes to local VCM and Codex, then returns a threaded reply. The core works offline; connections need external setup.",
+      "status": "Architecture illustration; execution experimental",
+      "svg": "exports/04-local-open.svg",
+      "png": "exports/04-local-open.png"
+    },
+    {
+      "id": "05-meet-the-channel",
+      "width": 1080,
+      "height": 1080,
+      "purpose": "Square community campaign",
+      "alt": "Big ideas. Meet the channel. Organize your team in VCM and explore optional Buzz.xyz and Slack connections. Team import; experimental task connections. The original orange Vic appears on cream.",
+      "status": "Campaign illustration",
+      "svg": "exports/05-meet-the-channel.svg",
+      "png": "exports/05-meet-the-channel.png"
+    },
+    {
+      "id": "06-slack-app-icon",
+      "width": 512,
+      "height": 512,
+      "purpose": "VCM Slack app icon",
+      "alt": "Original VCM identity for a user-configured Slack app.",
+      "status": "Identity asset; upload manually",
+      "svg": "exports/06-slack-app-icon.svg",
+      "png": "exports/06-slack-app-icon.png"
+    },
+    {
+      "id": "07-buzz-agent-avatar",
+      "width": 512,
+      "height": 512,
+      "purpose": "VCM Buzz agent avatar",
+      "alt": "Original VCM identity for a user-configured Buzz agent profile.",
+      "status": "Identity asset; upload manually",
+      "svg": "exports/07-buzz-agent-avatar.svg",
+      "png": "exports/07-buzz-agent-avatar.png"
+    },
+    {
+      "id": "08-community-cover",
+      "width": 1600,
+      "height": 400,
+      "purpose": "Community announcement cover",
+      "alt": "VCM. Big ideas deserve a team. Bring yours into the conversation. Buzz.xyz and Slack. Orange Vic on cream.",
+      "status": "Editorial cover; no platform placement guarantee",
+      "svg": "exports/08-community-cover.svg",
+      "png": "exports/08-community-cover.png"
+    }
+  ]
+}

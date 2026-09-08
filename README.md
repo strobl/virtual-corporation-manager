@@ -4,6 +4,7 @@
   <a href="#install-the-reviewed-archive"><strong>Get VCM →</strong></a> ·
   <a href="docs/developer-quickstart.md">Quickstart</a> ·
   <a href="docs/examples/README.md">Try the example</a> ·
+  <a href="docs/integrations/README.md">Buzz.xyz + Slack</a> ·
   <a href="CONTRIBUTING.md">Contribute</a> ·
   <a href="https://x.com/virtualcorpman">Follow VCM on X</a> ·
   <a href="https://github.com/strobl/virtual-corporation-manager/tree/main/brand">Brand kit</a>
@@ -97,6 +98,19 @@ Backups preserve configuration, work and job records, artifact bytes, time entri
 The server binds to loopback. This is a single-operator local product, with no shared accounts or supported LAN/tunnel hosting. See [architecture and data boundaries](docs/developer-architecture.md) and [security](SECURITY.md).
 
 To remove the isolated application, stop it and run `npm uninstall --prefix ./vcm-preview gitflash`. Your default and custom workspace directories remain intact.
+
+## Your team. In the conversation.
+
+![VCM with optional Buzz.xyz and Slack connections: team import and experimental tasks](docs/images/vcm-integrations.png)
+
+Organize in VCM. Bring your AI roles into Buzz.xyz, or explore focused tasks from Slack.
+
+| Buzz.xyz — Give your agents a room.                                                                                                       | Slack — A mention. A mission.                                                                         |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Export active AI roles and instructions as a native team file. Preview the import in Buzz Desktop, then configure the runtime separately. | An allowed owner mentions a named role. Local Codex runs the task and VCM replies in the same thread. |
+| [Buzz setup guide](docs/integrations/buzz.md)                                                                                             | [Slack setup guide and app manifest](docs/integrations/slack.md)                                      |
+
+Connections are optional. Buzz native import has historical evidence; Buzz task execution and Slack round trips remain experimental, with live useful-result acceptance still open. The graphic illustrates the routes. [Integration overview](docs/integrations/README.md) · [Campaign images, app icons and post drafts](https://github.com/strobl/virtual-corporation-manager/tree/main/brand/integrations)
 
 ## Optional execution
 
