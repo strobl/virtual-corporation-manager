@@ -65,16 +65,21 @@ export function CorporationWorkspace({
   if (!companies.length) {
     return (
       <section className="corporation-empty" aria-labelledby="corporation-empty-title">
-        <span className="eyebrow">Virtual Corporation Manager</span>
-        <h1 id="corporation-empty-title">Your companies, in one place.</h1>
-        <p>Manage your virtual corporations and the agents and people behind them.</p>
-        <div className="welcome-actions">
-          <button className="button primary large" onClick={actions.onCreate}>
-            Create your company <ArrowRight size={17} />
-          </button>
-          <button className="button" onClick={actions.onBrowseTemplates}>
-            <Layers3 size={16} /> Browse templates
-          </button>
+        <div className="corporation-welcome-hero">
+          <div className="corporation-welcome-copy">
+            <span className="eyebrow">Virtual Corporation Manager</span>
+            <h1 id="corporation-empty-title">Big ideas deserve a team.</h1>
+            <p>Start your company. Bring people and agents together. Build what comes next.</p>
+            <div className="welcome-actions">
+              <button className="button primary large" onClick={actions.onCreate}>
+                Create your company <ArrowRight size={17} />
+              </button>
+              <button className="button" onClick={actions.onBrowseTemplates}>
+                <Layers3 size={16} /> Browse templates
+              </button>
+            </div>
+          </div>
+          <img className="corporation-welcome-art" src="/vic.svg" alt="" width={140} height={150} />
         </div>
         <p className="corporation-local-note">
           Start with a name. Add your team and its responsibilities when you are ready.
@@ -91,6 +96,10 @@ export function CorporationWorkspace({
   if (mode === 'index' || !company) {
     return (
       <section className="corporations-index" aria-labelledby="corporations-title">
+        <div className="corporation-brand-line">
+          <p>Big ideas deserve a team.</p>
+          <img src="/vic.svg" alt="" width={48} height={52} />
+        </div>
         <div className="corporation-page-heading">
           <div>
             <span className="eyebrow">Virtual Corporation Manager</span>

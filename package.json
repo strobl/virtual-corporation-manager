@@ -1,6 +1,6 @@
 {
   "name": "gitflash",
-  "version": "0.1.0-alpha.8",
+  "version": "0.1.0-alpha.9",
   "description": "VCM — Virtual Corporation Manager: manage companies, people, AI agents and recorded hours locally",
   "type": "module",
   "license": "MIT",

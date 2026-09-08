@@ -29,29 +29,29 @@ The diagram is an illustrated example. Membership and reporting lines describe y
 
 ## See the workspace
 
-![Linden Studio company workspace with a human member, responsibilities and reporting](docs/images/corporation-desktop.png)
+![Northstar Studio in the VCM brand: human and AI members, responsibilities and reporting](docs/images/product-brand-company.jpg)
 
-_Fictional company and member data in the actual company-management interface. The [capture record](docs/images/corporation-provenance.json) identifies the source and viewport. This is not customer activity._
+_Fictional company and member data in the actual company-management interface. The [capture record](docs/images/product-brand-provenance.json) identifies the source and viewport. This is not customer activity._
 
 **Technical alpha — for developer evaluation.** The local core manages companies, human and AI members, and the existing Time Tracker. Optional execution remains experimental. Read the [acceptance record](docs/acceptance.md) for observed checks and remaining limits.
 
-**Current download: `0.1.0-alpha.8`.** This distribution-name maintenance release uses the VCM-named archive for the simplified company workspace. The [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.8) identifies its archive, source revision, checksum and verification. Alpha.7, Alpha.6, alpha.5 and earlier candidates retain their own artifacts and evidence.
+**Current download: `0.1.0-alpha.9`.** This release brings the VCM brand into the product: native wordmark and companion, Rubik headings, warm cream surfaces, orange actions and cobalt selections. Company management and the Time Tracker retain their existing behavior. The [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.9) identifies its archive, source revision, checksum and verification. Alpha.8, Alpha.7, Alpha.6, alpha.5 and earlier candidates retain their own artifacts and evidence.
 
 ## Install the reviewed archive
 
 Use **Node.js 24.14+ in the 24.x line, or Node 26.x**, with npm. The declared local-core targets are macOS, Linux and native Windows; consult the exact release's [OS/Node acceptance](docs/acceptance.md) rather than inferring a passing matrix from these targets. No database compiler, provider account or Python installation is needed for corporation management, the Time Tracker or the example below.
 
-Download `vcm-0.1.0-alpha.8.tgz` from the [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.8) and verify its SHA-256 against the attached `checksums.txt` and `release-manifest.json` before going offline. Keep those records with the source revision. The installed npm package remains `gitflash` for compatibility; the visible distribution archive uses the VCM filename. No npm registry namespace is required. You can also build this checkout with the source commands below.
+Download `vcm-0.1.0-alpha.9.tgz` from the [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.9) and verify its SHA-256 against the attached `checksums.txt` and `release-manifest.json` before going offline. Keep those records with the source revision. The installed npm package remains `gitflash` for compatibility; the visible distribution archive uses the VCM filename. No npm registry namespace is required. You can also build this checkout with the source commands below.
 
 Run these commands in the directory containing that verified archive. They install into a separate folder and start its `vcm` binary:
 
 ```sh
-npm install --offline --ignore-scripts --prefix ./vcm-preview ./vcm-0.1.0-alpha.8.tgz
+npm install --offline --ignore-scripts --prefix ./vcm-preview ./vcm-0.1.0-alpha.9.tgz
 npm exec --offline --prefix ./vcm-preview -- vcm --version
 npm exec --offline --prefix ./vcm-preview -- vcm --data-dir ./my-company
 ```
 
-Expected version: `0.1.0-alpha.8`. Open the loopback URL printed by the command if the browser does not open. Use the same working directory and `--data-dir` when restarting. Add `--port 4311` if 4310 is occupied, or `--no-open` to open the URL yourself.
+Expected version: `0.1.0-alpha.9`. Open the loopback URL printed by the command if the browser does not open. Use the same working directory and `--data-dir` when restarting. Add `--port 4311` if 4310 is occupied, or `--no-open` to open the URL yourself.
 
 **Run VCM with `vcm`.** Existing installations keep their workspace and settings. The archive retains its established package name for compatibility; see the [naming and compatibility contract](docs/branding.md).
 

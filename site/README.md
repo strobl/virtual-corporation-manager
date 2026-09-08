@@ -12,9 +12,9 @@ Check the homepage and Docs install blocks, command-copy success/failure feedbac
 
 ## Alpha 8 distribution-name maintenance handoff
 
-This site accompanies the **0.1.0-alpha.8 distribution-name maintenance release**. Publish the site only after Engineering verifies the actual release, public archive download and displayed installation commands. The exact release asset is:
+This site accompanies the **0.1.0-alpha.9 product-brand release**. Publish the site only after Engineering verifies the actual release, public archive download and displayed installation commands. The exact release asset is:
 
-`https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.8/vcm-0.1.0-alpha.8.tgz`
+`https://github.com/strobl/virtual-corporation-manager/releases/download/v0.1.0-alpha.9/vcm-0.1.0-alpha.9.tgz`
 
 The displayed command installs the compatibility package from the VCM-named archive into `./vcm-preview` without lifecycle scripts, checks `vcm --version`, and starts with explicit `./my-company` data. Requires Node.js `>=24.14.0 <25 || >=26.0.0 <27` and npm. The download needs network access; installed local core operation does not. The package name remains `gitflash`; `vcm` is canonical and `gitflash` a compatibility alias. No public npm namespace is assumed.
 

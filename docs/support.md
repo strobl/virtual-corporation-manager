@@ -1,6 +1,6 @@
 # VCM support
 
-Use this guide for company setup, team management, delivery-hours and optional Product Studio problems. Follow the [README installation route](../README.md#install-the-reviewed-archive) and [first-company instructions](first-company.md) for the local setup journey. **Version:** `0.1.0-alpha.8`. Exact installed-package and browser acceptance is recorded separately in [acceptance](acceptance.md); alpha.5 and alpha.6 evidence is historical and does not establish acceptance of this interface.
+Use this guide for company setup, team management, delivery-hours and optional Product Studio problems. Follow the [README installation route](../README.md#install-the-reviewed-archive) and [first-company instructions](first-company.md) for the local setup journey. **Version:** `0.1.0-alpha.9`. Exact installed-package and browser acceptance is recorded separately in [acceptance](acceptance.md); alpha.5 and alpha.6 evidence is historical and does not establish acceptance of this interface.
 
 ## Corporation and hours recovery
 

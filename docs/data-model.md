@@ -2,7 +2,7 @@
 
 VCM stores companies, human and AI members, their structure and responsibilities, execution records, workflow artifacts and Time Tracker in one SQLite database: `workspace.sqlite` inside the workspace directory. The default directory is `~/.gitflash`; `--data-dir` or `GITFLASH_DATA_DIR` selects another directory. There is no account, hosted database or model requirement for managing a company or booking delivery hours.
 
-This describes the `0.1.0-alpha.8` corporation-management release model. The [product contract](product/corporation-management.md) changes the primary management experience while retaining the existing domain identities, graph rules and SQLite schema. Published alpha.5/alpha.6 evidence is historical; exact acceptance belongs in the [acceptance record](acceptance.md).
+This describes the `0.1.0-alpha.9` corporation-management release model. The [product contract](product/corporation-management.md) changes the primary management experience while retaining the existing domain identities, graph rules and SQLite schema. Published alpha.5/alpha.6 evidence is historical; exact acceptance belongs in the [acceptance record](acceptance.md).
 
 ## Company structure
 

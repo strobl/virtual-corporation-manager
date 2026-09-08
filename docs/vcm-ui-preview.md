@@ -1,6 +1,6 @@
 # VCM corporation workspace
 
-This document describes the **`0.1.0-alpha.8` corporation-management technical prerelease**: one company context with humans and agents, responsibilities, reporting and company relationships. Execution is a secondary utility. Use the exact versioned archive and source/checksum record, or build the matching checkout through the [README](../README.md#install-the-reviewed-archive). The [acceptance record](acceptance.md) and versioned release manifest identify actual package and browser checks; this interface description does not substitute for them.
+This document describes the **`0.1.0-alpha.9` corporation-management technical prerelease**: one company context with humans and agents, responsibilities, reporting and company relationships. Execution is a secondary utility. Use the exact versioned archive and source/checksum record, or build the matching checkout through the [README](../README.md#install-the-reviewed-archive). The [acceptance record](acceptance.md) and versioned release manifest identify actual package and browser checks; this interface description does not substitute for them.
 
 ## Corporation-management journey
 
