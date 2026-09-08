@@ -1,6 +1,6 @@
 """Build the Buzz.xyz / Slack campaign from VCM's existing vector identity.
 
-Python standard library only. No network, generated screenshots or platform logos.
+Python standard library only. No network access; campaign raster masters are preserved.
 Run build.py, then render.cjs. Output is an offline asset kit, not a hosted site.
 """
 from pathlib import Path
@@ -124,7 +124,9 @@ b=logo(64,35)+text(330,128,'Big ideas deserve a team.',61,INK,True)+text(334,194
 b+=pill(335,250,'BUZZ.XYZ + SLACK',282,BLUE,'#FFFFFF')
 save('08-community-cover',1600,400,b,CREAM,'Community announcement cover','VCM. Big ideas deserve a team. Bring yours into the conversation. Buzz.xyz and Slack. Orange Vic on cream.','Editorial cover; no platform placement guarantee')
 
-(ROOT/'manifest.json').write_text(json.dumps(dict(brand='VCM — Virtual Corporation Manager',brandLine='Big ideas deserve a team.',created='2026-09-08',sourceIdentity='../assets/',assets=assets),indent=2,ensure_ascii=False)+'\n')
+campaign=json.loads((ROOT/'campaign/manifest.json').read_text())
+assets=campaign['assets']+assets
+(ROOT/'manifest.json').write_text(json.dumps(dict(brand='VCM — Virtual Corporation Manager',brandLine='Big ideas deserve a team.',created='2026-09-08',sourceIdentity='../assets/',primaryAsset=campaign['primaryAsset'],assets=assets),indent=2,ensure_ascii=False)+'\n')
 
 queue=json.loads((ROOT/'posts.json').read_text())
 by_id={a['id']:a for a in assets}
@@ -135,7 +137,8 @@ for p in queue['posts']:
     p['weightedCharacters']=len(re.sub(r'https://\S+','x'*23,p['text']))
     if p['channel']=='X':
         assert p['weightedCharacters']<=280,p['id']
-    cards+=f'<article class="post"><img src="{a["png"]}" alt="{html.escape(a["alt"],quote=True)}"><div class="copy"><small>{p["channel"]} · DRAFT</small><h3>{html.escape(p["title"])}</h3><p class="caption">{html.escape(p["text"])}</p><div class="actions"><button onclick="copyText(this)">Copy text</button><a href="{a["png"]}" download>PNG ↓</a><a href="{a["svg"]}" download>Editable SVG ↓</a></div><details><summary>Alt text</summary><p>{html.escape(a["alt"])}</p></details></div></article>'
+    source_link=f'<a href="{a["svg"]}" download>Editable SVG ↓</a>' if a.get('svg') else '<a href="campaign/README.md">Screenshot sources ↗</a>'
+    cards+=f'<article class="post"><img src="{a["png"]}" alt="{html.escape(a["alt"],quote=True)}"><div class="copy"><small>{p["channel"]} · DRAFT</small><h3>{html.escape(p["title"])}</h3><p class="caption">{html.escape(p["text"])}</p><div class="actions"><button onclick="copyText(this)">Copy text</button><a href="{a["png"]}" download>PNG ↓</a>{source_link}</div><details><summary>Alt text</summary><p>{html.escape(a["alt"])}</p></details></div></article>'
 (ROOT/'posts.json').write_text(json.dumps(queue,indent=2,ensure_ascii=False)+'\n')
 catalog=''.join(f'<a class="asset" href="{a["png"]}" download><img src="{a["png"]}" loading="lazy" alt="{html.escape(a["alt"],quote=True)}"><strong>{a["purpose"]}</strong><small>{a["width"]} × {a["height"]} · PNG ↓</small></a>' for a in assets)
 template=(ROOT/'source/gallery-template.html').read_text()

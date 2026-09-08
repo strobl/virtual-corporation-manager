@@ -101,7 +101,7 @@ To remove the isolated application, stop it and run `npm uninstall --prefix ./vc
 
 ## Your team. In the conversation.
 
-![VCM with optional Buzz.xyz and Slack connections: team import and experimental tasks](docs/images/vcm-integrations.png)
+![Build the team. Bring it to Buzz. VCM campaign based on the native Buzz import preview with three example roles.](docs/images/vcm-integrations.png)
 
 Organize in VCM. Bring your AI roles into Buzz.xyz, or explore focused tasks from Slack.
 
@@ -110,7 +110,7 @@ Organize in VCM. Bring your AI roles into Buzz.xyz, or explore focused tasks fro
 | Export active AI roles and instructions as a native team file. Preview the import in Buzz Desktop, then configure the runtime separately. | An allowed owner mentions a named role. Local Codex runs the task and VCM replies in the same thread. |
 | [Buzz setup guide](docs/integrations/buzz.md)                                                                                             | [Slack setup guide and app manifest](docs/integrations/slack.md)                                      |
 
-Connections are optional. Buzz native import has historical evidence; Buzz task execution and Slack round trips remain experimental, with live useful-result acceptance still open. The graphic illustrates the routes. [Integration overview](docs/integrations/README.md) · [Campaign images, app icons and post drafts](https://github.com/strobl/virtual-corporation-manager/tree/main/brand/integrations)
+Connections are optional. Buzz native import has historical evidence; Buzz task execution and Slack round trips remain experimental, with live useful-result acceptance still open. The campaign is based on a native Buzz import preview with the public three-role example; [see the screenshot story and source record](https://github.com/strobl/virtual-corporation-manager/tree/main/brand/integrations/campaign). [Integration overview](docs/integrations/README.md) · [Campaign images, app icons and post drafts](https://github.com/strobl/virtual-corporation-manager/tree/main/brand/integrations)
 
 ## Optional execution
 

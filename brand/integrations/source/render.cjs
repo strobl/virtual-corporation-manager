@@ -13,6 +13,24 @@ const root = path.resolve(__dirname, '..');
     const manifest = JSON.parse(fs.readFileSync(path.join(root, 'manifest.json')));
     const results = [];
     for (const asset of manifest.assets) {
+      if (asset.masterType === 'raster') {
+        const bytes = fs.readFileSync(path.join(root, asset.png));
+        if (
+          bytes.toString('hex', 0, 8) !== '89504e470d0a1a0a' ||
+          bytes.readUInt32BE(16) !== asset.width ||
+          bytes.readUInt32BE(20) !== asset.height
+        )
+          throw new Error(`Unexpected PNG dimensions: ${asset.id}`);
+        results.push({
+          id: asset.id,
+          width: asset.width,
+          height: asset.height,
+          bytes: bytes.length,
+          clipped: [],
+          textBounds: 'raster master; visual review required',
+        });
+        continue;
+      }
       await page.setViewportSize({ width: asset.width, height: asset.height });
       await page.setContent(
         '<!doctype html><meta charset="utf-8"><style>html,body{margin:0}svg{display:block}</style>' +
@@ -50,7 +68,7 @@ const root = path.resolve(__dirname, '..');
     }
     fs.mkdirSync(path.join(root, 'evidence'), { recursive: true });
     fs.copyFileSync(
-      path.join(root, 'exports/01-conversation.png'),
+      path.join(root, manifest.assets.find((asset) => asset.id === manifest.primaryAsset).png),
       path.join(root, '../../docs/images/vcm-integrations.png'),
     );
     const gallery = [];

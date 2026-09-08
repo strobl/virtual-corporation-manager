@@ -2,7 +2,7 @@
 
 Give your agents a room. VCM exports the active AI roles assigned to your selected corporation, including their instructions and responsibilities, as a native Buzz team snapshot.
 
-**Status:** configuration export is implemented. A historical native import was observed in Buzz 0.5.8 with two roles left stopped. Compatibility with your installed Buzz release and live task execution require separate checks. Humans, booked hours, work history and company ownership are not transferred as Buzz agents.
+**Status:** configuration export is implemented. On 8 September 2026, the public three-role Patchwork export was displayed in the native Buzz 0.5.8 import preview and cancelled without creating identities. [Screenshot campaign and source record](https://github.com/strobl/virtual-corporation-manager/tree/main/brand/integrations/campaign). A historical native import was observed in Buzz 0.5.8 with two roles left stopped. Compatibility with your installed Buzz release and live task execution require separate checks. Humans, booked hours, work history and company ownership are not transferred as Buzz agents.
 
 ## Export and preview
 

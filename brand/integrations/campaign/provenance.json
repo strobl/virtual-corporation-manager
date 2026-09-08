@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "capturedOn": "2026-09-08",
+  "repositoryBase": "8d46f9ee9ba6a629cc2835a3b63e72f9b85bd3b7",
+  "buzz": {
+    "version": "0.5.8",
+    "route": "Agents > Agent teams > New team > Import",
+    "screen": "Import team snapshot",
+    "source": {
+      "sha256": "b69a1f309324d004441c9cc4e3218c2bdf8e03e571060f67496f899762c9677e",
+      "width": 4718592,
+      "height": 4292935744,
+      "bytes": 108907
+    },
+    "sourcePublished": false,
+    "sourceExclusionReason": "Full native capture contains unrelated workspace context. Only the preview is represented in campaign compositions.",
+    "observedTeam": "Patchwork Studio (example)",
+    "observedMembers": ["Builder", "Reviewer", "Researcher"],
+    "previewObserved": true,
+    "importConfirmed": false,
+    "previewCancelled": true,
+    "agentsStarted": 0,
+    "messagesSent": 0,
+    "providerTasksRun": 0
+  },
+  "vcm": {
+    "version": "0.1.0-alpha.9",
+    "route": "Tools > Connections",
+    "fixture": "docs/examples/three-agent-studio.json",
+    "sourceFile": "vcm-connections-source.png",
+    "source": {
+      "sha256": "99fed6ebc7476b6de9b62c1a457d2e99c57fe6bfd1a836a50f9881417cac3d49",
+      "width": 65536,
+      "height": 4292542531,
+      "bytes": 83428
+    },
+    "captureWorkspace": "isolated fictional example",
+    "exportFunction": "src/adapters/buzz.ts:exportBuzzTeam",
+    "teamFile": "patchwork-studio.team.json",
+    "teamFileSha256": "76a8ce333d23ec5b7ab3acc74982971a2f37582aee5d04bcfcbd23a3b91a537e"
+  },
+  "production": {
+    "tool": "Imagegen",
+    "type": "Screenshot-based editorial compositions",
+    "uiTreatment": "Source UI crops are rescaled and re-rendered within generated campaign artwork. These are not unmodified screenshots.",
+    "references": ["../../assets/team-sculpture.png", "../../exports/readme-hero.png"],
+    "brandLine": "Big ideas deserve a team.",
+    "assets": [
+      {
+        "file": "buzz-import-hero.png",
+        "sha256": "0146816cb0e3ae03708fd5ced120e759ef5356d129e198ca0c75619469beaf70",
+        "width": 1672,
+        "height": 941,
+        "bytes": 1553349
+      },
+      {
+        "file": "buzz-export-to-import.png",
+        "sha256": "81948273bfa5a7bdad84c1bfb6db796f9fe903c4cc75422ad690861859be4057",
+        "width": 1672,
+        "height": 941,
+        "bytes": 1576035
+      }
+    ]
+  }
+}
