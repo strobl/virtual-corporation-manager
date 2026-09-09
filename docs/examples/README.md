@@ -12,7 +12,7 @@ The file configures these roles. It contains no executed work, accepted result, 
 
 ## Import and inspect
 
-Use the [README installation route](../../README.md#install-vcm) for the `0.1.0-alpha.10` technical alpha. Verified offline archives are covered in its advanced section. Earlier package evidence remains historical. Follow [the quickstart](../developer-quickstart.md), then open **Settings → Import a company definition**. Select the JSON file or paste its full contents, choose **Review import**, inspect the changes and choose **Apply changes**. Open **Corporations → Patchwork Studio (example)**.
+Use the [README installation route](../../README.md#install-vcm) for the `0.1.0-alpha.11` technical alpha. Verified offline archives are covered in its advanced section. Earlier package evidence remains historical. Follow [the quickstart](../developer-quickstart.md), then open **Settings → Import a company definition**. Select the JSON file or paste its full contents, choose **Review import**, inspect the changes and choose **Apply changes**. Open **Corporations → Patchwork Studio (example)**.
 
 Select a member to inspect its role, instructions and responsibilities. Choose **Edit member**, make a focused change, then **Review change → Save member**. The company overview also supports **Add member** for an **AI agent** or **Human**; this shipped fixture contains only the three agents listed above. Saving a member does not execute work or book time.
 

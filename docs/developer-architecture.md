@@ -50,7 +50,7 @@ The older three-step `src/web/CorporationSetup.tsx` remains in the source tree b
 
 The CompanyConsole activity summary covers direct runs only; workflow jobs remain separate in the work records view. Failed run or connection refreshes produce unavailable states rather than a claim of no active work or a ready runtime. Company totals open Time Tracker with all company members; a member's Log time action retains that member's company context. These are navigation/read-model responsibilities, not changes to the time ledger.
 
-The browser's product identity is in `src/web/identity.ts`; package name, default `~/.gitflash`, legacy environment variables and wire-format names retain compatibility. Do not globally replace those identifiers or edit historical migration SQL to change branding.
+The browser's product identity is in `src/web/identity.ts`; the npm package is `virtualcorporationmanager` and its only executable is `vcm`. The default `~/.gitflash`, legacy environment variables and wire-format names retain compatibility. Do not globally replace those identifiers or edit historical migration SQL to change branding.
 
 ## Data and API boundaries
 

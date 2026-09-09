@@ -31,7 +31,7 @@ The local core works offline with no hosted database, cloud inference, billing o
 
 _Actual company-management interface with fictional example data. [Screenshot provenance](docs/images/product-brand-provenance.json)._
 
-> **Technical alpha — for developer evaluation.** The local core manages companies, members and the Time Tracker. Optional execution is experimental. [Release 0.1.0-alpha.10](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.10). [Acceptance and limits](docs/acceptance.md)
+> **Technical alpha — for developer evaluation.** The local core manages companies, members and the Time Tracker. Optional execution is experimental. [Release 0.1.0-alpha.11](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.11). [Acceptance and limits](docs/acceptance.md)
 
 ## Install VCM
 
@@ -55,18 +55,13 @@ Open the local URL printed in your terminal. Stop with Ctrl+C and run the same c
 <details>
 <summary><strong>Platforms, launch options and existing installations</strong></summary>
 
-The declared local-core targets are macOS, Linux and native Windows. Check the exact release's [OS/Node acceptance](docs/acceptance.md) for observed results. Add `--port 4311` if 4310 is occupied, or `--no-open` to open the URL yourself. After a permanent install, `vcm --version` prints the installed version; this release prints `0.1.0-alpha.10`.
+The declared local-core targets are macOS, Linux and native Windows. Check the exact release's [OS/Node acceptance](docs/acceptance.md) for observed results. Add `--port 4311` if 4310 is occupied, or `--no-open` to open the URL yourself. After a permanent install, `vcm --version` prints the installed version; this release prints `0.1.0-alpha.11`.
 
-The npm package is `virtualcorporationmanager`. `vcm` is the everyday command; `gitflash` remains a compatibility alias. Both keep `~/.gitflash`, `GITFLASH_DATA_DIR` and existing workspaces. An explicit `--data-dir` takes precedence. [Naming and compatibility contract](docs/branding.md)
+The npm package is `virtualcorporationmanager`; its only CLI command is `vcm`. Existing workspace directories and data settings are preserved. An explicit `--data-dir` takes precedence. [Naming and workspace compatibility](docs/branding.md)
 
-If you previously installed the `gitflash` package globally, stop VCM before replacing that installation:
+To update an existing installation of this npm package, stop VCM, run `npm install -g virtualcorporationmanager`, then run `vcm` with the same data settings. Update older automation to call `vcm`.
 
-```sh
-npm uninstall -g gitflash
-npm install -g virtualcorporationmanager
-```
-
-Then run `vcm` with the same data settings as before. Uninstalling the application preserves its default and custom workspace directories. An older isolated `./vcm-preview` installation can also remain separate; stop its process before opening the same workspace with the new command.
+If an earlier, differently named package already owns the global command, use `npx virtualcorporationmanager` or remove that older application through your package manager before installing globally. An isolated installation can remain separate; stop its process before opening the same workspace. Removing the application preserves its workspace directories.
 
 </details>
 
@@ -74,17 +69,17 @@ Then run `vcm` with the same data settings as before. Uninstalling the applicati
 <details>
 <summary><strong>Advanced: install a verified archive offline</strong></summary>
 
-1. Obtain `vcm-0.1.0-alpha.10.tgz`, `checksums.txt` and `release-manifest.json` from the matching [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.10) or build this checkout.
+1. Obtain `vcm-0.1.0-alpha.11.tgz`, `checksums.txt` and `release-manifest.json` from the matching [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.11) or build this checkout.
 2. Verify the release archive's SHA-256 against those records before going offline. Keep the records with the source revision.
 3. Run these commands in the directory containing the verified archive:
 
 ```sh
-npm install --offline --prefix ./vcm-preview ./vcm-0.1.0-alpha.10.tgz
+npm install --offline --prefix ./vcm-preview ./vcm-0.1.0-alpha.11.tgz
 npm exec --offline --prefix ./vcm-preview -- vcm --version
 npm exec --offline --prefix ./vcm-preview -- vcm
 ```
 
-Expected version: `0.1.0-alpha.10`. This installs the application into `./vcm-preview`; workspace data still defaults to `~/.gitflash`. For a separate example workspace, append `--data-dir ./my-company` to the last command and keep using that path.
+Expected version: `0.1.0-alpha.11`. This installs the application into `./vcm-preview`; workspace data still defaults to `~/.gitflash`. For a separate example workspace, append `--data-dir ./my-company` to the last command and keep using that path.
 
 For later commands without a permanent install, replace the leading `vcm` with `npm exec --offline --prefix ./vcm-preview -- vcm`, from the directory containing `vcm-preview`. The package files are in `vcm-preview/node_modules/virtualcorporationmanager`. To remove this isolated installation, stop VCM and run `npm uninstall --prefix ./vcm-preview virtualcorporationmanager`; workspace data remains intact.
 

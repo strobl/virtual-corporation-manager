@@ -2,6 +2,16 @@
 
 ## npm installation release — 9 September 2026
 
+**0.1.0-alpha.11** installs the existing local application as `virtualcorporationmanager`, exposing only the `vcm` command. SQLite schema, data directory precedence, environment names and export formats remain unchanged. The package has no runtime dependencies or install lifecycle hooks. Start with `npx virtualcorporationmanager`, or install permanently with `npm install -g virtualcorporationmanager` and run `vcm`.
+
+`npm run test:package` checks the real installed command, absence of the removed command link, CLI help/version, an empty-cache local-registry npx invocation, global installation, default/custom workspace resolution, populated restart, exports, backup/restore and uninstall retention. The local fixture is not public-registry evidence.
+
+`npm run test:npm-upgrade -- <alpha.10.tgz> <alpha.11.tgz> <evidence.json>` checks the published alpha.10 archive by its frozen hash, creates a synthetic company/member/time entry, stops the old process and updates the same global npm package in place. The current command must reopen identical data, the removed command link must be absent, and uninstall must preserve SQLite bytes. The same script also supports the separately named alpha.9 archive for historical migration acceptance.
+
+The [versioned release](https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.11) records the exact source, tested archive SHA-256, observed OS/Node checks, upgrade receipt and fresh public-registry verification. Historical acceptance below retains its original scope.
+
+## Historical alpha.10 npm installation acceptance
+
 **0.1.0-alpha.10** packages the existing local application as `virtualcorporationmanager`. Its two aliases still resolve to one executable, and the SQLite schema, data directory precedence, environment names and export formats remain unchanged. The package has no runtime dependencies or install lifecycle hooks. The simplified setup is `npx virtualcorporationmanager`, or a permanent `npm install -g virtualcorporationmanager` followed by `vcm`.
 
 The source acceptance includes type checking, 350 passing tests with three opt-in sandbox skips, and the production build on macOS arm64 / Node 26.0.0. `npm run test:package` checks normal offline tarball installation without `--ignore-scripts`, bare package-name executable inference against an isolated local registry with an empty cache, and global command installation. It retains the company creation, saved IDs, Time Tracker, lock, export, backup/restore and uninstall-preservation checks. The configured matrix repeats packed acceptance on macOS, Linux and Windows with Node 24.14 / 24.x / 26.0 / 26.x; observed jobs belong to the exact source in the release manifest.

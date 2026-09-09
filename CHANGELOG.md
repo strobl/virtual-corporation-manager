@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-alpha.11 — One VCM command
+
+- Install only the `vcm` CLI command from `virtualcorporationmanager`; remove the earlier extra executable alias. Start with `npx virtualcorporationmanager`, or update a permanent installation and run `vcm`.
+- Remove old package-removal commands and obsolete alias guidance from current installation documentation and CLI help. Existing automation should call `vcm`.
+- Replace the superseded install block in derived workflow help and record the adaptation without changing role prompts, source identity or the frozen oracle.
+- Preserve existing workspace directories, environment configuration, SQLite data and machine-facing formats. Verify that updating the published alpha.10 package removes its extra command link while retaining populated workspace data.
+
 ## 0.1.0-alpha.10 — One-command installation
 
 - Publish the bundled application as `virtualcorporationmanager`, enabling `npx virtualcorporationmanager` or `npm install -g virtualcorporationmanager` followed by `vcm`.

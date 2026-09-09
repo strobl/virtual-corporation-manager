@@ -16,7 +16,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 const sourceManifest = JSON.parse(await readFile('package.json', 'utf8'));
 const started = performance.now();
-const temp = await mkdtemp(join(tmpdir(), 'gitflash-packed-'));
+const temp = await mkdtemp(join(tmpdir(), 'vcm-packed-'));
 const children = new Set();
 const npm = process.env.npm_execpath;
 if (!npm) throw new Error('Run with npm run test:package so the npm executable is explicit.');
@@ -73,12 +73,11 @@ async function assertDefaultDirectory(binaries) {
   };
   const doctors = binaries.map((binary) => JSON.parse(cli(binary, ['doctor'], { env })));
   assert.equal(doctors[0].dataDir, join(isolatedHome, '.gitflash'));
-  assert.deepEqual(doctors[1], doctors[0]);
   assert.deepEqual(await readdir(isolatedHome), ['.gitflash']);
   return {
     path: '~/.gitflash',
     method: 'Child-process OS homedir override; real user home and environment unchanged',
-    aliasesShareDirectory: true,
+    existingDirectoryPreserved: true,
     extraWorkspaceCreated: false,
   };
 }
@@ -157,25 +156,27 @@ try {
   assert.deepEqual(manifest.optionalDependencies ?? {}, {});
   for (const hook of ['preinstall', 'install', 'postinstall'])
     assert.equal(manifest.scripts?.[hook], undefined);
-  assert.deepEqual(manifest.bin, { vcm: 'dist/cli.js', gitflash: 'dist/cli.js' });
+  assert.deepEqual(manifest.bin, { vcm: 'dist/cli.js' });
   const vcm = await installedBinary(install, 'vcm', entry);
-  const gitflash = await installedBinary(install, 'gitflash', entry);
-  const binaries = [vcm, gitflash];
+  const binaries = [vcm];
+  const runtimeSource = await readFile(
+    join(install, 'node_modules', manifest.name, 'dist/runtime.js'),
+    'utf8',
+  );
+  assert(!/npm install[^\n]*gitflash-[0-9]/.test(runtimeSource));
+  const commandLinks = await readdir(join(install, 'node_modules', '.bin'));
+  assert(!commandLinks.some((name) => /^gitflash(?:\.cmd|\.ps1)?$/.test(name)));
   const help = binaries.map((binary) => cli(binary, ['--help']));
-  assert.equal(help[0], help[1]);
   assert.match(help[0], /^VCM .* — Virtual Corporation Manager/);
   assert.match(help[0], /Usage: vcm \[start\|doctor\|backup\|restore\|export\|time-export\]/);
-  assert.match(help[0], /gitflash remains a compatibility alias/);
+  assert(!help[0].includes('compatibility alias'));
   const versions = binaries.map((binary) => cli(binary, ['--version']).trim());
-  assert.deepEqual(versions, [manifest.version, manifest.version]);
+  assert.deepEqual(versions, [manifest.version]);
   const invalidCommands = binaries.map((binary) => cli(binary, ['init'], { expectedExit: 1 }));
   const invalidDiagnostics = invalidCommands.map((output) =>
     output.split('\n').find((line) => line.startsWith('VCM:')),
   );
-  assert.deepEqual(invalidDiagnostics, [
-    'VCM: Unknown command: init. Use --help.',
-    'VCM: Unknown command: init. Use --help.',
-  ]);
+  assert.deepEqual(invalidDiagnostics, ['VCM: Unknown command: init. Use --help.']);
   // An isolated local registry exercises the same bare package-name inference
   // as npx without requiring an unpublished name on the public registry.
   const registry = spawn(process.execPath, [
@@ -277,7 +278,7 @@ try {
   let app = await start(vcm, data);
   assert.match(app.output, new RegExp(`^VCM ${manifest.version.replaceAll('.', '\\.')}`));
   assert.match(
-    cli(gitflash, ['start', '--data-dir', data, '--port', '0', '--no-open'], {
+    cli(vcm, ['start', '--data-dir', data, '--port', '0', '--no-open'], {
       expectedExit: 1,
     }),
     /workspace is already open/,
@@ -388,7 +389,7 @@ try {
   assert.equal(savedTime.history.length, 2);
   assert.equal((await (await fetch(app.url + '/api/state')).json()).work.length, 0);
   await stop(app);
-  app = await start(gitflash, data);
+  app = await start(vcm, data);
   assert.match(
     cli(vcm, ['start', '--data-dir', data, '--port', '0', '--no-open'], {
       expectedExit: 1,
@@ -406,7 +407,6 @@ try {
   const envDoctors = binaries.map((binary) =>
     JSON.parse(cli(binary, ['doctor'], { env: { GITFLASH_DATA_DIR: data } })),
   );
-  assert.deepEqual(envDoctors[0], envDoctors[1]);
   assert.equal(envDoctors[0].dataDir, data);
   assert.equal(envDoctors[0].agents, 101);
   const ignoredEnvPath = join(temp, 'ignored-env-path');
@@ -425,7 +425,6 @@ try {
     cli(binary, ['export', '--data-dir', data, '--output', destination]);
     definitions.push(JSON.parse(await readFile(destination, 'utf8')));
   }
-  assert.deepEqual(definitions[0], definitions[1]);
   assert.deepEqual(definitions[0], exported);
   const timeExport = join(temp, 'delivery-hours.json');
   cli(vcm, ['time-export', '--data-dir', data, '--output', timeExport]);
@@ -433,23 +432,12 @@ try {
   assert.equal(exportedTime.format, 'gitflash-delivery-hours');
   assert.equal(exportedTime.version, 1);
   assert.deepEqual(exportedTime.entries, savedTime.entries);
-  const compatibilityTimeExport = join(temp, 'compatibility-delivery-hours.json');
-  cli(gitflash, ['time-export', '--data-dir', data, '--output', compatibilityTimeExport]);
-  assert.deepEqual(JSON.parse(await readFile(compatibilityTimeExport, 'utf8')), exportedTime);
   const backup = join(temp, 'backup.sqlite');
   cli(vcm, ['backup', '--data-dir', data, '--output', backup]);
   const restored = join(temp, 'restored');
-  cli(gitflash, ['restore', '--data-dir', restored, '--from', backup]);
-  const compatibilityBackup = join(temp, 'compatibility-backup.sqlite');
-  cli(gitflash, ['backup', '--data-dir', data, '--output', compatibilityBackup]);
-  const compatibilityRestored = join(temp, 'compatibility-restored');
-  cli(vcm, ['restore', '--data-dir', compatibilityRestored, '--from', compatibilityBackup]);
-  const restoredDoctors = [
-    JSON.parse(cli(vcm, ['doctor', '--data-dir', restored])),
-    JSON.parse(cli(gitflash, ['doctor', '--data-dir', compatibilityRestored])),
-  ];
-  for (const doctor of restoredDoctors)
-    assert.deepEqual({ ...doctor, dataDir: data }, envDoctors[0]);
+  cli(vcm, ['restore', '--data-dir', restored, '--from', backup]);
+  const restoredDoctor = JSON.parse(cli(vcm, ['doctor', '--data-dir', restored]));
+  assert.deepEqual({ ...restoredDoctor, dataDir: data }, envDoctors[0]);
   app = await start(vcm, restored);
   const recovered = await (await fetch(app.url + '/api/state')).json();
   assert.deepEqual(recovered.companies, reopened.companies);
@@ -469,12 +457,6 @@ try {
   });
   assert.equal(replayResponse.status, 200);
   assert.deepEqual(await replayResponse.json(), firstBooking);
-  await stop(app);
-  app = await start(gitflash, compatibilityRestored);
-  assert.deepEqual(await (await fetch(app.url + '/api/state')).json(), recovered);
-  const compatibilityRecoveredTime = await (await fetch(app.url + '/api/time')).json();
-  assert.deepEqual(compatibilityRecoveredTime.entries, savedTime.entries);
-  assert.deepEqual(compatibilityRecoveredTime.history, savedTime.history);
   await stop(app);
   app = await start(globalBinary, data);
   assert.deepEqual(await (await fetch(app.url + '/api/state')).json(), reopened);
@@ -513,12 +495,13 @@ try {
     cpu: cpus()[0]?.model,
     packageName: manifest.name,
     version: manifest.version,
-    installedBinaries: ['vcm', 'gitflash'],
-    commandInvocation: 'npm exec --offline --prefix <isolated-install> -- <vcm|gitflash>',
+    installedBinaries: ['vcm'],
+    removedCommandLinkAbsent: true,
+    commandInvocation: 'npm exec --offline --prefix <isolated-install> -- vcm',
     startupInvocation:
       process.platform === 'win32'
         ? 'Node executes the package entry verified in each installed .cmd shim'
-        : 'Node executes each installed named .bin symlink; both resolve to dist/cli.js',
+        : 'Node executes the installed vcm symlink resolving to dist/cli.js',
     defaultDirectory,
     template100PreviewAndApplyMs: Math.round(templateMs),
     totalMs: Math.round(performance.now() - started),
@@ -526,11 +509,10 @@ try {
       'offline npm install of self-contained tarball without --ignore-scripts; no runtime dependencies or install hooks',
       'bare package-name npx inference against a local registry fixture with an empty cache',
       'isolated global installation creates a working vcm command and reopens the populated workspace',
-      'vcm and gitflash installed aliases expose identical help/version and invalid-command exit codes',
-      'both aliases retain ~/.gitflash default and GITFLASH_DATA_DIR; --data-dir takes precedence',
-      'both aliases start the same populated workspace and contend for the same live lock',
-      'both aliases run doctor/export/time-export with equivalent data and existing format identifiers',
-      'cross-alias SQLite backup/restore works in both directions without creating an empty company',
+      'only vcm is installed; removed command link absent; help/version and invalid-command diagnostics pass',
+      'existing default workspace and environment configuration are retained; --data-dir takes precedence',
+      'vcm reopens the populated workspace and refuses a second process on the same live lock',
+      'vcm doctor/export/time-export preserve data and existing format identifiers',
       'packaged CLI and all referenced assets',
       'company and agent creation through API',
       '100-agent template atomic apply',

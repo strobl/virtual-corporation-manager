@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Install VCM locally, create your company, add people and AI agents, and manage responsibilities and recorded hours. Alpha 10 installation documentation."
+      content="Install VCM locally, create your company, add people and AI agents, and manage responsibilities and recorded hours. Alpha 11 installation documentation."
     />
     <meta name="theme-color" content="#f6f4ef" />
     <title>Developer quickstart — VCM</title>
@@ -68,7 +68,7 @@
             <p class="kicker">Local setup</p>
             <h2 id="install-title">Start VCM with one command.</h2>
             <p>
-              <strong>0.1.0-alpha.10 technical alpha.</strong>
+              <strong>0.1.0-alpha.11 technical alpha.</strong>
               Company setup, membership, responsibilities and the Time Tracker need no provider
               account or runtime connection.
             </p>
@@ -104,7 +104,7 @@ vcm</code></pre>
               to return to your workspace. The initial download needs an internet connection; the
               installed local core works offline. After a permanent install,
               <code>vcm --version</code> prints the installed version; this release is
-              <code>0.1.0-alpha.10</code>.
+              <code>0.1.0-alpha.11</code>.
             </p>
             <p>
               The examples below use the permanent installation. With npx, replace the leading
@@ -113,28 +113,30 @@ vcm</code></pre>
               the URL yourself.
             </p>
             <details>
-              <summary>Existing global gitflash installation</summary>
-              <p>Stop VCM, then replace the old application before starting the new command:</p>
+              <summary>Update an existing installation</summary>
+              <p>Stop VCM, update the current npm package, then reopen the same workspace.</p>
               <pre
-                class="command-block"
                 tabindex="0"
-                aria-label="Replace an existing global gitflash installation"
-              ><code>npm uninstall -g gitflash
-npm install -g virtualcorporationmanager
+                aria-label="Update VCM"
+              ><code>npm install -g virtualcorporationmanager
 vcm</code></pre>
               <p>
-                Keep the same <code>GITFLASH_DATA_DIR</code> or <code>--data-dir</code> setting. The
-                default remains <code>~/.gitflash</code>; removing the application leaves workspace
-                data intact. The <code>gitflash</code> command remains a compatibility alias.
+                The package installs only the <code>vcm</code> command. Existing workspace data is
+                preserved. Update older automation to call <code>vcm</code>.
+              </p>
+              <p>
+                If a differently named older package owns the global command, use
+                <code>npx virtualcorporationmanager</code> or remove the older application through
+                your package manager first. Do not overwrite command links forcibly.
               </p>
             </details>
             <details id="install-the-reviewed-archive">
               <summary>Advanced: install a verified archive offline</summary>
               <p>
-                Obtain <code>vcm-0.1.0-alpha.10.tgz</code>, <code>checksums.txt</code> and
+                Obtain <code>vcm-0.1.0-alpha.11.tgz</code>, <code>checksums.txt</code> and
                 <code>release-manifest.json</code> from the matching
                 <a
-                  href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.10"
+                  href="https://github.com/strobl/virtual-corporation-manager/releases/tag/v0.1.0-alpha.11"
                   >versioned release</a
                 >
                 or build the source checkout. Verify the release archive’s SHA-256 against those
@@ -145,11 +147,11 @@ vcm</code></pre>
                 class="command-block"
                 tabindex="0"
                 aria-label="Install and run the verified VCM archive offline"
-              ><code>npm install --offline --prefix ./vcm-preview ./vcm-0.1.0-alpha.10.tgz
+              ><code>npm install --offline --prefix ./vcm-preview ./vcm-0.1.0-alpha.11.tgz
 npm exec --offline --prefix ./vcm-preview -- vcm --version
 npm exec --offline --prefix ./vcm-preview -- vcm</code></pre>
               <p>
-                Expected version: <code>0.1.0-alpha.10</code>. For later commands, replace the
+                Expected version: <code>0.1.0-alpha.11</code>. For later commands, replace the
                 leading <code>vcm</code> with
                 <code>npm exec --offline --prefix ./vcm-preview -- vcm</code>, from the directory
                 containing <code>vcm-preview</code>. This isolates the application; workspace data

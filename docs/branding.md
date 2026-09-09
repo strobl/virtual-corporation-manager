@@ -4,9 +4,9 @@ The product is **Virtual Corporation Manager**, abbreviated **VCM**. Use these n
 
 | Surface              | Contract                                                                                                                                                                                                                                                                                                                |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Command              | `vcm` is canonical; `gitflash` remains a compatibility alias for the same executable.                                                                                                                                                                                                                                   |
+| Command              | `vcm` is the only installed CLI command. Start without a global installation with `npx virtualcorporationmanager`.                                                                                                                                                                                                      |
 | Distribution         | The package is `virtualcorporationmanager`, installed at `node_modules/virtualcorporationmanager`. Start with `npx virtualcorporationmanager`, or install globally and run `vcm`. The GitHub archive remains `vcm-<version>.tgz`, produced by `npm run pack:release`. No availability of the npm name `vcm` is claimed. |
-| Existing workspace   | Both commands resolve `--data-dir`, then `GITFLASH_DATA_DIR`, then the existing `~/.gitflash` default. No automatic directory move or workspace rewrite occurs.                                                                                                                                                         |
+| Existing workspace   | VCM resolves `--data-dir`, then `GITFLASH_DATA_DIR`, then the existing `~/.gitflash` default. No automatic directory move or workspace rewrite occurs.                                                                                                                                                                  |
 | Environment          | Existing `GITFLASH_*` configuration settings retain their names and behavior.                                                                                                                                                                                                                                           |
 | Protocol and exports | Existing identifiers such as `X-GitFlash-Token`, export format names, package IDs, sandbox profiles and persisted database fields remain compatible. User-facing download filenames use VCM while payload identifiers stay unchanged.                                                                                   |
 | Historical evidence  | Original outputs, source identifiers, hashes, migration statements, release assets and legal attribution retain their original bytes or provenance. Adapted current wording is recorded separately.                                                                                                                     |
@@ -16,19 +16,18 @@ These compatibility identifiers belong only where needed to identify the actual 
 
 ## Upgrade an existing installation
 
-`0.1.0-alpha.10` simplifies installation with an npm package. The package name changes from `gitflash` to `virtualcorporationmanager`. Workspace paths and formats keep their existing names.
+`0.1.0-alpha.11` installs only the `vcm` command. Existing scripts must call `vcm`; the previous command alias is removed. The npm package remains `virtualcorporationmanager`, and workspace paths and formats keep their existing names.
 
-If `gitflash` was installed globally, stop VCM and replace the application:
+Stop VCM before updating the application:
 
 ```sh
-npm uninstall -g gitflash
 npm install -g virtualcorporationmanager
 vcm
 ```
 
-Use the same `GITFLASH_DATA_DIR` or `--data-dir` as before. With neither setting, both commands use `~/.gitflash`. Removing the package leaves default and custom workspace data intact. Removing the old global package first also prevents its command links from colliding with the new installation.
+Use the same data settings as before. With no explicit setting, VCM keeps the existing workspace directory. Updating this npm package removes its previous extra command link without moving or rewriting workspace data.
 
-An older isolated `./vcm-preview` installation can remain separate. Stop its process before opening that workspace with the new command. To remove only that old application, run `npm uninstall --prefix ./vcm-preview gitflash` from the directory containing it. New isolated installations use `npm uninstall --prefix ./vcm-preview virtualcorporationmanager`. Do not delete a workspace directory as part of the package change.
+If a differently named older package owns the global command, use `npx virtualcorporationmanager`, or remove the old application through the package manager before installing globally. Do not force-overwrite command links. An older isolated installation can remain separate; stop its process before opening the same workspace with the current command. To remove an isolated installation of the current package, run `npm uninstall --prefix ./vcm-preview virtualcorporationmanager`. Application removal preserves workspace directories.
 
 ## Product visual system
 
