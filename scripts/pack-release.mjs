@@ -23,7 +23,7 @@ console.log(
       version: manifest.version,
       files: packed.files,
       bytes: packed.size,
-      note: 'Publish this tested archive as virtualcorporationmanager; vcm and gitflash share the existing workspace.',
+      note: 'Publish this tested archive as virtualcorporationmanager; vcm uses the existing workspace.',
     },
     null,
     2,

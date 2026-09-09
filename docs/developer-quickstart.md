@@ -2,7 +2,7 @@
 
 Create a virtual corporation, add its people and agents, and return to manage the same organization in a later session. VCM is for one local operator; adding a human member does not create a login or shared workspace. It does not import context automatically from arbitrary IDEs and chats.
 
-This guide accompanies the **`0.1.0-alpha.10` technical alpha**. Follow [the README installation route](../README.md#install-vcm); the commands below assume a permanent `npm install -g virtualcorporationmanager` installation. For the [verified offline archive](../README.md#install-the-reviewed-archive), replace the leading `vcm` in each command with `npm exec --offline --prefix ./vcm-preview -- vcm`, from the directory containing `vcm-preview`.
+This guide accompanies the **`0.1.0-alpha.11` technical alpha**. Follow [the README installation route](../README.md#install-vcm); the commands below assume a permanent `npm install -g virtualcorporationmanager` installation. For the [verified offline archive](../README.md#install-the-reviewed-archive), replace the leading `vcm` in each command with `npm exec --offline --prefix ./vcm-preview -- vcm`, from the directory containing `vcm-preview`.
 
 Earlier release artifacts retain their own source/checksum records and acceptance evidence. Product Studio's actual useful-result acceptance remains open after two 300-second intake timeouts at `ultra`, with no v2 bundle or owner acceptance.
 
@@ -15,7 +15,7 @@ vcm --data-dir ./my-company --no-open
 
 Use Node.js 24.14+ in the 24.x line, or 26.x. Open the printed `http://127.0.0.1:…` URL. Stop with Ctrl+C before maintenance. Relative paths are relative to your terminal's working directory; use an absolute `--data-dir` if you start from different directories.
 
-The supported commands are `start` (also the default), `doctor`, `backup`, `restore`, `export` and `time-export`. There is no CLI import, `init`, `run`, YAML loader or automatic configuration watcher. `gitflash` remains an alias for the same executable and workspace behavior. Both retain `GITFLASH_DATA_DIR` and default `~/.gitflash`; the explicit flag takes precedence.
+The supported commands are `start` (also the default), `doctor`, `backup`, `restore`, `export` and `time-export`. There is no CLI import, `init`, `run`, YAML loader or automatic configuration watcher. `vcm` is the only installed CLI command. It retains `GITFLASH_DATA_DIR` and default `~/.gitflash`; the explicit flag takes precedence.
 
 ## Represent your own company
 

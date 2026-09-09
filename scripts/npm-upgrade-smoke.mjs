@@ -1,6 +1,6 @@
 /** Verify a published legacy archive -> renamed package with synthetic local data. */
 import { spawn, spawnSync } from 'node:child_process';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile, readdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { createHash } from 'node:crypto';
@@ -19,11 +19,19 @@ const hashes = await Promise.all(
       .digest('hex'),
   ),
 );
-assert.equal(
-  hashes[0],
-  'dd6bb54dc9cc6cd40e972d99eae88d2dd78f20eaab3eb6749a50350efc59c50f',
-  'Use the published alpha.9 archive.',
-);
+const supportedReleases = {
+  dd6bb54dc9cc6cd40e972d99eae88d2dd78f20eaab3eb6749a50350efc59c50f: {
+    name: 'gitflash',
+    version: '0.1.0-alpha.9',
+  },
+  '2de06d939f40545c19b5ae3cf562e3b9aa443557e1c8bd4f7716792e8cc26931': {
+    name: 'virtualcorporationmanager',
+    version: '0.1.0-alpha.10',
+  },
+};
+const oldRelease = supportedReleases[hashes[0]];
+assert(oldRelease, 'Use the SHA-verified published alpha.9 or alpha.10 archive.');
+const newName = 'virtualcorporationmanager';
 const npm = process.env.npm_execpath;
 if (!npm) throw new Error('Run through npm run test:npm-upgrade.');
 const temp = await mkdtemp(join(tmpdir(), 'vcm-npm-upgrade-'));
@@ -84,7 +92,7 @@ async function stop() {
 }
 try {
   command(['install', ...args, archives[0]]);
-  let url = await start('gitflash');
+  let url = await start(oldRelease.name);
   const get = async (path) => (await fetch(url + path)).json();
   const session = await get('/api/session');
   const post = async (path, body) => {
@@ -148,11 +156,39 @@ try {
   state = await get('/api/state');
   await stop();
   const before = await readFile(join(data, 'workspace.sqlite'));
-  command(['uninstall', ...args, 'gitflash']);
-  assert.deepEqual(await readFile(join(data, 'workspace.sqlite')), before);
+  if (oldRelease.name !== newName) {
+    command(['uninstall', ...args, oldRelease.name]);
+    assert.deepEqual(await readFile(join(data, 'workspace.sqlite')), before);
+  }
   command(['install', ...args, archives[1]]);
   assert.deepEqual(await readFile(join(data, 'workspace.sqlite')), before);
-  url = await start('virtualcorporationmanager');
+  const links = await readdir(process.platform === 'win32' ? prefix : join(prefix, 'bin'));
+  assert(!links.some((name) => /^gitflash(?:\.cmd|\.ps1)?$/.test(name)));
+  assert(links.includes(process.platform === 'win32' ? 'vcm.cmd' : 'vcm'));
+  const expectedVersion = JSON.parse(await readFile('package.json', 'utf8')).version;
+  let shimResult;
+  if (process.platform === 'win32') {
+    const pathKey = Object.keys(process.env).find((key) => key.toLowerCase() === 'path') ?? 'PATH';
+    shimResult = spawnSync(
+      process.execPath,
+      [npm, 'exec', '--offline', '--call', 'vcm --version'],
+      {
+        cwd: temp,
+        encoding: 'utf8',
+        timeout: 15000,
+        env: { ...process.env, [pathKey]: `${prefix};${process.env[pathKey]}` },
+      },
+    );
+  } else {
+    shimResult = spawnSync(join(prefix, 'bin', 'vcm'), ['--version'], {
+      cwd: temp,
+      encoding: 'utf8',
+      timeout: 15000,
+    });
+  }
+  assert.equal(shimResult.status, 0, shimResult.stderr || shimResult.stdout);
+  assert.equal(shimResult.stdout.trim(), expectedVersion);
+  url = await start(newName);
   assert.deepEqual(await get('/api/state'), state);
   const reopenedTime = await get('/api/time');
   for (const key of ['entries', 'catalog', 'history', 'timezone'])
@@ -166,15 +202,19 @@ try {
     node: process.version,
     platform: process.platform,
     arch: process.arch,
-    oldArchive: { version: '0.1.0-alpha.9', sha256: hashes[0] },
+    oldArchive: { ...oldRelease, sha256: hashes[0] },
+    upgradeMode:
+      oldRelease.name === newName ? 'in-place npm update' : 'replace older named package',
+    removedCommandLinkAbsent: true,
+    upgradedCommandVersion: shimResult.stdout.trim(),
     newArchive: { sha256: hashes[1] },
     syntheticFixture: true,
     checks: [
-      'global install of published gitflash alpha.9 archive without ignore-scripts',
+      'global install of SHA-verified published old archive without ignore-scripts',
       'company, agent, responsibilities and 0.3 booked hours created with the old package',
-      'stop, uninstall old package, install renamed package without moving workspace',
+      'stop and update the package without moving or rewriting the workspace',
       'company, agent IDs, complete state, time entries, catalog and history preserved',
-      'uninstalling either package preserves the workspace SQLite bytes',
+      'current vcm link works, removed command link is absent, and uninstall preserves SQLite bytes',
     ],
   };
   if (evidencePath)

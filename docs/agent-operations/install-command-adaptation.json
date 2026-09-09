@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "kind": "VCM current install-help adaptation",
+  "releaseVersion": "0.1.0-alpha.11",
+  "baseRevision": "be455d2872c95a423a80d5d5c2fd99bd3fe14050",
+  "originalImportReceipt": "import-receipt.json",
+  "previousBrandingReceipt": "branding-receipt.json",
+  "path": "src/jobs/content.generated.json",
+  "previousAdaptedSha256": "f6d75bfb22eec556f859b3814e49a438a5cbd315222e2e98c08e55397e25168d",
+  "adaptedSha256": "1dc90adad51cc7059929a2867584ce718ae371da59f00f75810a59658c392639",
+  "scope": "Replace only the superseded install block in the derived runtime help with the current npx and vcm instructions. All other imported fields, role prompts, oracle, source identity and source manifest hash are unchanged. Original source receipts refer to their original snapshots."
+}

@@ -4,7 +4,7 @@ Create a company, add its people and agents, and keep their responsibilities att
 
 ## Install VCM
 
-This guide accompanies the **`0.1.0-alpha.10` technical alpha**. The [README](../README.md#install-vcm) records the installation route. Earlier releases retain their own artifacts and acceptance evidence.
+This guide accompanies the **`0.1.0-alpha.11` technical alpha**. The [README](../README.md#install-vcm) records the installation route. Earlier releases retain their own artifacts and acceptance evidence.
 
 Use Node.js **24.14+ within 24.x, or 26.x**, with npm:
 
@@ -21,7 +21,7 @@ vcm
 
 Open the local URL printed in the terminal. Stop with Ctrl+C and run the same command to return to your corporation. The workspace defaults to `~/.gitflash`; existing `GITFLASH_DATA_DIR` settings are retained. Add `--port 4311` if the default port is occupied. For a separate learning workspace after a permanent install, use `vcm --data-dir ./vcm-first-company` and restart from the same working directory with that path.
 
-For verified offline archives or an existing global `gitflash` installation, use the [advanced installation instructions](../README.md#install-the-reviewed-archive) and [compatibility guide](branding.md). After a permanent install, include `vcm --version` with any support report; this release prints `0.1.0-alpha.10`.
+For verified offline archives or an older global installation, use the [advanced installation instructions](../README.md#install-the-reviewed-archive) and [compatibility guide](branding.md). After a permanent install, include `vcm --version` with any support report; this release prints `0.1.0-alpha.11`.
 
 ## Create and return to your company
 
