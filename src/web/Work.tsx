@@ -13,6 +13,7 @@ import type { Agent, WorkspaceState } from '../domain/contracts';
 import { Dialog } from './Dialogs';
 import { request } from './client';
 import { textExcerpt } from './TextDisclosure';
+import { LinkedText } from './LinkedText';
 import { createWorkViewModel, initialRunForScope, runDisplayState } from './work-view-model';
 
 export interface IntegrationStatus {
@@ -416,7 +417,7 @@ export function WorkView({
                     role="region"
                     aria-label="Manual output"
                   >
-                    {record.output}
+                    <LinkedText text={record.output} />
                   </pre>
                   {reviewable && (
                     <button
@@ -451,7 +452,7 @@ export function WorkView({
                   role="region"
                   aria-label="Accepted output"
                 >
-                  {record.output}
+                  <LinkedText text={record.output} />
                 </pre>
               </details>
             </article>
@@ -464,7 +465,9 @@ export function WorkView({
             <span className={`status-pill ${run.status} work-status-${runState!.tone}`}>
               {runState!.label}
             </span>
-            <h3 className="preview-title task-result-title">{textExcerpt(run.task)}</h3>
+            <h3 className="preview-title task-result-title">
+              <LinkedText text={run.task} limit={160} />
+            </h3>
             <button
               className="text-button work-result-agent"
               onClick={() => {
@@ -482,7 +485,7 @@ export function WorkView({
             )}
             {run.output ? (
               <pre className="result-output" tabIndex={0} role="region" aria-label="Task output">
-                {run.output}
+                <LinkedText text={run.output} />
               </pre>
             ) : (
               <p className="connection-note">
@@ -519,7 +522,7 @@ export function WorkView({
             <details className="text-disclosure">
               <summary>Read original task</summary>
               <pre className="full-text" tabIndex={0} role="region" aria-label="Original task">
-                {run.task}
+                <LinkedText text={run.task} />
               </pre>
             </details>
             <footer className="dialog-actions">

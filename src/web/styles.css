@@ -1584,6 +1584,20 @@ main:focus {
 .purpose-text {
   overflow-wrap: anywhere;
 }
+.linked-text-link {
+  color: var(--brand-cobalt);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  overflow-wrap: anywhere;
+}
+.linked-text-link:hover {
+  text-decoration-thickness: 2px;
+}
+.linked-text-link:focus-visible {
+  outline: 2px solid var(--brand-cobalt);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
 .task-result-title,
 .description-preview {
   display: -webkit-box;
@@ -1591,6 +1605,13 @@ main:focus {
   -webkit-line-clamp: 3;
   overflow: hidden;
   overflow-wrap: anywhere;
+}
+/* Character excerpts already bound the length; keep every link reachable on narrow screens. */
+.task-result-title:has(.linked-text-link),
+.description-preview:has(.linked-text-link) {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
 }
 .text-disclosure {
   margin-top: 12px;

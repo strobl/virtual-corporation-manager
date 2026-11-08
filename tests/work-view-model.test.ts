@@ -222,11 +222,11 @@ describe('company work presentation', () => {
         .replaceAll('<', '&lt;')
         .replaceAll('>', '&gt;');
       const serializedOutput = details?.match(/aria-label="Manual output">([\s\S]*?)<\/pre>/)?.[1];
-      // HTML strips the first newline after <pre>; React emits an extra newline
-      // when the original value starts with one so the browser preserves it.
-      const parsedOutput = serializedOutput?.startsWith('\n')
-        ? serializedOutput.slice(1)
-        : serializedOutput;
+      // The inline wrapper keeps HTML from stripping an initial newline after <pre>.
+      expect(serializedOutput).toMatch(/^<span class="linked-text">/);
+      const parsedOutput = serializedOutput
+        ?.replace(/^<span class="linked-text">/, '')
+        .replace(/<\/span>$/, '');
       expect(parsedOutput).toBe(escaped);
       expect(details).toContain('tabindex="0" role="region"');
       if (reviewable) {
@@ -622,6 +622,21 @@ describe('result hierarchy', () => {
     return dialog!;
   }
 
+  it('opens PDF resources from a task and its output while preserving original result text', () => {
+    const value = run('linked-output', {
+      task: 'Review https://example.com/brief.pdf',
+      output: 'Result:\n  https://example.com/result.pdf?download=1&team=ops\n',
+    });
+    const dialog = resultDialog(value, [record(value)]);
+    expect(dialog).toContain('href="https://example.com/brief.pdf"');
+    expect(dialog).toContain('href="https://example.com/result.pdf?download=1&amp;team=ops"');
+    expect(dialog).toContain('target="_blank" rel="noopener noreferrer"');
+    const output = dialog.match(/aria-label="Task output">([\s\S]*?)<\/pre>/)?.[1];
+    expect(output?.replace(/<a\b[^>]*>|<\/a>|<span class="linked-text">|<\/span>/g, '')).toBe(
+      value.output.replace('&', '&amp;'),
+    );
+  });
+
   it('presents exact output before native technical disclosure and retains complete context and explicit actions', () => {
     const value = run('receipt-original-id', {
       task:
@@ -649,8 +664,8 @@ describe('result hierarchy', () => {
       );
     const output = dialog.match(/<pre\b[^>]*aria-label="Task output"[^>]*>([\s\S]*?)<\/pre>/);
     const task = dialog.match(/<pre\b[^>]*aria-label="Original task"[^>]*>([\s\S]*?)<\/pre>/);
-    expect(output?.[1]).toBe(escaped(value.output));
-    expect(task?.[1]).toBe(escaped(value.task));
+    expect(output?.[1]).toBe(`<span class="linked-text">${escaped(value.output)}</span>`);
+    expect(task?.[1]).toBe(`<span class="linked-text">${escaped(value.task)}</span>`);
     expect(dialog).not.toContain('<script>');
     expect(dialog.indexOf('Needs your review')).toBeLessThan(
       dialog.indexOf('aria-label="Task output"'),

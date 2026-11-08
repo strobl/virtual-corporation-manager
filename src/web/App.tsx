@@ -67,6 +67,7 @@ import {
 } from './change-recovery';
 import type { TimeSnapshot } from '../time/contracts';
 import { TextDisclosure, textExcerpt } from './TextDisclosure';
+import { LinkedText } from './LinkedText';
 import { BrandMark } from './BrandMark';
 import { createWorkViewModel, getRunTargetCompany, workAgentDestination } from './work-view-model';
 import { TimeTracker, TimezoneSettings } from './TimeTracker';
@@ -984,8 +985,13 @@ export function App() {
                             <span className="eyebrow">Your corporation</span>
                             <h1>{company?.name ?? 'Your organization'}</h1>
                             <p>
-                              {textExcerpt(company?.description ?? '', 140) ||
-                                'Define the team, reporting lines and responsibilities behind your corporation.'}
+                              <LinkedText
+                                text={
+                                  company?.description ||
+                                  'Define the team, reporting lines and responsibilities behind your corporation.'
+                                }
+                                limit={140}
+                              />
                             </p>
                           </div>
                         </div>
@@ -1203,7 +1209,9 @@ export function App() {
                                   {selectedAgent.responsibilities.length ? (
                                     <ul className="responsibilities">
                                       {selectedAgent.responsibilities.map((item, index) => (
-                                        <li key={index}>{item}</li>
+                                        <li key={index}>
+                                          <LinkedText text={item} />
+                                        </li>
                                       ))}
                                     </ul>
                                   ) : (
@@ -1213,8 +1221,12 @@ export function App() {
                                 <section className="inspector-section">
                                   <h3>Instructions</h3>
                                   <p className="preserve-lines">
-                                    {selectedAgent.instructions ||
-                                      'Add working context and constraints to guide this agent.'}
+                                    <LinkedText
+                                      text={
+                                        selectedAgent.instructions ||
+                                        'Add working context and constraints to guide this agent.'
+                                      }
+                                    />
                                   </p>
                                 </section>
                                 {selectedAgent.kind === 'agent' && (

@@ -12,6 +12,7 @@ import type {
 } from '../time/contracts';
 import { request } from './client';
 import { Dialog } from './Dialogs';
+import { LinkedText } from './LinkedText';
 import { roleLabel } from './model';
 import {
   addTimeDays,
@@ -1014,15 +1015,21 @@ function EntryFacts({ entry }: { entry: TimeEntry }) {
       <dt>Date</dt>
       <dd>{entry.date}</dd>
       <dt>What was delivered</dt>
-      <dd className="time-full-text">{entry.description}</dd>
+      <dd className="time-full-text">
+        <LinkedText text={entry.description} />
+      </dd>
       <dt>Client project</dt>
-      <dd>{entry.clientProject || '—'}</dd>
+      <dd>
+        <LinkedText text={entry.clientProject || '—'} />
+      </dd>
       <dt>Calculation basis</dt>
       <dd>{timeBasisLabel(entry)}</dd>
       {entry.basis.requestedDeliverable && (
         <>
           <dt>Requested deliverable</dt>
-          <dd>{entry.basis.requestedDeliverable}</dd>
+          <dd>
+            <LinkedText text={entry.basis.requestedDeliverable} />
+          </dd>
           <dt>Quantity</dt>
           <dd>{entry.basis.quantity}</dd>
           <dt>Captured reference</dt>
@@ -1042,7 +1049,9 @@ function EntryFacts({ entry }: { entry: TimeEntry }) {
       {entry.voidReason && (
         <>
           <dt>Void reason</dt>
-          <dd>{entry.voidReason}</dd>
+          <dd>
+            <LinkedText text={entry.voidReason} />
+          </dd>
         </>
       )}
     </dl>
@@ -1060,7 +1069,11 @@ function History({ rows }: { rows: TimeHistoryEntry[] }) {
               {row.action.replace('entry.', '').replace('catalog.', '')} · {row.createdAt} ·{' '}
               {row.source}
             </summary>
-            {row.reason && <p>{row.reason}</p>}
+            {row.reason && (
+              <p>
+                <LinkedText text={row.reason} />
+              </p>
+            )}
             {(['before', 'after'] as const).map((side) => {
               const value = row[side];
               return (
@@ -1210,7 +1223,9 @@ function VoidEntry({
           Exclude {formatTenths(entry.tenths)}h from every total. The original entry and its
           correction history remain inspectable. This does not change Work acceptance.
         </p>
-        <p className="time-full-text">{entry.description}</p>
+        <p className="time-full-text">
+          <LinkedText text={entry.description} />
+        </p>
         <label>
           Reason
           <input

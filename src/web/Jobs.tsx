@@ -17,6 +17,7 @@ import type { WorkspaceState } from '../domain/contracts';
 import type { JobInfo, JobStage, JobStatus, StageId, WorkflowInfo } from '../jobs/contracts';
 import { request } from './client';
 import { Dialog } from './Dialogs';
+import { LinkedText } from './LinkedText';
 import { companyAgents } from './model';
 import type { IntegrationStatus } from './Work';
 import './jobs.css';
@@ -250,7 +251,9 @@ export function JobsView({
               Product Studio · {workflow.id}
             </span>
             <h3>Try the Product Studio example</h3>
-            <p>{workflow.description}</p>
+            <p>
+              <LinkedText text={workflow.description} />
+            </p>
             <span className="studio-sample-label">
               Synthetic stock-alert exercise · Python standard library
             </span>
@@ -441,7 +444,9 @@ function StartJobDialog({
         <div>
           <span className="eyebrow">{workflow.id} · Synthetic exercise</span>
           <h3>{workflow.title}</h3>
-          <p>{workflow.description}</p>
+          <p>
+            <LinkedText text={workflow.description} />
+          </p>
         </div>
         <div className="connection-note">
           <strong>Job company: {target?.name ?? 'No active company selected'}</strong>
@@ -507,7 +512,9 @@ function StartJobDialog({
           <summary>Prerequisites and included files</summary>
           <ul>
             {workflow.prerequisites.map((item) => (
-              <li key={item}>{item}</li>
+              <li key={item}>
+                <LinkedText text={item} />
+              </li>
             ))}
           </ul>
           <p>Deliverables: {workflow.deliverables.join(', ')}.</p>
@@ -524,7 +531,11 @@ function StartJobDialog({
             <section key={label}>
               <h4>{label}</h4>
               <pre className="full-text" tabIndex={0} role="region" aria-label={label}>
-                {content}
+                {label === 'Brief' || label === 'Acceptance criteria' ? (
+                  <LinkedText text={content ?? ''} />
+                ) : (
+                  content
+                )}
               </pre>
             </section>
           ))}
@@ -835,7 +846,9 @@ function JobDetail({
           <div>
             <h4>{labels[job.ownerReview.decision]}</h4>
             <p>Acceptance owner: {job.acceptanceOwner ?? 'Not recorded in this historical job'}</p>
-            <p>{job.ownerReview.note}</p>
+            <p>
+              <LinkedText text={job.ownerReview.note} />
+            </p>
             <small>{date(job.ownerReview.reviewedAt)}</small>
           </div>
         </section>
@@ -933,7 +946,7 @@ function StageEvidence({ stage, jobId }: { stage: JobStage; jobId: string }) {
             role="region"
             aria-label={`${stageNames[stage.kind]} output`}
           >
-            {stage.output}
+            <LinkedText text={stage.output} />
           </pre>
         ) : (
           <p className="muted small">No final role output recorded.</p>
