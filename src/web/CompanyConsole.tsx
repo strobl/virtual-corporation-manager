@@ -16,6 +16,7 @@ import type { IntegrationStatus, RunInfo } from './Work';
 import { agentInitials, roleLabel } from './model';
 import { formatTenths } from './time-view-model';
 import { textExcerpt } from './TextDisclosure';
+import { LinkedText } from './LinkedText';
 import {
   consoleDepartmentLabel,
   consoleRuntime,
@@ -168,11 +169,17 @@ export function CompanyConsole({
                 </span>
                 <ChevronRight size={14} aria-hidden="true" />
               </button>
-              {relationship.description && <p>{textExcerpt(relationship.description, 140)}</p>}
+              {relationship.description && (
+                <p>
+                  <LinkedText text={relationship.description} limit={140} />
+                </p>
+              )}
               {relationship.description !== textExcerpt(relationship.description, 140) && (
                 <details className="console-relationship-note">
                   <summary>Read full note</summary>
-                  <p className="console-full-text">{relationship.description}</p>
+                  <p className="console-full-text">
+                    <LinkedText text={relationship.description} />
+                  </p>
                 </details>
               )}
             </li>
@@ -207,13 +214,20 @@ export function CompanyConsole({
       </header>
       <div className="console-purpose">
         <p>
-          {textExcerpt(company.description, 240) ||
-            'Give this corporation a purpose, then build the team around it.'}
+          <LinkedText
+            text={
+              company.description ||
+              'Give this corporation a purpose, then build the team around it.'
+            }
+            limit={240}
+          />
         </p>
         {company.description !== textExcerpt(company.description, 240) && (
           <details>
             <summary>Read full purpose</summary>
-            <p className="console-full-text">{company.description}</p>
+            <p className="console-full-text">
+              <LinkedText text={company.description} />
+            </p>
           </details>
         )}
         <button className="text-button" onClick={actions.onEditCompany}>
@@ -582,7 +596,7 @@ export function CompanyConsole({
             <section className="console-member-section">
               <h3>Purpose</h3>
               <p className="console-full-text">
-                {department.description || 'No purpose defined yet.'}
+                <LinkedText text={department.description || 'No purpose defined yet.'} />
               </p>
             </section>
             <dl className="console-member-facts">
@@ -668,7 +682,9 @@ export function CompanyConsole({
               {member.responsibilities.length ? (
                 <ul>
                   {member.responsibilities.map((responsibility, index) => (
-                    <li key={index}>{responsibility}</li>
+                    <li key={index}>
+                      <LinkedText text={responsibility} />
+                    </li>
                   ))}
                 </ul>
               ) : (
@@ -680,7 +696,9 @@ export function CompanyConsole({
                 <summary>
                   {member.kind === 'agent' ? 'Agent instructions' : 'Member instructions'}
                 </summary>
-                <p className="console-full-text">{member.instructions}</p>
+                <p className="console-full-text">
+                  <LinkedText text={member.instructions} />
+                </p>
               </details>
             )}
             <section className="console-member-section">

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Make web addresses in company and team descriptions, responsibilities, notes, task results and time-entry details clickable. Links open in a new tab; shortened previews retain the full destination, and stored text stays unchanged.
+
 ## 0.1.0-alpha.11 — One VCM command
 
 - Install only the `vcm` CLI command from `virtualcorporationmanager`; remove the earlier extra executable alias. Start with `npx virtualcorporationmanager`, or update a permanent installation and run `vcm`.

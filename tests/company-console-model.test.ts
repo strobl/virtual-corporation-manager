@@ -442,6 +442,27 @@ function renderConsole(
 }
 
 describe('company management access', () => {
+  it('links resources in company and member context without changing stored text or nesting links in buttons', () => {
+    const state = workspace();
+    state.companies[0].description = 'Company files: https://example.com/company.pdf';
+    state.agents[2].instructions = 'Use https://example.com/instructions.pdf';
+    state.agents[2].responsibilities = ['Review https://example.com/review.pdf'];
+    state.departments[0].description = 'Department guide: https://example.com/department.pdf';
+    const before = JSON.stringify(state);
+    const memberHtml = renderConsole(state, null, 'local');
+    for (const resource of ['company', 'instructions', 'review']) {
+      expect(memberHtml).toContain(`href="https://example.com/${resource}.pdf"`);
+    }
+    const departmentHtml = renderConsole(state, 'department-a');
+    expect(departmentHtml).toContain('href="https://example.com/department.pdf"');
+    for (const html of [memberHtml, departmentHtml]) {
+      for (const button of html.match(/<button\b[\s\S]*?<\/button>/g) ?? []) {
+        expect(button).not.toContain('<a ');
+      }
+    }
+    expect(JSON.stringify(state)).toBe(before);
+  });
+
   it('places department and relationship management before all 100 members', () => {
     const state = workspace();
     state.agents = Array.from({ length: 100 }, (_, index) => agent(`member-${index}`));

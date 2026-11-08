@@ -15,6 +15,7 @@ import { CorporationOrgChart } from '../components/organization/CorporationOrgCh
 import { companyAgents, toSnapshot } from './model';
 import { aggregateTime, formatTenths, timeMonday } from './time-view-model';
 import { textExcerpt } from './TextDisclosure';
+import { LinkedText } from './LinkedText';
 
 interface Props {
   mode: 'index' | 'company';
@@ -192,8 +193,12 @@ export function CorporationWorkspace({
           <span className="eyebrow">Your corporation · {company.shortCode}</span>
           <h1 id="corporation-title">{company.name}</h1>
           <p>
-            {company.description ||
-              'Give your corporation a clear purpose and organize the team behind it.'}
+            <LinkedText
+              text={
+                company.description ||
+                'Give your corporation a clear purpose and organize the team behind it.'
+              }
+            />
           </p>
           <button className="text-button" onClick={actions.onEditCompany}>
             <Pencil size={13} /> Edit corporation

@@ -2,7 +2,7 @@ import { Bot, ChevronRight, Layers3, Plus, Building2, UsersRound } from 'lucide-
 import type { WorkspaceState } from '../domain/contracts';
 import type { Selection } from './model';
 import { agentInitials, companyAgents, roleLabel } from './model';
-import { textExcerpt } from './TextDisclosure';
+import { LinkedText } from './LinkedText';
 import { BrandMark } from './BrandMark';
 
 /** Department composition builds on the original company's progressive disclosure. */
@@ -113,7 +113,10 @@ export function CompanyMap({
               <ChevronRight size={14} />
             </button>
             <p className="department-purpose">
-              {textExcerpt(group.description, 180) || 'Define this department’s responsibilities.'}
+              <LinkedText
+                text={group.description || 'Define this department’s responsibilities.'}
+                limit={180}
+              />
             </p>
             {group.managerId && (
               <div className="department-lead">
